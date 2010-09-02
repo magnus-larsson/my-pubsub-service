@@ -10,27 +10,4 @@
 
     <context:component-scan base-package="se.vgregion.push.controllers"/>
 
-	<bean id="velocityConfig"
-		class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
-		<property name="resourceLoaderPath" value="/WEB-INF/velocity/" />
-		<property name="velocityProperties">
-			<!-- To get Velocity to correctly handle UTF-8 -->
-			<props>
-				<prop key="input.encoding">utf-8</prop>
-				<prop key="output.encoding">utf-8 </prop>
-			</props>
-		</property>
-		
-	</bean>
-
-	<bean id="viewResolver"
-		class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
-		<!-- <property name="cache" value="true"/>-->
-		<property name="prefix" value="" />
-		<property name="suffix" value=".vm" />
-<!--		<property name="exposeRequestAttributes" value="true"/>-->
-<!--	 	<property name="exposeSessionAttributes" value="true"/>-->
-<!--  		<property name="exposeSpringMacroHelpers" value="true"/>-->
-	</bean>
-
 </beans>

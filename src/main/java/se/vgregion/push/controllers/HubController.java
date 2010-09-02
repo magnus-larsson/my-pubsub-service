@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class HubController {
@@ -34,12 +33,10 @@ public class HubController {
         this.retrieverQueue = retrieverQueue;
     }
 
-
     @RequestMapping(value="/", method=RequestMethod.POST)
-    public ModelAndView post(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void post(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String mode = request.getParameter("hub.mode");
         
-        System.out.println(mode);
         if("publish".equals(mode)) {
             LOG.info("Received publish request");
             String[] urls = request.getParameterValues("hub.url");
@@ -51,8 +48,6 @@ public class HubController {
                 response.sendError(500, "Missing hub.url parameter");
             }
         }
-        
-        return null;
     }
 
     private void publish(String url, HttpServletResponse response) throws IOException {
