@@ -1,0 +1,9 @@
+#summary Overal system design
+#labels Featured,Phase-Design
+
+This project aims to implement PubSubHubbub in a Java application, targeted for deployment on typical Servlet engines like Apache Tomcat.
+
+The overall design of this project is based on a number of processors with queues on which they listen for jobs. An example of a processor is FeedRetriever which, given a URL on it's queue will retrieve a feed and store a locally. It will then publish the URL on the queue for the FeedDistributor, another processor. You can think of processors as actors in Scala. The purpose of this design is to decouple processing a publication (or polling) event from for example the retrieval, distribution. Processors run on a thread pool and we can thus add additional processing threads for scaling the application. Also, it allows publications to be very quick, as the full content distribution is done asynchronously.
+
+The following picture shows an overview of the design:
+http://oppna-program-pubsub-service.googlecode.com/svn/wiki/images/push-publish.png
