@@ -14,6 +14,8 @@
   <name>${project.artifactId}</name>
 
   <modules>
+    <module>composites/types</module>
+    <module>composites/svc</module>
     <module>composites/webcomp</module>
     <module>modules/web</module>
   </modules>
