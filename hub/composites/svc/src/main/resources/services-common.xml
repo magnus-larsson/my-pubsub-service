@@ -26,6 +26,39 @@
 	<context:component-scan base-package="se.vgregion.push.repository.jpa" />
 	<context:component-scan base-package="se.vgregion.push.services" />
 
+ 	<bean id="feedDirectory"
+		class="java.io.File">
+		<constructor-arg value="/tmp/test-repo" />
+	</bean>
+
+
+ 	<bean id="retrieverQueue"
+		class="java.util.concurrent.LinkedBlockingQueue" >
+	</bean>
+
+ 	<bean id="distributionQueue"
+		class="java.util.concurrent.LinkedBlockingQueue">
+	</bean>
+
+
+ 	<bean id="feedRetriever"
+		class="se.vgregion.push.processors.FeedRetriever"
+		init-method="start"
+		destroy-method="stop">
+		<constructor-arg ref="retrieverQueue" />
+		<constructor-arg ref="distributionQueue" />
+		<constructor-arg ref="feedDirectory" />
+	</bean>
+
+ 	<bean id="feedDistributor"
+		class="se.vgregion.push.processors.FeedDistributor"
+		init-method="start"
+		destroy-method="stop">
+		<constructor-arg ref="distributionQueue" />
+		<constructor-arg ref="feedDirectory" />
+	</bean>
+
+
 	<tx:annotation-driven />
 
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
