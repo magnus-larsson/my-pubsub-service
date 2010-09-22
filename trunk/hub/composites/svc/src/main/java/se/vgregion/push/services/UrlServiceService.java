@@ -17,11 +17,11 @@
  *
  */
 
-package se.vgregion.urlservice.services;
+package se.vgregion.push.services;
 
 import java.net.URISyntaxException;
 
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.push.types.ShortLink;
 
 /**
  * Service for handling short link, modelled after the bit.ly version 3 API

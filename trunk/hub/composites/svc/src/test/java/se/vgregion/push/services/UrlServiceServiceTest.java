@@ -17,14 +17,15 @@
  *
  */
 
-package se.vgregion.urlservice.services;
+package se.vgregion.push.services;
 
 import java.net.URISyntaxException;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.push.services.DefaultUrlServiceService;
+import se.vgregion.push.types.ShortLink;
 
 public class UrlServiceServiceTest {
 

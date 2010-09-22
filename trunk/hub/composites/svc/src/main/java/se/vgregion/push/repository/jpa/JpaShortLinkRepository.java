@@ -17,7 +17,7 @@
  *
  */
 
-package se.vgregion.urlservice.repository.jpa;
+package se.vgregion.push.repository.jpa;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -26,8 +26,8 @@ import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
 import se.vgregion.portal.core.infrastructure.persistence.jpa.JpaRepository;
-import se.vgregion.urlservice.repository.ShortLinkRepository;
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.push.repository.ShortLinkRepository;
+import se.vgregion.push.types.ShortLink;
     
 @Repository
 public class JpaShortLinkRepository extends JpaRepository<ShortLink, Long> implements ShortLinkRepository {

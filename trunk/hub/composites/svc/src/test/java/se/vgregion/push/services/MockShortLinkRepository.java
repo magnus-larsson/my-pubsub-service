@@ -17,13 +17,13 @@
  *
  */
 
-package se.vgregion.urlservice.services;
+package se.vgregion.push.services;
 
 import java.util.List;
 import java.util.Map;
 
-import se.vgregion.urlservice.repository.ShortLinkRepository;
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.push.repository.ShortLinkRepository;
+import se.vgregion.push.types.ShortLink;
     
 public class MockShortLinkRepository implements ShortLinkRepository {
     
