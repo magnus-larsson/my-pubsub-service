@@ -27,23 +27,19 @@ import javax.persistence.Id;
 import se.vgregion.portal.core.domain.patterns.entity.AbstractEntity;
 
 @Entity
-public class ShortLink extends AbstractEntity<ShortLink, Long> {
+public class Subscription extends AbstractEntity<Subscription, Long> {
 
     @Id
     @GeneratedValue
     private long id;
     
-    @Column(unique=true, nullable=false)
-    private String hash;
-    
     @Column(nullable=false)
     private String url;
-
-    public ShortLink() {
+    
+    public Subscription() {
     }
 
-    public ShortLink(String hash, String url) {
-        this.hash = hash;
+    public Subscription(String url) {
         this.url = url;
     }
     
@@ -51,12 +47,6 @@ public class ShortLink extends AbstractEntity<ShortLink, Long> {
         return id;
     }
     
-    public String getHash() {
-        return hash;
-    }
-    public void setHash(String hash) {
-        this.hash = hash;
-    }
     public String getUrl() {
         return url;
     }
