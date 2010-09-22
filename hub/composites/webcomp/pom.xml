@@ -19,6 +19,13 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>pubsubhubbub-hub-composite-svc</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+	    
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 			<version>3.0.0.RELEASE</version>
