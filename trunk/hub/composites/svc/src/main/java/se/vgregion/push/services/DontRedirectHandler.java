@@ -17,7 +17,7 @@
  *
  */
 
-package se.vgregion.push.processors;
+package se.vgregion.push.services;
 
 import java.net.URI;
 
