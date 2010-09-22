@@ -17,7 +17,7 @@
  *
  */
 
-package se.vgregion.urlservice.repository.jpa;
+package se.vgregion.push.repository.jpa;
 
 import javax.persistence.PersistenceException;
 
@@ -27,8 +27,8 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import se.vgregion.urlservice.repository.ShortLinkRepository;
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.push.repository.ShortLinkRepository;
+import se.vgregion.push.types.ShortLink;
 
 
 public class JpaShortLinkRepositoryTest {

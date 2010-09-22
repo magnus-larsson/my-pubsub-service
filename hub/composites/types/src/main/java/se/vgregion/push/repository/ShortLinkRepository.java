@@ -17,10 +17,10 @@
  *
  */
 
-package se.vgregion.urlservice.repository;
+package se.vgregion.push.repository;
 
 import se.vgregion.portal.core.domain.patterns.repository.Repository;
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.push.types.ShortLink;
     
 public interface ShortLinkRepository extends Repository<ShortLink, Long> {
 

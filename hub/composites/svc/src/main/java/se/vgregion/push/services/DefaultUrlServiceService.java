@@ -17,7 +17,7 @@
  *
  */
 
-package se.vgregion.urlservice.services;
+package se.vgregion.push.services;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -32,8 +32,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import se.vgregion.urlservice.repository.ShortLinkRepository;
-import se.vgregion.urlservice.types.ShortLink;
+import se.vgregion.push.repository.ShortLinkRepository;
+import se.vgregion.push.types.ShortLink;
 
 @Service
 public class DefaultUrlServiceService implements UrlServiceService {

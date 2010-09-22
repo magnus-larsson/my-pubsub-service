@@ -17,7 +17,7 @@
  *
  */
 
-package se.vgregion.urlservice.types;
+package se.vgregion.push.types;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
