@@ -23,8 +23,8 @@
                            http://www.springframework.org/schema/tx
                            http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-	<context:component-scan base-package="se.vgregion.urlservice.dao.jpa" />
-	<context:component-scan base-package="se.vgregion.urlservice.services" />
+	<context:component-scan base-package="se.vgregion.push.repository.jpa" />
+	<context:component-scan base-package="se.vgregion.push.services" />
 
 	<tx:annotation-driven />
 

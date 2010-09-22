@@ -20,45 +20,22 @@
 package se.vgregion.push.repository.jpa;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.stereotype.Repository;
 
 import se.vgregion.portal.core.infrastructure.persistence.jpa.JpaRepository;
-import se.vgregion.push.repository.ShortLinkRepository;
-import se.vgregion.push.types.ShortLink;
+import se.vgregion.push.repository.SubscriptionRepository;
+import se.vgregion.push.types.Subscription;
     
 @Repository
-public class JpaShortLinkRepository extends JpaRepository<ShortLink, Long> implements ShortLinkRepository {
+public class JpaSubscriptionRepository extends JpaRepository<Subscription, Long> implements SubscriptionRepository {
     
     @PersistenceContext
     private EntityManager em;
 
-    public JpaShortLinkRepository() {
-        super(ShortLink.class);
+    public JpaSubscriptionRepository() {
+        super(Subscription.class);
     }
     
-    /**
-     * Find link by hash.
-     */
-    public ShortLink findByHash(String hash) {
-        try {
-            return (ShortLink)em.createQuery("select l from ShortLink l where l.hash = :hash")
-                .setParameter("hash", hash).getSingleResult();
-        } catch(NoResultException e) {
-            return null;
-        }
-
-    }
-
-    @Override
-    public ShortLink findByUrl(String url) {
-        try {
-            return (ShortLink)em.createQuery("select l from ShortLink l where l.url = :url")
-            .setParameter("url", url).getSingleResult();
-        } catch(NoResultException e) {
-            return null;
-        }
-    }   
 }

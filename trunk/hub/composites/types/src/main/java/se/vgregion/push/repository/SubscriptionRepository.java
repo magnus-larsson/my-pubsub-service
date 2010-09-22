@@ -20,17 +20,8 @@
 package se.vgregion.push.repository;
 
 import se.vgregion.portal.core.domain.patterns.repository.Repository;
-import se.vgregion.push.types.ShortLink;
+import se.vgregion.push.types.Subscription;
     
-public interface ShortLinkRepository extends Repository<ShortLink, Long> {
+public interface SubscriptionRepository extends Repository<Subscription, Long> {
 
-    /**
-     * Find link by hash.
-     */
-    ShortLink findByHash(String hash);
-
-    /**
-     * Find link by URL.
-     */
-    ShortLink findByUrl(String url);
 }
