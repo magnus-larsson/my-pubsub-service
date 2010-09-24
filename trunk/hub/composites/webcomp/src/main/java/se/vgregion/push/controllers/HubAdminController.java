@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class HubAdminController {
 
-    @Resource(name="retrieverQueue")
+    @Resource(name="retrieveQueue")
     private BlockingQueue<String> retrieverQueue;
 
     @Resource(name="distributionQueue")
