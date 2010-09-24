@@ -41,7 +41,7 @@ public class HubController {
     private final static Logger LOG = LoggerFactory.getLogger(HubController.class);
 
     
-    @Resource(name="retrieverQueue")
+    @Resource(name="retrieveQueue")
     private BlockingQueue<String> retrieverQueue;
     
     public BlockingQueue<String> getRetrieverQueue() {

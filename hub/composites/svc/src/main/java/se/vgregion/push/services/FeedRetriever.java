@@ -19,20 +19,13 @@
 
 package se.vgregion.push.services;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,28 +33,13 @@ public class FeedRetriever {
 
     private final static Logger LOG = LoggerFactory.getLogger(FeedRetriever.class);
     
-    private final BlockingQueue<String> retrieveQueue;
-    private final BlockingQueue<String> distributionQueue;
-    private final ExecutorService executor;
-    private File feedDirectory;
-    private File tmpDirectory = new File(System.getProperty("java.io.tmpdir"));
+    private BlockingQueue<String> retrieveQueue;
+    private BlockingQueue<String> distributionQueue;
+    private ExecutorService executor = Executors.newFixedThreadPool(2);
     
-    private HttpClient httpclient = new DefaultHttpClient();
+    private FeedRetrieverService feedRetrieverService;
     
-    public FeedRetriever(BlockingQueue<String> retrieveQueue, BlockingQueue<String> distributionQueue, File feedDirectory) {
-        this.retrieveQueue = retrieveQueue;
-        this.distributionQueue = distributionQueue;
-        this.feedDirectory = feedDirectory;
-        
-        executor = Executors.newFixedThreadPool(2);
-    }
-
     public void start() {
-        if(!feedDirectory.exists()) {
-            LOG.info("Creating feed directory at \"{}\"", feedDirectory.getAbsolutePath());
-            feedDirectory.mkdirs();
-        }
-        
         LOG.info("Starting FeedRetriever");
         executor.execute(new Runnable() {
             @Override
@@ -69,33 +47,15 @@ public class FeedRetriever {
                 while(true) {
                     try {
                         String feed = retrieveQueue.take();
-                        
-                        String fileName = DigestUtils.md5Hex(feed);
-                        
-                        LOG.debug("Downloading feed {}", feed);
 
-                        HttpGet httpget = new HttpGet(feed);
+                        
                         try {
-                            HttpResponse response = httpclient.execute(httpget);
-                            HttpEntity entity = response.getEntity();
+                            LOG.info("Retrieving feed: {}", feed);
+
+                            feedRetrieverService.retrieve(feed);
                             
-                            File destFile = new File(feedDirectory, fileName);
-                            File tmpFile = new File(tmpDirectory, fileName);
-                            FileOutputStream tmpFOS = new FileOutputStream(tmpFile);
-                            entity.writeTo(tmpFOS);
-                            tmpFOS.close();
-                            
-                            LOG.debug("Feed downloaded: {}", feed);
-                            
-                            if(tmpFile.renameTo(destFile)) {
-                                LOG.warn("Feed successfully retrived, putting for distribution: {}", feed);
-                                distributionQueue.put(feed);
-                            } else {
-                                LOG.warn("Failed to move tmp file \"{}\" to destination \"{}\"", tmpFile.getAbsolutePath(), destFile.getAbsolutePath());
-                            }
-                            
-                        } catch (ClientProtocolException e) {
-                            LOG.error("Failed to download feed: " + feed, e);
+                            LOG.warn("Feed successfully retrived, putting for distribution: {}", feed);
+                            distributionQueue.put(feed);
                         } catch (IOException e) {
                             LOG.error("Failed to download feed: " + feed, e);
                         }
@@ -115,4 +75,29 @@ public class FeedRetriever {
         executor.shutdownNow();
     }
 
+    public BlockingQueue<String> getRetrieveQueue() {
+        return retrieveQueue;
+    }
+
+    public BlockingQueue<String> getDistributionQueue() {
+        return distributionQueue;
+    }
+    
+    @Resource(name="retrieveQueue")
+    public void setRetrieveQueue(BlockingQueue<String> retrieveQueue) {
+        this.retrieveQueue = retrieveQueue;
+    }
+
+    @Resource(name="distributionQueue")
+    public void setDistributionQueue(BlockingQueue<String> distributionQueue) {
+        this.distributionQueue = distributionQueue;
+    }
+
+    public ExecutorService getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(ExecutorService executor) {
+        this.executor = executor;
+    }
 }

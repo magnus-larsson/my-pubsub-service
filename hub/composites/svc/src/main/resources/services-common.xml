@@ -31,8 +31,7 @@
 		<constructor-arg value="/tmp/test-repo" />
 	</bean>
 
-
- 	<bean id="retrieverQueue"
+ 	<bean id="retrieveQueue"
 		class="java.util.concurrent.LinkedBlockingQueue" >
 	</bean>
 
@@ -40,22 +39,21 @@
 		class="java.util.concurrent.LinkedBlockingQueue">
 	</bean>
 
-
- 	<bean id="feedRetriever"
-		class="se.vgregion.push.processors.FeedRetriever"
+ 	<bean id="feedDistributor"
+		class="se.vgregion.push.services.FeedDistributor"
 		init-method="start"
 		destroy-method="stop">
-		<constructor-arg ref="retrieverQueue" />
 		<constructor-arg ref="distributionQueue" />
 		<constructor-arg ref="feedDirectory" />
 	</bean>
 
- 	<bean id="feedDistributor"
-		class="se.vgregion.push.processors.FeedDistributor"
+ 	<bean id="feedRetriver"
+		class="se.vgregion.push.services.FeedRetriver"
 		init-method="start"
 		destroy-method="stop">
-		<constructor-arg ref="distributionQueue" />
-		<constructor-arg ref="feedDirectory" />
+<!--		<constructor-arg ref="retrieveQueue" />-->
+<!--		<constructor-arg ref="distributionQueue" />-->
+<!--		<constructor-arg ref="feedDirectory" />-->
 	</bean>
 
 
