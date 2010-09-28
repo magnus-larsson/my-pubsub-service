@@ -22,6 +22,8 @@ package se.vgregion.push.controllers;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -36,48 +38,91 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import se.vgregion.push.services.RetrievalRequest;
+import se.vgregion.push.services.SubscriptionRequest;
+import se.vgregion.push.services.SubscriptionService;
 
 @Controller
 public class HubController {
 
     private final static Logger LOG = LoggerFactory.getLogger(HubController.class);
 
+    private final static List<String> ALLOWED_SCHEMES = Arrays.asList("http", "https");
     
     @Resource(name="retrieveQueue")
     private BlockingQueue<RetrievalRequest> retrieverQueue;
     
-    public BlockingQueue<RetrievalRequest> getRetrieverQueue() {
-        return retrieverQueue;
-    }
-
-    public void setRetrieverQueue(BlockingQueue<RetrievalRequest> retrieverQueue) {
-        this.retrieverQueue = retrieverQueue;
-    }
-
+    @Resource
+    private SubscriptionService subscriptionService;
+    
     @RequestMapping(value="/", method=RequestMethod.POST)
     public void post(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String mode = request.getParameter("hub.mode");
         
         if("publish".equals(mode)) {
-            LOG.info("Received publish request");
-            String[] urls = request.getParameterValues("hub.url");
-            if(urls != null) {
-                for(String url : urls) {
-                    publish(url, response);
-                }
+            publish(request, response);
+        } else if("subscribe".equals(mode)) {
+            subscribe(request, response);
+        } else {
+            response.sendError(500, "Unknown hub.mode parameter");
+        }
+    }
+    
+    private void subscribe(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        URI callback = notNullAndValidUrl(request.getParameter("hub.callback"));
+        if(callback != null) {
+            URI topic = notNullAndValidUrl(request.getParameter("hub.topic"));
+            
+            if(topic != null) {
+                String verify = request.getParameter("hub.verify");
+                if("sync".equals(verify) || "async".equals(verify)) {
+                    String leaseSecondsString = request.getParameter("hub.lease_seconds");
+                    
+                    try {
+                        long leaseSeconds = leaseSecondsString != null ? Long.parseLong(leaseSecondsString) : 0;
+                        
+                        String secret = request.getParameter("hub.secret");
+                        String verifyToken = request.getParameter("hub.verify_token");
+                        
+                        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(callback, topic, leaseSeconds, verifyToken);
+                        
+                        try {
+                            subscriptionService.verify(subscriptionRequest);
+                            response.setStatus(204);
+                        } catch(Exception e) {
+                            response.sendError(500);
+                        }
+                    } catch(NumberFormatException e) {
+                        response.sendError(500, "Invalid hub.lease_seconds");
+                    }
+                } else {
+                    response.sendError(500, "Invalid hub.verify");
+                } 
             } else {
-                response.sendError(500, "Missing hub.url parameter");
+                response.sendError(500, "Invalid hub.topic");
             }
+        } else {
+            response.sendError(500, "Invalid hub.callback");
         }
     }
 
+    private void publish(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        LOG.info("Received publish request");
+        String[] urls = request.getParameterValues("hub.url");
+        if(urls != null) {
+            for(String url : urls) {
+                publish(url, response);
+            }
+        } else {
+            response.sendError(500, "Missing hub.url parameter");
+        }
+
+    }
+    
     private void publish(String url, HttpServletResponse response) throws IOException {
         try {
             URI uri = new URI(url);
             
-            if("http".equals(uri.getScheme())) {
-                 // TODO handle https
-                
+            if(allowScheme(uri)) {
                 boolean wasAdded = false;
                 try {
                     wasAdded = retrieverQueue.offer(new RetrievalRequest(url), 2000, TimeUnit.MILLISECONDS);
@@ -96,5 +141,39 @@ public class HubController {
         } catch (URISyntaxException e1) {
             response.sendError(500, "Invalid hub.url value: " + url);
         }
+    }
+
+    public BlockingQueue<RetrievalRequest> getRetrieverQueue() {
+        return retrieverQueue;
+    }
+
+    public void setRetrieverQueue(BlockingQueue<RetrievalRequest> retrieverQueue) {
+        this.retrieverQueue = retrieverQueue;
+    }
+
+
+    
+    public SubscriptionService getSubscriptionService() {
+        return subscriptionService;
+    }
+
+    public void setSubscriptionService(SubscriptionService subscriptionService) {
+        this.subscriptionService = subscriptionService;
+    }
+
+    private URI notNullAndValidUrl(String url) {
+        if(url != null) {
+            try {
+                return new URI(url);
+            } catch (URISyntaxException e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+    
+    private boolean allowScheme(URI uri) {
+        return ALLOWED_SCHEMES.contains(uri.getScheme());
     }
 }

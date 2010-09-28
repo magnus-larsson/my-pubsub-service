@@ -46,7 +46,9 @@
 	</bean>
 
  	<bean id="subscriptionService"
-		class="se.vgregion.push.services.impl.DefaultSubscriptionService">
+		class="se.vgregion.push.services.impl.DefaultSubscriptionService"
+		autowire="constructor"
+		>
 	</bean>
 
  	<bean id="feedDistributor"

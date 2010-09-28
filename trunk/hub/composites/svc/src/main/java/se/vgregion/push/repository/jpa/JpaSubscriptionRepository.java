@@ -19,8 +19,10 @@
 
 package se.vgregion.push.repository.jpa;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import java.net.URI;
+import java.util.List;
+
+import javax.persistence.NoResultException;
 
 import org.springframework.stereotype.Repository;
 
@@ -31,11 +33,17 @@ import se.vgregion.push.types.Subscription;
 @Repository
 public class JpaSubscriptionRepository extends JpaRepository<Subscription, Long> implements SubscriptionRepository {
     
-    @PersistenceContext
-    private EntityManager em;
-
     public JpaSubscriptionRepository() {
         super(Subscription.class);
     }
-    
+
+    @SuppressWarnings("unchecked")
+    public List<Subscription> findByTopic(URI topic) {
+        try {
+            return entityManager.createQuery("select l from Subscription l where l.topic = :topic")
+                .setParameter("topic", topic.toString()).getResultList();
+        } catch(NoResultException e) {
+            return null;
+        }
+    }   
 }

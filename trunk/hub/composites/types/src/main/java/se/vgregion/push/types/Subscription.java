@@ -19,6 +19,8 @@
 
 package se.vgregion.push.types;
 
+import java.net.URI;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -34,25 +36,51 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     private long id;
     
     @Column(nullable=false)
-    private String url;
+    private String callback;
     
-    public Subscription() {
+    @Column
+    private long leaseSeconds;
+    
+    @Column
+    private String secret;
+
+    @Column(nullable=false)
+    private String topic;
+
+    /* Make JPA happy */
+    protected Subscription() {
     }
 
-    public Subscription(String url) {
-        this.url = url;
+    public Subscription(URI topic, String callback) {
+        this.topic = topic.toString();
+        this.callback = callback;
     }
+
+    public Subscription(URI topic, String callback, long leaseSeconds, String secret) {
+        this.topic = topic.toString();
+        this.callback = callback;
+        this.leaseSeconds = leaseSeconds;
+        this.secret = secret;
+    }
+
     
     public Long getId() {
         return id;
     }
     
-    public String getUrl() {
-        return url;
+    public String getCallback() {
+        return callback;
     }
-    public void setUrl(String url) {
-        this.url = url;
+
+    public URI getTopic() {
+        return URI.create(topic);
     }
-    
-    
+
+    public long getLeaseSeconds() {
+        return leaseSeconds;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
 }

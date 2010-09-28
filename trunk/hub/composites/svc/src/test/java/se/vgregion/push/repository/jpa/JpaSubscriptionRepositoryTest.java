@@ -19,6 +19,9 @@
 
 package se.vgregion.push.repository.jpa;
 
+import java.net.URI;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,14 +41,22 @@ public class JpaSubscriptionRepositoryTest {
     
     @Before
     public void setup() {
-        sub1 = dao.persist(new Subscription("http://example.com/1"));
+        sub1 = dao.persist(new Subscription(URI.create("http://example.com/feed"), "http://example.com/sub11"));
     }
     
     @Test
     public void findByPk() {
         Subscription loaded = dao.findByPk(sub1.getId());
         
-        Assert.assertEquals(sub1.getUrl(), loaded.getUrl());
+        Assert.assertEquals(sub1.getCallback(), loaded.getCallback());
+    }
+
+    @Test
+    public void findByTopic() {
+        List<Subscription> loaded = dao.findByTopic(URI.create("http://example.com/feed"));
+        
+        Assert.assertEquals(1, loaded.size());
+        Assert.assertEquals(sub1.getCallback(), loaded.get(0).getCallback());
     }
 
 }

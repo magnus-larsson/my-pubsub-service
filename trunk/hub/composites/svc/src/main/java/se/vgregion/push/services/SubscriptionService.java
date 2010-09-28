@@ -19,11 +19,15 @@
 
 package se.vgregion.push.services;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 import se.vgregion.push.types.Subscription;
 
 public interface SubscriptionService {
 
-    List<Subscription> getAllSubscriptions();
+    List<Subscription> getAllSubscriptionsForFeed(URI feed);
+    
+    void verify(SubscriptionRequest request) throws IOException;
 }
