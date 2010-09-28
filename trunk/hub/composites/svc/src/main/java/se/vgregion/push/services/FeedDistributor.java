@@ -23,13 +23,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import javax.annotation.Resource;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
@@ -37,29 +37,30 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.vgregion.push.types.Subscription;
+
 public class FeedDistributor {
 
     private final static Logger LOG = LoggerFactory.getLogger(FeedDistributor.class);
     
-    private final BlockingQueue<String> distributionQueue;
+    private final BlockingQueue<DistributionRequest> distributionQueue;
     private final ExecutorService executor;
-    private File feedDirectory;
+    
+    @Resource
+    private SubscriptionService subscriptionService;
     
     private DefaultHttpClient httpclient = new DefaultHttpClient();
     
-    public FeedDistributor(BlockingQueue<String> distributionQueue, File feedDirectory) {
+    public FeedDistributor(BlockingQueue<DistributionRequest> distributionQueue, SubscriptionService subscriptionService) {
         this.distributionQueue = distributionQueue;
-        this.feedDirectory = feedDirectory;
+        this.subscriptionService = subscriptionService;
+        
         executor = Executors.newFixedThreadPool(2);
         
         // not allowed to redirect when distributing
         httpclient.setRedirectHandler(new DontRedirectHandler());
     }
 
-    private List<String> getSubscribers(String feed) {
-        return Arrays.asList("http://localhost:8000/");
-    }
-    
     public void start() {
         LOG.info("Starting FeedDistributor");
         executor.execute(new Runnable() {
@@ -67,22 +68,24 @@ public class FeedDistributor {
             public void run() {
                 while(true) {
                     try {
-                        String feed = distributionQueue.take();
+                        DistributionRequest request = distributionQueue.take();
                         
-                        List<String> subscribers = getSubscribers(feed);
+                        List<Subscription> subscribers = subscriptionService.getAllSubscriptions();
                         
                         if(!subscribers.isEmpty()) {
-                            String fileName = DigestUtils.md5Hex(feed);
-                            File file = new File(feedDirectory, fileName);
+                            File file = request.getFile();
+                            
                             byte[] buffer = new byte[(int)file.length()];
                             
-                            LOG.debug("Distributing " + feed);
+                            LOG.debug("Distributing " + request.getUrl());
                             try {
                                 FileInputStream fis = new FileInputStream(file);
                                 fis.read(buffer, 0, buffer.length);
+                                fis.close();
 
-                                for(String subscriber : subscribers) {
-                                    HttpPost post = new HttpPost(subscriber);
+                                for(Subscription subscription : subscribers) {
+                                    LOG.debug("Distributing to " + subscription.getUrl());
+                                    HttpPost post = new HttpPost(subscription.getUrl());
                                     
                                     // TODO might also use FileEntity, but that will not cache the data
                                     post.setEntity(new ByteArrayEntity(buffer));
@@ -91,12 +94,12 @@ public class FeedDistributor {
                                     try {
                                         response = httpclient.execute(post);
                                         if(response.getStatusLine().getStatusCode() == 200) {
-                                            LOG.debug("Succeeded distributing to subscriber {}", subscriber);
+                                            LOG.debug("Succeeded distributing to subscriber {}", subscription.getUrl());
                                         } else {
-                                            LOG.debug("Failed distributing to subscriber \"{}\" with error \"{}\"", subscriber, response.getStatusLine());
+                                            LOG.debug("Failed distributing to subscriber \"{}\" with error \"{}\"", subscription.getUrl(), response.getStatusLine());
                                         }
                                     } catch(IOException e) {
-                                        LOG.debug("Failed distributing to subscriber: " + subscriber, e);
+                                        LOG.debug("Failed distributing to subscriber: " + subscription.getUrl(), e);
                                     } finally {
                                         if(response != null) {
                                             if(response.getEntity() != null) {
@@ -107,12 +110,12 @@ public class FeedDistributor {
                                     }
                                     // TODO handle retries
                                 }
-                                LOG.info("Feed distributed to {} subscribers: {}", subscribers.size(), feed);
+                                LOG.info("Feed distributed to {} subscribers: {}", subscribers.size(), request.getUrl());
                             } catch (IOException e) {
-                                LOG.debug("Failed to distribute feed: " + feed, e);
+                                LOG.debug("Failed to distribute feed: " + request.getUrl(), e);
                             }
                         } else {
-                            LOG.debug("No subscribers for published feed, ignoring: {}", feed);
+                            LOG.debug("No subscribers for published feed, ignoring: {}", request.getUrl());
                         }
                     } catch (InterruptedException e) {
                         // shutting down

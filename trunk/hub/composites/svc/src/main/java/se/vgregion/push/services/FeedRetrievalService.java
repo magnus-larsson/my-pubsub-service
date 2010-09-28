@@ -19,11 +19,16 @@
 
 package se.vgregion.push.services;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 
-import se.vgregion.push.types.Subscription;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface SubscriptionService {
 
-    List<Subscription> getAllSubscriptions();
+public interface FeedRetrievalService {
+
+    @Transactional
+    public abstract File retrieve(URI url) throws IOException;
+
 }

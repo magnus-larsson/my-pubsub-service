@@ -31,14 +31,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import se.vgregion.push.services.DistributionRequest;
+import se.vgregion.push.services.RetrievalRequest;
+
 @Controller
 public class HubAdminController {
 
     @Resource(name="retrieveQueue")
-    private BlockingQueue<String> retrieverQueue;
+    private BlockingQueue<RetrievalRequest> retrieverQueue;
 
     @Resource(name="distributionQueue")
-    private BlockingQueue<String> distributionQueue;
+    private BlockingQueue<DistributionRequest> distributionQueue;
     
     @RequestMapping(value="/admin", method=RequestMethod.GET)
     public void post(HttpServletRequest request, HttpServletResponse response) throws IOException {

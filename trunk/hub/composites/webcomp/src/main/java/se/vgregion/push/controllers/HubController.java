@@ -35,6 +35,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import se.vgregion.push.services.RetrievalRequest;
+
 @Controller
 public class HubController {
 
@@ -42,13 +44,13 @@ public class HubController {
 
     
     @Resource(name="retrieveQueue")
-    private BlockingQueue<String> retrieverQueue;
+    private BlockingQueue<RetrievalRequest> retrieverQueue;
     
-    public BlockingQueue<String> getRetrieverQueue() {
+    public BlockingQueue<RetrievalRequest> getRetrieverQueue() {
         return retrieverQueue;
     }
 
-    public void setRetrieverQueue(BlockingQueue<String> retrieverQueue) {
+    public void setRetrieverQueue(BlockingQueue<RetrievalRequest> retrieverQueue) {
         this.retrieverQueue = retrieverQueue;
     }
 
@@ -78,7 +80,7 @@ public class HubController {
                 
                 boolean wasAdded = false;
                 try {
-                    wasAdded = retrieverQueue.offer(url, 2000, TimeUnit.MILLISECONDS);
+                    wasAdded = retrieverQueue.offer(new RetrievalRequest(url), 2000, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
                     wasAdded = false;
                 }

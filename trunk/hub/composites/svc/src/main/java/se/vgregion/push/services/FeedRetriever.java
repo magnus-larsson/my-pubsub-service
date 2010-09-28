@@ -19,6 +19,7 @@
 
 package se.vgregion.push.services;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -29,16 +30,27 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class FeedRetriever {
 
     private final static Logger LOG = LoggerFactory.getLogger(FeedRetriever.class);
     
-    private BlockingQueue<String> retrieveQueue;
-    private BlockingQueue<String> distributionQueue;
+    @Resource(name="retrieveQueue")
+    private BlockingQueue<RetrievalRequest> retrieveQueue;
+    
+    @Resource(name="distributionQueue")
+    private BlockingQueue<DistributionRequest> distributionQueue;
     private ExecutorService executor = Executors.newFixedThreadPool(2);
     
-    private FeedRetrieverService feedRetrieverService;
+    private FeedRetrievalService feedRetrieverService;
     
+    public FeedRetriever(BlockingQueue<RetrievalRequest> retrieveQueue,
+            BlockingQueue<DistributionRequest> distributionQueue, FeedRetrievalService feedRetrieverService) {
+        this.retrieveQueue = retrieveQueue;
+        this.distributionQueue = distributionQueue;
+        this.feedRetrieverService = feedRetrieverService;
+    }
+
     public void start() {
         LOG.info("Starting FeedRetriever");
         executor.execute(new Runnable() {
@@ -46,18 +58,20 @@ public class FeedRetriever {
             public void run() {
                 while(true) {
                     try {
-                        String feed = retrieveQueue.take();
-
+                        RetrievalRequest request = retrieveQueue.take();
                         
                         try {
-                            LOG.info("Retrieving feed: {}", feed);
+                            LOG.info("Retrieving feed: {}", request.getUrl());
 
-                            feedRetrieverService.retrieve(feed);
+                            File file = feedRetrieverService.retrieve(request.getUrl());
                             
-                            LOG.warn("Feed successfully retrived, putting for distribution: {}", feed);
-                            distributionQueue.put(feed);
+                            LOG.warn("Feed successfully retrived, putting for distribution: {}", request.getUrl());
+                            
+                            DistributionRequest distributionRequest = new DistributionRequest(request.getUrl(), file);
+                            
+                            distributionQueue.put(distributionRequest);
                         } catch (IOException e) {
-                            LOG.error("Failed to download feed: " + feed, e);
+                            LOG.error("Failed to download feed: " + request.getUrl(), e);
                         }
                     } catch (InterruptedException e) {
                         // shutting down
@@ -73,31 +87,5 @@ public class FeedRetriever {
     public void stop() {
         LOG.info("Stopping FeedRetriever");
         executor.shutdownNow();
-    }
-
-    public BlockingQueue<String> getRetrieveQueue() {
-        return retrieveQueue;
-    }
-
-    public BlockingQueue<String> getDistributionQueue() {
-        return distributionQueue;
-    }
-    
-    @Resource(name="retrieveQueue")
-    public void setRetrieveQueue(BlockingQueue<String> retrieveQueue) {
-        this.retrieveQueue = retrieveQueue;
-    }
-
-    @Resource(name="distributionQueue")
-    public void setDistributionQueue(BlockingQueue<String> distributionQueue) {
-        this.distributionQueue = distributionQueue;
-    }
-
-    public ExecutorService getExecutor() {
-        return executor;
-    }
-
-    public void setExecutor(ExecutorService executor) {
-        this.executor = executor;
     }
 }

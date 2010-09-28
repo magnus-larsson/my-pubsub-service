@@ -17,13 +17,26 @@
  *
  */
 
-package se.vgregion.push.services;
+package se.vgregion.push.services.impl;
 
 import java.util.List;
 
+import se.vgregion.push.services.SubscriptionService;
 import se.vgregion.push.types.Subscription;
 
-public interface SubscriptionService {
+public class MockSubscriptionService implements SubscriptionService {
 
-    List<Subscription> getAllSubscriptions();
+    private List<Subscription> subscriptions;
+    
+    public MockSubscriptionService(List<Subscription> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
+
+
+
+    @Override
+    public List<Subscription> getAllSubscriptions() {
+        return subscriptions;
+    }
+
 }
