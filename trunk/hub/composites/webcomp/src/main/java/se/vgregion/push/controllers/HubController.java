@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import se.vgregion.push.services.RetrievalRequest;
 import se.vgregion.push.services.SubscriptionRequest;
 import se.vgregion.push.services.SubscriptionService;
+import se.vgregion.push.types.Subscription;
 
 @Controller
 public class HubController {
@@ -87,6 +88,11 @@ public class HubController {
                         
                         try {
                             subscriptionService.verify(subscriptionRequest);
+                            
+                            Subscription subscription = new Subscription(topic, callback, leaseSeconds, secret);
+                            
+                            subscriptionService.addSubscription(subscription);
+                            
                             response.setStatus(204);
                         } catch(Exception e) {
                             response.sendError(500);

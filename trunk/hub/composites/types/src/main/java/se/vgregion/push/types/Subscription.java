@@ -51,14 +51,14 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     protected Subscription() {
     }
 
-    public Subscription(URI topic, String callback) {
+    public Subscription(URI topic, URI callback) {
         this.topic = topic.toString();
-        this.callback = callback;
+        this.callback = callback.toString();
     }
 
-    public Subscription(URI topic, String callback, long leaseSeconds, String secret) {
+    public Subscription(URI topic, URI callback, long leaseSeconds, String secret) {
         this.topic = topic.toString();
-        this.callback = callback;
+        this.callback = callback.toString();
         this.leaseSeconds = leaseSeconds;
         this.secret = secret;
     }
@@ -68,8 +68,8 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
         return id;
     }
     
-    public String getCallback() {
-        return callback;
+    public URI getCallback() {
+        return URI.create(callback);
     }
 
     public URI getTopic() {

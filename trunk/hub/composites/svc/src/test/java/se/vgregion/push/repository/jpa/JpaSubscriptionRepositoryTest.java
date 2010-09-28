@@ -41,7 +41,7 @@ public class JpaSubscriptionRepositoryTest {
     
     @Before
     public void setup() {
-        sub1 = dao.persist(new Subscription(URI.create("http://example.com/feed"), "http://example.com/sub11"));
+        sub1 = dao.persist(new Subscription(URI.create("http://example.com/feed"), URI.create("http://example.com/sub11")));
     }
     
     @Test
