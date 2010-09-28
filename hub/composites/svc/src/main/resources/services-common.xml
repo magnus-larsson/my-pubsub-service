@@ -24,7 +24,8 @@
                            http://www.springframework.org/schema/tx/spring-tx.xsd">
 
 	<context:component-scan base-package="se.vgregion.push.repository.jpa" />
-	<context:component-scan base-package="se.vgregion.push.services" />
+
+	<tx:annotation-driven />
 
  	<bean id="feedDirectory"
 		class="java.io.File">
@@ -39,25 +40,33 @@
 		class="java.util.concurrent.LinkedBlockingQueue">
 	</bean>
 
+ 	<bean id="feedRetrieverService"
+		class="se.vgregion.push.services.impl.DefaultFeedRetrieverService">
+		<constructor-arg ref="feedDirectory" />
+	</bean>
+
+ 	<bean id="subscriptionService"
+		class="se.vgregion.push.services.impl.DefaultSubscriptionService">
+	</bean>
+
  	<bean id="feedDistributor"
 		class="se.vgregion.push.services.FeedDistributor"
 		init-method="start"
 		destroy-method="stop">
 		<constructor-arg ref="distributionQueue" />
-		<constructor-arg ref="feedDirectory" />
+		<constructor-arg ref="subscriptionService" />
 	</bean>
+
 
  	<bean id="feedRetriver"
-		class="se.vgregion.push.services.FeedRetriver"
+		class="se.vgregion.push.services.FeedRetriever"
 		init-method="start"
 		destroy-method="stop">
-<!--		<constructor-arg ref="retrieveQueue" />-->
-<!--		<constructor-arg ref="distributionQueue" />-->
-<!--		<constructor-arg ref="feedDirectory" />-->
+		<constructor-arg ref="retrieveQueue" />
+		<constructor-arg ref="distributionQueue" />
+		<constructor-arg ref="feedRetrieverService" />
 	</bean>
 
-
-	<tx:annotation-driven />
 
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="entityManagerFactory" />

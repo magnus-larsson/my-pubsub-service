@@ -17,11 +17,12 @@
  *
  */
 
-package se.vgregion.push.services;
+package se.vgregion.push.services.impl;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 
 import javax.annotation.Resource;
 
@@ -36,30 +37,49 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
-public class FeedRetrieverService {
+import se.vgregion.push.services.FeedRetrievalService;
 
-    private final static Logger LOG = LoggerFactory.getLogger(FeedRetrieverService.class);
+@Service
+public class DefaultFeedRetrieverService implements FeedRetrievalService {
+
+    private final static Logger LOG = LoggerFactory.getLogger(DefaultFeedRetrieverService.class);
 
     private File feedDirectory;
 
     private File tmpDirectory = new File(System.getProperty("java.io.tmpdir"));
 
     private HttpClient httpclient = new DefaultHttpClient();
+
+    public DefaultFeedRetrieverService(File feedDirectory) {
+        this.feedDirectory = feedDirectory;
+    }
     
+    public DefaultFeedRetrieverService(File feedDirectory, File tmpDirectory) {
+        this.feedDirectory = feedDirectory;
+        this.tmpDirectory = tmpDirectory;
+    }
+
+    /* (non-Javadoc)
+     * @see se.vgregion.push.services.impl.FeedRetrievalService#retrieve(se.vgregion.push.services.RetrievalRequest)
+     */
     @Transactional
-    public void retrieve(String feed) throws IOException {
+    public File retrieve(URI url) throws IOException {
         if(!feedDirectory.exists()) {
             LOG.info("Creating feed directory at \"{}\"", feedDirectory.getAbsolutePath());
             feedDirectory.mkdirs();
         }
         
-        String fileName = DigestUtils.md5Hex(feed);
+        String fileName = DigestUtils.md5Hex(url.toString());
 
-        LOG.debug("Downloading feed {}", feed);
+        LOG.debug("Downloading feed {}", url);
 
-        HttpGet httpget = new HttpGet(feed);
+        HttpGet httpget = new HttpGet(url);
         HttpResponse response = httpclient.execute(httpget);
+        
+        if(response.getStatusLine().getStatusCode() != 200) {
+            throw new IOException("Failed to download feed: " + response.getStatusLine());
+        }
+        
         HttpEntity entity = response.getEntity();
 
         File destFile = new File(feedDirectory, fileName);
@@ -67,11 +87,12 @@ public class FeedRetrieverService {
         FileOutputStream tmpFOS = new FileOutputStream(tmpFile);
         entity.writeTo(tmpFOS);
         tmpFOS.close();
-
-        LOG.debug("Feed downloaded: {}", feed);
+        LOG.debug("Feed downloaded: {}", url);
 
         if (tmpFile.renameTo(destFile)) {
-            LOG.warn("Feed successfully retrived, putting for distribution: {}", feed);
+            LOG.warn("Feed successfully retrived, putting for distribution: {}", url);
+            
+            return destFile;
         } else {
             throw new IOException("Failed to move tmp file \"" + tmpFile.getAbsolutePath() + "\" to destination \""
                     + destFile.getAbsolutePath() + "\"");

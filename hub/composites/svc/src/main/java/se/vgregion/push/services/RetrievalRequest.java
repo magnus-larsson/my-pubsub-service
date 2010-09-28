@@ -19,11 +19,24 @@
 
 package se.vgregion.push.services;
 
-import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import se.vgregion.push.types.Subscription;
 
-public interface SubscriptionService {
+public class RetrievalRequest {
 
-    List<Subscription> getAllSubscriptions();
+    private URI url;
+
+    public RetrievalRequest(String url) throws URISyntaxException {
+        this.url = new URI(url);
+    }
+
+    public RetrievalRequest(URI url) {
+        this.url = url;
+    }
+
+    
+    public URI getUrl() {
+        return url;
+    }
 }

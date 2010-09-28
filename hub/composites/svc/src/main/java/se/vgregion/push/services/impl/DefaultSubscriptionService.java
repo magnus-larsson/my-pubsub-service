@@ -17,13 +17,24 @@
  *
  */
 
-package se.vgregion.push.services;
+package se.vgregion.push.services.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import se.vgregion.push.services.SubscriptionService;
 import se.vgregion.push.types.Subscription;
 
-public interface SubscriptionService {
+@Service
+public class DefaultSubscriptionService implements SubscriptionService {
 
-    List<Subscription> getAllSubscriptions();
+    @Transactional(readOnly=true)
+    @Override
+    public List<Subscription> getAllSubscriptions() {
+        return Arrays.asList(new Subscription("http://localhost:8000"));
+    }
+
 }

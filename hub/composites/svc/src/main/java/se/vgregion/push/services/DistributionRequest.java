@@ -19,11 +19,27 @@
 
 package se.vgregion.push.services;
 
-import java.util.List;
+import java.io.File;
+import java.net.URI;
 
-import se.vgregion.push.types.Subscription;
 
-public interface SubscriptionService {
+public class DistributionRequest {
 
-    List<Subscription> getAllSubscriptions();
+    private URI url;
+    private File file;
+
+    public DistributionRequest(URI url, File file) {
+        this.url = url;
+        this.file = file;
+    }
+
+    public URI getUrl() {
+        return url;
+    }
+
+    public File getFile() {
+        return file;
+    }
+    
+    
 }
