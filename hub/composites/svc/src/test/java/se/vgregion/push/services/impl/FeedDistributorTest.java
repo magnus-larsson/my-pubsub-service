@@ -34,7 +34,6 @@ import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.localserver.LocalTestServer;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
@@ -45,8 +44,6 @@ import org.junit.Test;
 
 import se.vgregion.push.services.DistributionRequest;
 import se.vgregion.push.services.FeedDistributor;
-import se.vgregion.push.services.FeedRetriever;
-import se.vgregion.push.services.RetrievalRequest;
 import se.vgregion.push.types.Subscription;
 
 
@@ -54,7 +51,8 @@ public class FeedDistributorTest {
 
     private static final File TMP = new File("target/test-tmp");
     private static final File FEED = new File(TMP, "feed");
-    private static final URI TEST_URI = URI.create("http://example.com");
+    private static final URI FEED_URI = URI.create("http://example.com");
+    private static final URI SUB_URI = URI.create("http://example.com/sub1");
 
     private static final HttpEntity TEST_ENTITY = Utils.createEntity("hello world");
     
@@ -75,7 +73,7 @@ public class FeedDistributorTest {
         server.start();
         
         List<Subscription> subscriptions = new ArrayList<Subscription>();
-        Subscription sub1 = new Subscription(buildSubscriptionUrl("/sub1").toString());
+        Subscription sub1 = new Subscription(FEED_URI, buildSubscriptionUrl("/sub1").toString());
         subscriptions.add(sub1);
         
         MockSubscriptionService service = new MockSubscriptionService(subscriptions);
@@ -87,7 +85,7 @@ public class FeedDistributorTest {
     
     @Test
     public void test() throws Exception {
-        distributionQueue.put(new DistributionRequest(TEST_URI, FEED));
+        distributionQueue.put(new DistributionRequest(SUB_URI, FEED));
         
         final LinkedBlockingQueue<HttpRequest> issuedRequests = new LinkedBlockingQueue<HttpRequest>();
         server.register("/*", new HttpRequestHandler() {

@@ -17,31 +17,27 @@
  *
  */
 
-package se.vgregion.push.services.impl;
+package se.vgregion.push.controllers;
 
 import java.net.URI;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
 
 import se.vgregion.push.services.SubscriptionRequest;
 import se.vgregion.push.services.SubscriptionService;
 import se.vgregion.push.types.Subscription;
 
+@Service
 public class MockSubscriptionService implements SubscriptionService {
-
-    private List<Subscription> subscriptions;
-    
-    public MockSubscriptionService(List<Subscription> subscriptions) {
-        this.subscriptions = subscriptions;
-    }
 
     @Override
     public List<Subscription> getAllSubscriptionsForFeed(URI feed) {
-        return subscriptions;
+        return null;
     }
 
     @Override
     public void verify(SubscriptionRequest request) {
         
     }
-
 }

@@ -100,6 +100,12 @@ public class DefaultFeedRetrievalServiceTest {
     
     @After
     public void after() {
+        try {
+            server.stop();
+        } catch (Exception e) {
+            // ignore
+        }
+        
         deleteDir(TMP);
         deleteDir(FEEDS);
     }

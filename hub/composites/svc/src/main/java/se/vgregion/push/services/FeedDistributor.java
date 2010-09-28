@@ -70,7 +70,7 @@ public class FeedDistributor {
                     try {
                         DistributionRequest request = distributionQueue.take();
                         
-                        List<Subscription> subscribers = subscriptionService.getAllSubscriptions();
+                        List<Subscription> subscribers = subscriptionService.getAllSubscriptionsForFeed(request.getUrl());
                         
                         if(!subscribers.isEmpty()) {
                             File file = request.getFile();
@@ -84,8 +84,8 @@ public class FeedDistributor {
                                 fis.close();
 
                                 for(Subscription subscription : subscribers) {
-                                    LOG.debug("Distributing to " + subscription.getUrl());
-                                    HttpPost post = new HttpPost(subscription.getUrl());
+                                    LOG.debug("Distributing to " + subscription.getCallback());
+                                    HttpPost post = new HttpPost(subscription.getCallback());
                                     
                                     // TODO might also use FileEntity, but that will not cache the data
                                     post.setEntity(new ByteArrayEntity(buffer));
@@ -94,12 +94,12 @@ public class FeedDistributor {
                                     try {
                                         response = httpclient.execute(post);
                                         if(response.getStatusLine().getStatusCode() == 200) {
-                                            LOG.debug("Succeeded distributing to subscriber {}", subscription.getUrl());
+                                            LOG.debug("Succeeded distributing to subscriber {}", subscription.getCallback());
                                         } else {
-                                            LOG.debug("Failed distributing to subscriber \"{}\" with error \"{}\"", subscription.getUrl(), response.getStatusLine());
+                                            LOG.debug("Failed distributing to subscriber \"{}\" with error \"{}\"", subscription.getCallback(), response.getStatusLine());
                                         }
                                     } catch(IOException e) {
-                                        LOG.debug("Failed distributing to subscriber: " + subscription.getUrl(), e);
+                                        LOG.debug("Failed distributing to subscriber: " + subscription.getCallback(), e);
                                     } finally {
                                         if(response != null) {
                                             if(response.getEntity() != null) {

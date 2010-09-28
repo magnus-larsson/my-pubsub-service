@@ -17,31 +17,40 @@
  *
  */
 
-package se.vgregion.push.services.impl;
+package se.vgregion.push.services;
 
 import java.net.URI;
-import java.util.List;
 
-import se.vgregion.push.services.SubscriptionRequest;
-import se.vgregion.push.services.SubscriptionService;
-import se.vgregion.push.types.Subscription;
+public class SubscriptionRequest {
 
-public class MockSubscriptionService implements SubscriptionService {
-
-    private List<Subscription> subscriptions;
+    private URI callback;
+    private URI topic;
+    private long leaseSeconds;
+    private String verifyToken;
     
-    public MockSubscriptionService(List<Subscription> subscriptions) {
-        this.subscriptions = subscriptions;
+    public SubscriptionRequest(URI callback, URI topic, long leaseSeconds, String verifyToken) {
+        this.callback = callback;
+        this.topic = topic;
+        this.leaseSeconds = leaseSeconds;
+        this.verifyToken = verifyToken;
     }
 
-    @Override
-    public List<Subscription> getAllSubscriptionsForFeed(URI feed) {
-        return subscriptions;
+    public URI getCallback() {
+        return callback;
     }
 
-    @Override
-    public void verify(SubscriptionRequest request) {
-        
+    public URI getTopic() {
+        return topic;
     }
 
+    public long getLeaseSeconds() {
+        return leaseSeconds;
+    }
+
+    public String getVerifyToken() {
+        return verifyToken;
+    }
+
+    
+    
 }
