@@ -40,4 +40,9 @@ public class MockSubscriptionService implements SubscriptionService {
     public void verify(SubscriptionRequest request) {
         
     }
+
+    @Override
+    public Subscription addSubscription(Subscription subscription) {
+        return subscription;
+    }
 }

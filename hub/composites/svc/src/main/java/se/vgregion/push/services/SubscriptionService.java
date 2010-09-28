@@ -30,4 +30,6 @@ public interface SubscriptionService {
     List<Subscription> getAllSubscriptionsForFeed(URI feed);
     
     void verify(SubscriptionRequest request) throws IOException;
+    
+    Subscription addSubscription(Subscription subscription);
 }

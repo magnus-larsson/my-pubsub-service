@@ -73,7 +73,7 @@ public class FeedDistributorTest {
         server.start();
         
         List<Subscription> subscriptions = new ArrayList<Subscription>();
-        Subscription sub1 = new Subscription(FEED_URI, buildSubscriptionUrl("/sub1").toString());
+        Subscription sub1 = new Subscription(FEED_URI, buildSubscriptionUrl("/sub1"));
         subscriptions.add(sub1);
         
         MockSubscriptionService service = new MockSubscriptionService(subscriptions);

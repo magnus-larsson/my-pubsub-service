@@ -104,4 +104,10 @@ public class DefaultSubscriptionService implements SubscriptionService {
     private boolean successStatus(int status) {
         return status >= 200 && status <300;
     }
+
+    @Override
+    public Subscription addSubscription(Subscription subscription) {
+        return subscriptionRepository.persist(subscription);
+        
+    }
 }
