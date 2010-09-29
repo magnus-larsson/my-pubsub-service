@@ -44,6 +44,7 @@ import org.junit.Test;
 
 import se.vgregion.push.services.DistributionRequest;
 import se.vgregion.push.services.FeedDistributor;
+import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
 
 
@@ -85,7 +86,7 @@ public class FeedDistributorTest {
     
     @Test
     public void test() throws Exception {
-        distributionQueue.put(new DistributionRequest(SUB_URI, FEED));
+        distributionQueue.put(new DistributionRequest(new Feed(FEED_URI, TEST_ENTITY.getContent())));
         
         final LinkedBlockingQueue<HttpRequest> issuedRequests = new LinkedBlockingQueue<HttpRequest>();
         server.register("/*", new HttpRequestHandler() {

@@ -30,6 +30,8 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.vgregion.push.types.Feed;
+
 
 public class FeedRetriever {
 
@@ -63,11 +65,11 @@ public class FeedRetriever {
                         try {
                             LOG.info("Retrieving feed: {}", request.getUrl());
 
-                            File file = feedRetrieverService.retrieve(request.getUrl());
+                            Feed feed = feedRetrieverService.retrieve(request.getUrl());
                             
                             LOG.warn("Feed successfully retrived, putting for distribution: {}", request.getUrl());
                             
-                            DistributionRequest distributionRequest = new DistributionRequest(request.getUrl(), file);
+                            DistributionRequest distributionRequest = new DistributionRequest(feed);
                             
                             distributionQueue.put(distributionRequest);
                         } catch (IOException e) {

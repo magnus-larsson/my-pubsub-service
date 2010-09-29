@@ -19,8 +19,6 @@
 
 package se.vgregion.push.services;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -32,7 +30,7 @@ import javax.annotation.Resource;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,25 +68,16 @@ public class FeedDistributor {
                     try {
                         DistributionRequest request = distributionQueue.take();
                         
-                        List<Subscription> subscribers = subscriptionService.getAllSubscriptionsForFeed(request.getUrl());
+                        List<Subscription> subscribers = subscriptionService.getAllSubscriptionsForFeed(request.getFeed().getUrl());
                         
                         if(!subscribers.isEmpty()) {
-                            File file = request.getFile();
-                            
-                            byte[] buffer = new byte[(int)file.length()];
-                            
-                            LOG.debug("Distributing " + request.getUrl());
+                            LOG.debug("Distributing " + request.getFeed().getUrl());
                             try {
-                                FileInputStream fis = new FileInputStream(file);
-                                fis.read(buffer, 0, buffer.length);
-                                fis.close();
-
                                 for(Subscription subscription : subscribers) {
                                     LOG.debug("Distributing to " + subscription.getCallback());
                                     HttpPost post = new HttpPost(subscription.getCallback());
                                     
-                                    // TODO might also use FileEntity, but that will not cache the data
-                                    post.setEntity(new ByteArrayEntity(buffer));
+                                    post.setEntity(new InputStreamEntity(request.getFeed().getContent(), request.getFeed().getContent().available()));
                                     
                                     HttpResponse response = null;
                                     try {
@@ -110,12 +99,12 @@ public class FeedDistributor {
                                     }
                                     // TODO handle retries
                                 }
-                                LOG.info("Feed distributed to {} subscribers: {}", subscribers.size(), request.getUrl());
+                                LOG.info("Feed distributed to {} subscribers: {}", subscribers.size(), request.getFeed().getUrl());
                             } catch (IOException e) {
-                                LOG.debug("Failed to distribute feed: " + request.getUrl(), e);
+                                LOG.debug("Failed to distribute feed: " + request.getFeed().getUrl(), e);
                             }
                         } else {
-                            LOG.debug("No subscribers for published feed, ignoring: {}", request.getUrl());
+                            LOG.debug("No subscribers for published feed, ignoring: {}", request.getFeed().getUrl());
                         }
                     } catch (InterruptedException e) {
                         // shutting down

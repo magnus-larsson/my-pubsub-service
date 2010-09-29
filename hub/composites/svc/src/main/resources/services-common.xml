@@ -40,9 +40,15 @@
 		class="java.util.concurrent.LinkedBlockingQueue">
 	</bean>
 
+ 	<bean id="feedRepository"
+		class="se.vgregion.push.repository.jpa.FileSystemFeedRepository">
+		<constructor-arg ref="feedDirectory" />
+	</bean>
+
+
  	<bean id="feedRetrieverService"
 		class="se.vgregion.push.services.impl.DefaultFeedRetrieverService">
-		<constructor-arg ref="feedDirectory" />
+		<constructor-arg ref="feedRepository" />
 	</bean>
 
  	<bean id="subscriptionService"
