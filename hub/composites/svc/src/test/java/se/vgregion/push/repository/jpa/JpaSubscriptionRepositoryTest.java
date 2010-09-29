@@ -22,6 +22,8 @@ package se.vgregion.push.repository.jpa;
 import java.net.URI;
 import java.util.List;
 
+import javax.persistence.PersistenceException;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,5 +80,11 @@ public class JpaSubscriptionRepositoryTest {
     @Test
     public void findByTopicAndCallbackNoneExisting() {
         Assert.assertNull(repository.findByTopicAndCallback(TOPIC, URI.create("http://dummy")));
+    }
+    
+    @Test(expected=PersistenceException.class)
+    public void persistDuplicates() {
+        repository.persist(new Subscription(TOPIC, CALLBACK));
+        repository.persist(new Subscription(TOPIC, CALLBACK));
     }
 }

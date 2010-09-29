@@ -26,8 +26,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.annotation.Resource;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.InputStreamEntity;
@@ -42,9 +40,8 @@ public class FeedDistributor {
     private final static Logger LOG = LoggerFactory.getLogger(FeedDistributor.class);
     
     private final BlockingQueue<DistributionRequest> distributionQueue;
-    private final ExecutorService executor;
+    private final ExecutorService executor = Executors.newFixedThreadPool(2);;
     
-    @Resource
     private PushService subscriptionService;
     
     private DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -52,8 +49,6 @@ public class FeedDistributor {
     public FeedDistributor(BlockingQueue<DistributionRequest> distributionQueue, PushService subscriptionService) {
         this.distributionQueue = distributionQueue;
         this.subscriptionService = subscriptionService;
-        
-        executor = Executors.newFixedThreadPool(2);
         
         // not allowed to redirect when distributing
         httpclient.setRedirectHandler(new DontRedirectHandler());
