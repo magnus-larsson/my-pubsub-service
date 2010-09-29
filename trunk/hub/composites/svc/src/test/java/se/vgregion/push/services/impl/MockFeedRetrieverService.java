@@ -20,15 +20,13 @@
 package se.vgregion.push.services.impl;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 
 import org.apache.http.HttpEntity;
-import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.push.services.FeedRetrievalService;
+import se.vgregion.push.types.Feed;
 
 public class MockFeedRetrieverService implements FeedRetrievalService {
 
@@ -40,13 +38,8 @@ public class MockFeedRetrieverService implements FeedRetrievalService {
         this.entity = entity;
     }
 
-    public File retrieve(URI url) throws IOException {
-        File file = File.createTempFile("tmp", "tmp", tmpDirectory);
-        OutputStream in = new FileOutputStream(file);
-        entity.writeTo(in);
-        in.close();
-        
-        return file;
+    public Feed retrieve(URI url) throws IOException {
+        return new Feed(url, entity.getContent());
         
     }
 }

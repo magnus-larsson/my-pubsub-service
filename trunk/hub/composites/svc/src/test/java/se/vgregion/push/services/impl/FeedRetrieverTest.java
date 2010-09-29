@@ -60,16 +60,13 @@ public class FeedRetrieverTest {
     
     @Test
     public void test() throws Exception {
-        
-        
         retrievalQueue.put(new RetrievalRequest(TEST_URI));
         
         DistributionRequest distributionRequest = distributionQueue.poll(1000, TimeUnit.MILLISECONDS);
         
         Assert.assertNotNull(distributionRequest);
-        Assert.assertEquals(TEST_URI, distributionRequest.getUrl());
-        Assert.assertTrue(distributionRequest.getFile().exists());
-        Assert.assertEquals(TEST_ENTITY.getContentLength(), distributionRequest.getFile().length());
+        Assert.assertEquals(TEST_URI, distributionRequest.getFeed().getUrl());
+        Assert.assertEquals(TEST_ENTITY.getContentLength(), distributionRequest.getFeed().getContent().available());
     }
     
     @After

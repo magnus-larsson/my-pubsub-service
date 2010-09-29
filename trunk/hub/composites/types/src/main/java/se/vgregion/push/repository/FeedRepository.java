@@ -17,22 +17,14 @@
  *
  */
 
-package se.vgregion.push.services;
+package se.vgregion.push.repository;
+
+import java.io.IOException;
 
 import se.vgregion.push.types.Feed;
 
-
-public class DistributionRequest {
-
-    private Feed feed;
-
-    public DistributionRequest(Feed feed) {
-        this.feed= feed;
-    }
-
-    public Feed getFeed() {
-        return feed;
-    }
     
-    
+public interface FeedRepository  {
+
+    Feed persist(Feed object) throws IOException;
 }

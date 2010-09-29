@@ -28,7 +28,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.localserver.LocalTestServer;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
@@ -37,28 +36,27 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import se.vgregion.push.repository.jpa.FileSystemFeedRepository;
+import se.vgregion.push.types.Feed;
+
 
 public class DefaultFeedRetrievalServiceTest {
 
     private static final File TMP = new File("target/test-tmp");
     private static final File FEEDS = new File("target/test-feeds");
     
-    private DefaultFeedRetrieverService service = new DefaultFeedRetrieverService(FEEDS);
+    private FileSystemFeedRepository feedRepository = new FileSystemFeedRepository(FEEDS, TMP);
+    private DefaultFeedRetrieverService service = new DefaultFeedRetrieverService(feedRepository);
     private LocalTestServer server = new LocalTestServer(null, null);
-    private HttpEntity testEntity;
+    private HttpEntity testEntity = Utils.createEntity("hello world");
     
     @Before
     public void before() throws Exception {
-        testEntity = new StringEntity("hello world");
-        
         deleteDir(TMP);
         deleteDir(FEEDS);
 
         Assert.assertTrue("Failed to create " + TMP.getAbsolutePath(), TMP.mkdirs());
         Assert.assertTrue("Failed to create " + FEEDS.getAbsolutePath(), FEEDS.mkdirs());
-
-        service.setFeedDirectory(FEEDS);
-        service.setFeedDirectory(TMP);
 
         server.start();
     }
@@ -77,10 +75,9 @@ public class DefaultFeedRetrievalServiceTest {
                 response.setEntity(testEntity);
             }});
         
-        File downloaded = service.retrieve(buildTestUrl("/test"));
+        Feed downloaded = service.retrieve(buildTestUrl("/test"));
         
-        Assert.assertTrue(downloaded.exists());
-        Assert.assertEquals(testEntity.getContentLength(), downloaded.length());
+        Assert.assertEquals(testEntity.getContentLength(), downloaded.getContent().available());
     }
 
     @Test(expected=IOException.class)

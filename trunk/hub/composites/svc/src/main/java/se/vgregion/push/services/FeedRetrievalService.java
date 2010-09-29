@@ -19,16 +19,17 @@
 
 package se.vgregion.push.services;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import se.vgregion.push.types.Feed;
+
 
 public interface FeedRetrievalService {
 
     @Transactional
-    public abstract File retrieve(URI url) throws IOException;
+    public abstract Feed retrieve(URI url) throws IOException;
 
 }
