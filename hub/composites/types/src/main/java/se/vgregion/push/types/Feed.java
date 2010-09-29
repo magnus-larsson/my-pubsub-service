@@ -34,20 +34,22 @@ import se.vgregion.portal.core.domain.patterns.entity.AbstractEntity;
 public class Feed extends AbstractEntity<Feed, Long> {
 
     private URI url;
+    private ContentType contentType;
     private byte[] data;
     
     /* Make JPA happy */
     protected Feed() {
     }
 
-    public Feed(URI url, byte[] data) {
+    public Feed(URI url, ContentType contentType, byte[] data) {
         this.url = url;
+        this.contentType = contentType;
         this.data = data;
     }
 
-    public Feed(URI url, InputStream in) throws IOException {
+    public Feed(URI url, ContentType contentType, InputStream in) throws IOException {
         this.url = url;
-        
+        this.contentType = contentType;
         this.data = drain(in);
     }
     
@@ -67,6 +69,10 @@ public class Feed extends AbstractEntity<Feed, Long> {
     
     public Long getId() {
         return null;
+    }
+
+    public ContentType getContentType() {
+        return contentType;
     }
 
     public URI getUrl() {

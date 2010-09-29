@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import se.vgregion.push.repository.FeedRepository;
+import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
     
 public class FileSystemFeedRepository implements FeedRepository {
@@ -65,7 +66,7 @@ public class FileSystemFeedRepository implements FeedRepository {
         
         if(destFile.exists()) {
             // TODO cache inputstream!
-            return new Feed(url, new FileInputStream(destFile));
+            return new Feed(url, ContentType.ATOM, new FileInputStream(destFile));
         } else {
             return null;
         }
