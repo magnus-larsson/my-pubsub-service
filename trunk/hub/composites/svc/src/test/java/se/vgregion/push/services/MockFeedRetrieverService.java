@@ -28,6 +28,7 @@ import org.apache.http.HttpEntity;
 
 import se.vgregion.push.services.PushService;
 import se.vgregion.push.services.SubscriptionRequest;
+import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
 
@@ -42,7 +43,7 @@ public class MockFeedRetrieverService implements PushService {
     }
 
     public Feed retrieve(URI url) throws IOException {
-        return new Feed(url, entity.getContent());
+        return new Feed(url, ContentType.ATOM, entity.getContent());
         
     }
 

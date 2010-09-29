@@ -30,6 +30,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,9 @@ public class FeedDistributor {
                                 for(Subscription subscription : subscribers) {
                                     LOG.debug("Distributing to " + subscription.getCallback());
                                     HttpPost post = new HttpPost(subscription.getCallback());
+                                    
+                                    // TODO get from feed
+                                    post.addHeader(new BasicHeader("Content-Type", "application/atom+xm"));
                                     
                                     post.setEntity(new InputStreamEntity(request.getFeed().getContent(), request.getFeed().getContent().available()));
                                     

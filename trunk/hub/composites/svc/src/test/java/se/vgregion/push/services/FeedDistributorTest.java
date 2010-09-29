@@ -44,6 +44,7 @@ import org.junit.Test;
 
 import se.vgregion.push.services.DistributionRequest;
 import se.vgregion.push.services.FeedDistributor;
+import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
 
@@ -86,7 +87,7 @@ public class FeedDistributorTest {
     
     @Test
     public void test() throws Exception {
-        distributionQueue.put(new DistributionRequest(new Feed(FEED_URI, TEST_ENTITY.getContent())));
+        distributionQueue.put(new DistributionRequest(new Feed(FEED_URI, ContentType.ATOM, TEST_ENTITY.getContent())));
         
         final LinkedBlockingQueue<HttpRequest> issuedRequests = new LinkedBlockingQueue<HttpRequest>();
         server.register("/*", new HttpRequestHandler() {
@@ -99,6 +100,7 @@ public class FeedDistributorTest {
         
         HttpRequest request = issuedRequests.poll(10000, TimeUnit.MILLISECONDS);
         Assert.assertNotNull(request);
+        Assert.assertEquals(ContentType.ATOM.toString(), request.getHeaders("Content-Type")[0].getValue());
         Assert.assertTrue(request instanceof HttpEntityEnclosingRequest);
         
         HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();

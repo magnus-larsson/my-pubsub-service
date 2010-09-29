@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -37,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.repository.SubscriptionRepository;
+import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
 
@@ -127,8 +129,21 @@ public class DefaultPushService implements PushService {
         }
         
         HttpEntity entity = response.getEntity();
+        
+        Header[] contentTypes = response.getHeaders("Content-Type");
+        
+        // TODO is this a reasonable default?
+        ContentType contentType = ContentType.ATOM;
+        if(contentTypes.length > 0) {
+            try {
+                contentType = ContentType.fromValue(contentTypes[0].getValue());
+            } catch(IllegalArgumentException e) {
+                // TODO How to handle this, sniff the entity?
+                contentType = ContentType.ATOM;
+            }
+        }
 
-        Feed feed = new Feed(url, entity.getContent());
+        Feed feed = new Feed(url, contentType, entity.getContent());
         
         feed = feedRepository.persist(feed);
         
