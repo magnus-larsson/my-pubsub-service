@@ -19,7 +19,6 @@
 
 package se.vgregion.push.services;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -44,13 +43,13 @@ public class FeedRetriever {
     private BlockingQueue<DistributionRequest> distributionQueue;
     private ExecutorService executor = Executors.newFixedThreadPool(2);
     
-    private FeedRetrievalService feedRetrieverService;
+    private PushService pushService;
     
     public FeedRetriever(BlockingQueue<RetrievalRequest> retrieveQueue,
-            BlockingQueue<DistributionRequest> distributionQueue, FeedRetrievalService feedRetrieverService) {
+            BlockingQueue<DistributionRequest> distributionQueue, PushService pushService) {
         this.retrieveQueue = retrieveQueue;
         this.distributionQueue = distributionQueue;
-        this.feedRetrieverService = feedRetrieverService;
+        this.pushService = pushService;
     }
 
     public void start() {
@@ -65,7 +64,7 @@ public class FeedRetriever {
                         try {
                             LOG.info("Retrieving feed: {}", request.getUrl());
 
-                            Feed feed = feedRetrieverService.retrieve(request.getUrl());
+                            Feed feed = pushService.retrieve(request.getUrl());
                             
                             LOG.warn("Feed successfully retrived, putting for distribution: {}", request.getUrl());
                             

@@ -112,7 +112,7 @@ public class HubControllerTest {
         final LinkedBlockingQueue<Subscription> subscriptions = new LinkedBlockingQueue<Subscription>();
         final LinkedBlockingQueue<SubscriptionRequest> subscriptionRequests = new LinkedBlockingQueue<SubscriptionRequest>();
 
-        controller.setSubscriptionService(new MockSubscriptionService() {
+        controller.setSubscriptionService(new MockPushService() {
             @Override
             public void verify(SubscriptionRequest request) {
                 subscriptionRequests.add(request);
@@ -267,7 +267,7 @@ public class HubControllerTest {
         final LinkedBlockingQueue<Subscription> subscriptions = new LinkedBlockingQueue<Subscription>();
         final LinkedBlockingQueue<SubscriptionRequest> subscriptionRequests = new LinkedBlockingQueue<SubscriptionRequest>();
 
-        controller.setSubscriptionService(new MockSubscriptionService() {
+        controller.setSubscriptionService(new MockPushService() {
             @Override
             public void verify(SubscriptionRequest request) {
                 subscriptionRequests.add(request);

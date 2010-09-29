@@ -19,22 +19,28 @@
 
 package se.vgregion.push.services;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
 
-@Service
-public class DefaultDownloadService {
-
-    private final static Logger LOG = LoggerFactory.getLogger(DefaultDownloadService.class);
+public interface PushService {
 
     @Transactional
-    public List<Subscription> getAllSubscriptions() {
-        return null;
-    }
+    List<Subscription> getAllSubscriptionsForFeed(URI feed);
+    
+    void verify(SubscriptionRequest request) throws IOException;
+    
+    @Transactional
+    Subscription subscribe(Subscription subscription);
+    
+    @Transactional
+    Subscription unsubscribe(Subscription subscription);
+    
+    @Transactional
+    public abstract Feed retrieve(URI url) throws IOException;
 }

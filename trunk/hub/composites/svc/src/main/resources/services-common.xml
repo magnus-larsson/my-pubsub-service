@@ -45,16 +45,11 @@
 		<constructor-arg ref="feedDirectory" />
 	</bean>
 
-
- 	<bean id="feedRetrieverService"
-		class="se.vgregion.push.services.impl.DefaultFeedRetrieverService">
-		<constructor-arg ref="feedRepository" />
-	</bean>
-
- 	<bean id="subscriptionService"
-		class="se.vgregion.push.services.impl.DefaultSubscriptionService"
+ 	<bean id="pushService"
+		class="se.vgregion.push.services.DefaultPushService"
 		autowire="constructor"
 		>
+		<constructor-arg ref="feedRepository" index="1" />
 	</bean>
 
  	<bean id="feedDistributor"
@@ -62,7 +57,7 @@
 		init-method="start"
 		destroy-method="stop">
 		<constructor-arg ref="distributionQueue" />
-		<constructor-arg ref="subscriptionService" />
+		<constructor-arg ref="pushService" />
 	</bean>
 
 
@@ -72,7 +67,7 @@
 		destroy-method="stop">
 		<constructor-arg ref="retrieveQueue" />
 		<constructor-arg ref="distributionQueue" />
-		<constructor-arg ref="feedRetrieverService" />
+		<constructor-arg ref="pushService" />
 	</bean>
 
 

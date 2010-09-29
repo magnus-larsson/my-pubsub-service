@@ -17,29 +17,44 @@
  *
  */
 
-package se.vgregion.push.services.impl;
+package se.vgregion.push.controllers;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
-import org.apache.http.HttpEntity;
+import org.springframework.stereotype.Service;
 
-import se.vgregion.push.services.FeedRetrievalService;
+import se.vgregion.push.services.SubscriptionRequest;
+import se.vgregion.push.services.PushService;
 import se.vgregion.push.types.Feed;
+import se.vgregion.push.types.Subscription;
 
-public class MockFeedRetrieverService implements FeedRetrievalService {
+@Service
+public class MockPushService implements PushService {
 
-    private File tmpDirectory;
-    private HttpEntity entity;
-
-    public MockFeedRetrieverService(File tmpDirectory, HttpEntity entity) {
-        this.tmpDirectory = tmpDirectory;
-        this.entity = entity;
+    @Override
+    public List<Subscription> getAllSubscriptionsForFeed(URI feed) {
+        return null;
     }
 
-    public Feed retrieve(URI url) throws IOException {
-        return new Feed(url, entity.getContent());
+    @Override
+    public void verify(SubscriptionRequest request) {
         
+    }
+
+    @Override
+    public Subscription subscribe(Subscription subscription) {
+        return subscription;
+    }
+
+    @Override
+    public Subscription unsubscribe(Subscription subscription) {
+        return subscription;
+    }
+
+    @Override
+    public Feed retrieve(URI url) throws IOException {
+        return null;
     }
 }

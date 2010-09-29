@@ -17,7 +17,7 @@
  *
  */
 
-package se.vgregion.push.services.impl;
+package se.vgregion.push.services;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,16 +37,17 @@ import org.junit.Before;
 import org.junit.Test;
 
 import se.vgregion.push.repository.jpa.FileSystemFeedRepository;
+import se.vgregion.push.services.DefaultPushService;
 import se.vgregion.push.types.Feed;
 
 
-public class DefaultFeedRetrievalServiceTest {
+public class DefaultPushServiceRetrievalTest {
 
     private static final File TMP = new File("target/test-tmp");
     private static final File FEEDS = new File("target/test-feeds");
     
     private FileSystemFeedRepository feedRepository = new FileSystemFeedRepository(FEEDS, TMP);
-    private DefaultFeedRetrieverService service = new DefaultFeedRetrieverService(feedRepository);
+    private DefaultPushService service = new DefaultPushService(null, feedRepository);
     private LocalTestServer server = new LocalTestServer(null, null);
     private HttpEntity testEntity = Utils.createEntity("hello world");
     
