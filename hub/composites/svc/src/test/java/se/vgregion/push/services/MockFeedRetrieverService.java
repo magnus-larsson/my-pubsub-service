@@ -17,41 +17,56 @@
  *
  */
 
-package se.vgregion.push.services.impl;
+package se.vgregion.push.services;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
+
+import se.vgregion.push.services.PushService;
 import se.vgregion.push.services.SubscriptionRequest;
-import se.vgregion.push.services.SubscriptionService;
+import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
 
-public class MockSubscriptionService implements SubscriptionService {
+public class MockFeedRetrieverService implements PushService {
 
-    private List<Subscription> subscriptions;
-    
-    public MockSubscriptionService(List<Subscription> subscriptions) {
-        this.subscriptions = subscriptions;
+    private File tmpDirectory;
+    private HttpEntity entity;
+
+    public MockFeedRetrieverService(File tmpDirectory, HttpEntity entity) {
+        this.tmpDirectory = tmpDirectory;
+        this.entity = entity;
     }
 
-    @Override
-    public List<Subscription> getAllSubscriptionsForFeed(URI feed) {
-        return subscriptions;
-    }
-
-    @Override
-    public void verify(SubscriptionRequest request) {
+    public Feed retrieve(URI url) throws IOException {
+        return new Feed(url, entity.getContent());
         
     }
 
     @Override
+    public List<Subscription> getAllSubscriptionsForFeed(URI feed) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public Subscription subscribe(Subscription subscription) {
-        return subscription;
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
     public Subscription unsubscribe(Subscription subscription) {
-        return subscription;
+        // TODO Auto-generated method stub
+        return null;
     }
 
+    @Override
+    public void verify(SubscriptionRequest request) throws IOException {
+        // TODO Auto-generated method stub
+        
+    }
 }

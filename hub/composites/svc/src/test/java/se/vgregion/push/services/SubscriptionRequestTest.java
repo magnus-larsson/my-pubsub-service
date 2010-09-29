@@ -1,4 +1,4 @@
-package se.vgregion.push.services.impl;
+package se.vgregion.push.services;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;

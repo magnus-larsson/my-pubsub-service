@@ -17,7 +17,7 @@
  *
  */
 
-package se.vgregion.push.services.impl;
+package se.vgregion.push.services;
 
 import java.io.IOException;
 import java.net.URI;
@@ -42,11 +42,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import se.vgregion.push.repository.SubscriptionRepository;
 import se.vgregion.push.services.SubscriptionMode;
 import se.vgregion.push.services.SubscriptionRequest;
-import se.vgregion.push.services.SubscriptionService;
+import se.vgregion.push.services.PushService;
 import se.vgregion.push.types.Subscription;
 
 
-public class DefaultSubscriptionServiceTest {
+public class DefaultPushServiceTest {
 
     private static final URI CALLBACK = URI.create("http://example.com/callback");
     private static final URI TOPIC = URI.create("http://example.com/topic");
@@ -54,7 +54,7 @@ public class DefaultSubscriptionServiceTest {
     private ApplicationContext ctx = new ClassPathXmlApplicationContext("services-test.xml");
     
     private SubscriptionRepository repository = ctx.getBean(SubscriptionRepository.class);
-    private SubscriptionService service = ctx.getBean(SubscriptionService.class);
+    private PushService service = ctx.getBean(PushService.class);
 
     private LocalTestServer server = new LocalTestServer(null, null);
     

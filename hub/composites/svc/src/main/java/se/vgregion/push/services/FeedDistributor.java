@@ -45,11 +45,11 @@ public class FeedDistributor {
     private final ExecutorService executor;
     
     @Resource
-    private SubscriptionService subscriptionService;
+    private PushService subscriptionService;
     
     private DefaultHttpClient httpclient = new DefaultHttpClient();
     
-    public FeedDistributor(BlockingQueue<DistributionRequest> distributionQueue, SubscriptionService subscriptionService) {
+    public FeedDistributor(BlockingQueue<DistributionRequest> distributionQueue, PushService subscriptionService) {
         this.distributionQueue = distributionQueue;
         this.subscriptionService = subscriptionService;
         

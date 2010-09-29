@@ -17,23 +17,28 @@
  *
  */
 
-package se.vgregion.push.controllers;
+package se.vgregion.push.services;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 import se.vgregion.push.services.SubscriptionRequest;
-import se.vgregion.push.services.SubscriptionService;
+import se.vgregion.push.services.PushService;
+import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
 
-@Service
-public class MockSubscriptionService implements SubscriptionService {
+public class MockSubscriptionService implements PushService {
+
+    private List<Subscription> subscriptions;
+    
+    public MockSubscriptionService(List<Subscription> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
 
     @Override
     public List<Subscription> getAllSubscriptionsForFeed(URI feed) {
-        return null;
+        return subscriptions;
     }
 
     @Override
@@ -50,4 +55,10 @@ public class MockSubscriptionService implements SubscriptionService {
     public Subscription unsubscribe(Subscription subscription) {
         return subscription;
     }
+
+    @Override
+    public Feed retrieve(URI url) throws IOException {
+        return null;
+    }
+
 }
