@@ -34,29 +34,49 @@ import se.vgregion.push.types.Subscription;
 
 public class JpaSubscriptionRepositoryTest {
 
+    private static final URI CALLBACK = URI.create("http://example.com/sub11");
+    private static final URI TOPIC = URI.create("http://example.com/feed");
+    
     private ApplicationContext ctx = new ClassPathXmlApplicationContext("services-test.xml");
-    private SubscriptionRepository dao = ctx.getBean(SubscriptionRepository.class);
+    private SubscriptionRepository repository = ctx.getBean(SubscriptionRepository.class);
     
     private Subscription sub1;
     
     @Before
     public void setup() {
-        sub1 = dao.persist(new Subscription(URI.create("http://example.com/feed"), URI.create("http://example.com/sub11")));
+        sub1 = repository.persist(new Subscription(TOPIC, CALLBACK));
     }
     
     @Test
     public void findByPk() {
-        Subscription loaded = dao.findByPk(sub1.getId());
+        Subscription loaded = repository.findByPk(sub1.getId());
         
-        Assert.assertEquals(sub1.getCallback(), loaded.getCallback());
+        Assert.assertEquals(CALLBACK, loaded.getCallback());
     }
 
     @Test
     public void findByTopic() {
-        List<Subscription> loaded = dao.findByTopic(URI.create("http://example.com/feed"));
+        List<Subscription> loaded = repository.findByTopic(TOPIC);
         
         Assert.assertEquals(1, loaded.size());
-        Assert.assertEquals(sub1.getCallback(), loaded.get(0).getCallback());
+        Assert.assertEquals(CALLBACK, loaded.get(0).getCallback());
+    }
+    
+    @Test
+    public void findByTopicNoneExisting() {
+        Assert.assertEquals(0, repository.findByTopic(URI.create("http://dummy")).size());
     }
 
+    @Test
+    public void findByTopicAndCallback() {
+        Subscription subscription = repository.findByTopicAndCallback(TOPIC, CALLBACK);
+        
+        Assert.assertNotNull(subscription);
+        Assert.assertEquals(CALLBACK, subscription.getCallback());
+    }
+
+    @Test
+    public void findByTopicAndCallbackNoneExisting() {
+        Assert.assertNull(repository.findByTopicAndCallback(TOPIC, URI.create("http://dummy")));
+    }
 }

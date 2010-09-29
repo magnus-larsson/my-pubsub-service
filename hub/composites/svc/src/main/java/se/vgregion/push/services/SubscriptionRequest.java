@@ -19,7 +19,9 @@
 
 package se.vgregion.push.services;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 
 public class SubscriptionRequest {
 
@@ -51,6 +53,33 @@ public class SubscriptionRequest {
         return verifyToken;
     }
 
-    
+    public URI getVerificationUrl(String challenge) {
+        try {
+            StringBuffer fullUrl = new StringBuffer();
+            fullUrl.append(callback);
+            
+            if(callback.getQuery() != null) {
+                fullUrl.append("&");
+            } else {
+                fullUrl.append("?");
+            }
+            
+            fullUrl.append("hub.mode=subscribe")
+                .append("&hub.topic=").append(URLEncoder.encode(topic.toString(), "UTF-8"))
+                .append("&hub.challenge=").append(URLEncoder.encode(challenge, "UTF-8"));
+                
+            if(leaseSeconds > 0) {
+                fullUrl.append("&hub.lease_seconds=").append(leaseSeconds);
+            }
+            if(verifyToken != null) {
+                fullUrl.append("&hub.verify_token=").append(URLEncoder.encode(verifyToken, "UTF-8"));
+            }
+            
+            return URI.create(fullUrl.toString());
+        } catch (UnsupportedEncodingException e) {
+            // should never happen
+            throw new RuntimeException(e);
+        }
+    }
     
 }

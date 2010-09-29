@@ -62,21 +62,7 @@ public class DefaultSubscriptionService implements SubscriptionService {
     public void verify(SubscriptionRequest request) throws IOException {
         String challenge = UUID.randomUUID().toString();
         
-        
-        StringBuffer fullUrl = new StringBuffer();
-        fullUrl.append(request.getCallback())
-            .append("?")
-            .append("hub.mode=subscribe")
-            .append("&hub.topic=").append(URLEncoder.encode(request.getTopic().toString(), "UTF-8"))
-            .append("&hub.challenge=").append(challenge)
-            .append("&hub.lease_seconds=").append(request.getLeaseSeconds());
-        
-        if(request.getVerifyToken() != null) {
-            fullUrl.append("&hub.verify_token=").append(URLEncoder.encode(request.getVerifyToken(), "UTF-8"));
-        }
-        
-        
-        HttpGet get = new HttpGet(fullUrl.toString());
+        HttpGet get = new HttpGet(request.getVerificationUrl(challenge));
         
         HttpResponse response = httpclient.execute(get);
         
@@ -98,7 +84,7 @@ public class DefaultSubscriptionService implements SubscriptionService {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         entity.writeTo(out);
         
-        return out.toString("ASCII");
+        return out.toString("UTF-8");
     }
     
     private boolean successStatus(int status) {
@@ -107,7 +93,13 @@ public class DefaultSubscriptionService implements SubscriptionService {
 
     @Override
     public Subscription addSubscription(Subscription subscription) {
-        return subscriptionRepository.persist(subscription);
+        // if subscription already exist, replace it
+        Subscription existing = subscriptionRepository.findByTopicAndCallback(subscription.getTopic(), subscription.getCallback());
         
+        if(existing != null) {
+            subscriptionRepository.removeEntity(existing);
+        }
+        
+        return subscriptionRepository.persist(subscription);
     }
 }
