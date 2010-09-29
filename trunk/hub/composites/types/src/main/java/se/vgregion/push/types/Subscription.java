@@ -25,10 +25,16 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import se.vgregion.portal.core.domain.patterns.entity.AbstractEntity;
 
 @Entity
+@Table(
+        uniqueConstraints=
+            @UniqueConstraint(columnNames={"TOPIC", "CALLBACK"})
+    )
 public class Subscription extends AbstractEntity<Subscription, Long> {
 
     @Id
