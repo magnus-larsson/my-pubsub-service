@@ -28,4 +28,6 @@ import se.vgregion.push.types.Subscription;
 public interface SubscriptionRepository extends Repository<Subscription, Long> {
 
     List<Subscription> findByTopic(URI url);
+    
+    Subscription findByTopicAndCallback(URI topic, URI callback);
 }

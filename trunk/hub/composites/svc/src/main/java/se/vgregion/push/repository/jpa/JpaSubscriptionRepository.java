@@ -20,6 +20,7 @@
 package se.vgregion.push.repository.jpa;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.NoResultException;
@@ -43,7 +44,21 @@ public class JpaSubscriptionRepository extends JpaRepository<Subscription, Long>
             return entityManager.createQuery("select l from Subscription l where l.topic = :topic")
                 .setParameter("topic", topic.toString()).getResultList();
         } catch(NoResultException e) {
+            return Collections.EMPTY_LIST;
+        }
+    }   
+
+    @SuppressWarnings("unchecked")
+    public Subscription findByTopicAndCallback(URI topic, URI callback) {
+        try {
+            return (Subscription) entityManager.createQuery("select l from Subscription l where l.topic = :topic " +
+            		"and l.callback = :callback")
+        		.setParameter("topic", topic.toString())
+        		.setParameter("callback", callback.toString())
+                        .getSingleResult();
+        } catch(NoResultException e) {
             return null;
         }
     }   
+
 }
