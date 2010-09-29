@@ -45,7 +45,12 @@ public class MockSubscriptionService implements SubscriptionService {
     }
 
     @Override
-    public Subscription addSubscription(Subscription subscription) {
+    public Subscription subscribe(Subscription subscription) {
+        return subscription;
+    }
+
+    @Override
+    public Subscription unsubscribe(Subscription subscription) {
         return subscription;
     }
 

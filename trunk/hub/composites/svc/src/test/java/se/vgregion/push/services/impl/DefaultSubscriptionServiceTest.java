@@ -36,13 +36,26 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import se.vgregion.push.repository.SubscriptionRepository;
+import se.vgregion.push.services.SubscriptionMode;
 import se.vgregion.push.services.SubscriptionRequest;
+import se.vgregion.push.services.SubscriptionService;
+import se.vgregion.push.types.Subscription;
 
 
 public class DefaultSubscriptionServiceTest {
 
-    private DefaultSubscriptionService service = new DefaultSubscriptionService(null);
+    private static final URI CALLBACK = URI.create("http://example.com/callback");
+    private static final URI TOPIC = URI.create("http://example.com/topic");
+    
+    private ApplicationContext ctx = new ClassPathXmlApplicationContext("services-test.xml");
+    
+    private SubscriptionRepository repository = ctx.getBean(SubscriptionRepository.class);
+    private SubscriptionService service = ctx.getBean(SubscriptionService.class);
+
     private LocalTestServer server = new LocalTestServer(null, null);
     
     private SubscriptionRequest subscriptionRequest;
@@ -56,7 +69,7 @@ public class DefaultSubscriptionServiceTest {
         long leaseSeconds = 123;
         String verifyToken = "token";
         
-        subscriptionRequest = new SubscriptionRequest(callback, topic, leaseSeconds, verifyToken);
+        subscriptionRequest = new SubscriptionRequest(SubscriptionMode.SUBSCRIBE, callback, topic, leaseSeconds, verifyToken);
 
     }
     
@@ -125,6 +138,44 @@ public class DefaultSubscriptionServiceTest {
 
         service.verify(subscriptionRequest);
     }
+    
+    @Test
+    public void subscribe() {
+        service.subscribe(new Subscription(TOPIC, CALLBACK));
+        
+        Assert.assertEquals(1, repository.findAll().size());
+    }
+
+    @Test
+    public void subscribeWithExisting() {
+        repository.persist(new Subscription(TOPIC, CALLBACK));
+        
+        service.subscribe(new Subscription(TOPIC, CALLBACK, 123, "sekrit"));
+        
+        Assert.assertEquals(1, repository.findAll().size());
+        Assert.assertEquals(123, repository.findByTopicAndCallback(TOPIC, CALLBACK).getLeaseSeconds());
+    }
+
+    @Test
+    public void unsubscribe() {
+        repository.persist(new Subscription(TOPIC, CALLBACK));
+        
+        Assert.assertEquals(1, repository.findAll().size());
+
+        service.unsubscribe(new Subscription(TOPIC, CALLBACK));
+        
+        Assert.assertEquals(0, repository.findAll().size());
+    }
+
+    @Test
+    public void unsubscribeNonExisting() {
+        Assert.assertEquals(0, repository.findAll().size());
+
+        service.unsubscribe(new Subscription(TOPIC, CALLBACK));
+        
+        Assert.assertEquals(0, repository.findAll().size());
+    }
+    
     
     private String getQueryParamValue(String url, String name) {
         int start = url.indexOf(name);

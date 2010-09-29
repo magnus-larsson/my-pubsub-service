@@ -92,14 +92,20 @@ public class DefaultSubscriptionService implements SubscriptionService {
     }
 
     @Override
-    public Subscription addSubscription(Subscription subscription) {
+    public Subscription subscribe(Subscription subscription) {
         // if subscription already exist, replace it
+        unsubscribe(subscription);
+        
+        return subscriptionRepository.persist(subscription);
+    }
+
+    @Override
+    public Subscription unsubscribe(Subscription subscription) {
         Subscription existing = subscriptionRepository.findByTopicAndCallback(subscription.getTopic(), subscription.getCallback());
         
         if(existing != null) {
             subscriptionRepository.removeEntity(existing);
         }
-        
-        return subscriptionRepository.persist(subscription);
+        return existing;
     }
 }

@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import se.vgregion.push.services.RetrievalRequest;
 import se.vgregion.push.services.SubscriptionRequest;
 import se.vgregion.push.services.SubscriptionService;
+import se.vgregion.push.services.SubscriptionMode;
 import se.vgregion.push.types.Subscription;
 
 @Controller
@@ -62,13 +63,15 @@ public class HubController {
         if("publish".equals(mode)) {
             publish(request, response);
         } else if("subscribe".equals(mode)) {
-            subscribe(request, response);
+            subscribe(request, response, SubscriptionMode.SUBSCRIBE);
+        } else if("unsubscribe".equals(mode)) {
+            subscribe(request, response, SubscriptionMode.UNSUBSCRIBE);
         } else {
             response.sendError(500, "Unknown hub.mode parameter");
         }
     }
     
-    private void subscribe(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void subscribe(HttpServletRequest request, HttpServletResponse response, SubscriptionMode mode) throws IOException {
         URI callback = notNullAndValidUrl(request.getParameter("hub.callback"));
         if(callback != null) {
             URI topic = notNullAndValidUrl(request.getParameter("hub.topic"));
@@ -84,14 +87,14 @@ public class HubController {
                         String secret = request.getParameter("hub.secret");
                         String verifyToken = request.getParameter("hub.verify_token");
                         
-                        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(callback, topic, leaseSeconds, verifyToken);
+                        SubscriptionRequest subscriptionRequest = new SubscriptionRequest(mode, callback, topic, leaseSeconds, verifyToken);
                         
                         try {
                             subscriptionService.verify(subscriptionRequest);
                             
                             Subscription subscription = new Subscription(topic, callback, leaseSeconds, secret);
                             
-                            subscriptionService.addSubscription(subscription);
+                            subscriptionService.subscribe(subscription);
                             
                             response.setStatus(204);
                         } catch(Exception e) {

@@ -38,6 +38,10 @@ public class JpaSubscriptionRepository extends JpaRepository<Subscription, Long>
         super(Subscription.class);
     }
 
+    public void removeEntity(Subscription entity) {
+        entityManager.remove(entityManager.merge(entity));
+    }
+    
     @SuppressWarnings("unchecked")
     public List<Subscription> findByTopic(URI topic) {
         try {
@@ -48,7 +52,6 @@ public class JpaSubscriptionRepository extends JpaRepository<Subscription, Long>
         }
     }   
 
-    @SuppressWarnings("unchecked")
     public Subscription findByTopicAndCallback(URI topic, URI callback) {
         try {
             return (Subscription) entityManager.createQuery("select l from Subscription l where l.topic = :topic " +

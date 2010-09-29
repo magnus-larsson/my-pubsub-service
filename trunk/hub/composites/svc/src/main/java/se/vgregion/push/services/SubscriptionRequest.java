@@ -29,12 +29,18 @@ public class SubscriptionRequest {
     private URI topic;
     private long leaseSeconds;
     private String verifyToken;
+    private SubscriptionMode mode;
     
-    public SubscriptionRequest(URI callback, URI topic, long leaseSeconds, String verifyToken) {
+    public SubscriptionRequest(SubscriptionMode mode, URI callback, URI topic, long leaseSeconds, String verifyToken) {
+        this.mode = mode;
         this.callback = callback;
         this.topic = topic;
         this.leaseSeconds = leaseSeconds;
         this.verifyToken = verifyToken;
+    }
+
+    public SubscriptionMode getMode() {
+        return mode;
     }
 
     public URI getCallback() {
@@ -55,27 +61,31 @@ public class SubscriptionRequest {
 
     public URI getVerificationUrl(String challenge) {
         try {
-            StringBuffer fullUrl = new StringBuffer();
-            fullUrl.append(callback);
+            StringBuffer url = new StringBuffer();
+            url.append(callback);
             
             if(callback.getQuery() != null) {
-                fullUrl.append("&");
+                url.append("&");
             } else {
-                fullUrl.append("?");
+                url.append("?");
             }
             
-            fullUrl.append("hub.mode=subscribe")
-                .append("&hub.topic=").append(URLEncoder.encode(topic.toString(), "UTF-8"))
+            if(mode.equals(SubscriptionMode.SUBSCRIBE)) {
+                url.append("hub.mode=subscribe");
+            } else {
+                url.append("hub.mode=unsubscribe");
+            }
+            url.append("&hub.topic=").append(URLEncoder.encode(topic.toString(), "UTF-8"))
                 .append("&hub.challenge=").append(URLEncoder.encode(challenge, "UTF-8"));
                 
             if(leaseSeconds > 0) {
-                fullUrl.append("&hub.lease_seconds=").append(leaseSeconds);
+                url.append("&hub.lease_seconds=").append(leaseSeconds);
             }
             if(verifyToken != null) {
-                fullUrl.append("&hub.verify_token=").append(URLEncoder.encode(verifyToken, "UTF-8"));
+                url.append("&hub.verify_token=").append(URLEncoder.encode(verifyToken, "UTF-8"));
             }
             
-            return URI.create(fullUrl.toString());
+            return URI.create(url.toString());
         } catch (UnsupportedEncodingException e) {
             // should never happen
             throw new RuntimeException(e);
