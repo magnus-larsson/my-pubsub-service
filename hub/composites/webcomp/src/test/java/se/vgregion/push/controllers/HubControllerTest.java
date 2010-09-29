@@ -30,7 +30,9 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import se.vgregion.push.services.RetrievalRequest;
+import se.vgregion.push.services.SubscriptionMode;
 import se.vgregion.push.services.SubscriptionRequest;
+import se.vgregion.push.types.Subscription;
 
 public class HubControllerTest {
 
@@ -95,7 +97,7 @@ public class HubControllerTest {
     }
     
     @Test
-    public void subscription() throws Exception {
+    public void subscribe() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/");
         request.setParameter("hub.mode", "subscribe");
         request.setParameter("hub.callback", SUBSCRIPTION_CALLBACK.toString());
@@ -107,6 +109,7 @@ public class HubControllerTest {
         
         MockHttpServletResponse response = new MockHttpServletResponse();
         
+        final LinkedBlockingQueue<Subscription> subscriptions = new LinkedBlockingQueue<Subscription>();
         final LinkedBlockingQueue<SubscriptionRequest> subscriptionRequests = new LinkedBlockingQueue<SubscriptionRequest>();
 
         controller.setSubscriptionService(new MockSubscriptionService() {
@@ -114,14 +117,30 @@ public class HubControllerTest {
             public void verify(SubscriptionRequest request) {
                 subscriptionRequests.add(request);
             }
+
+            @Override
+            public Subscription subscribe(Subscription subscription) {
+                subscriptions.add(subscription);
+                return subscription;
+            }
+            
+            
         });
         
         controller.post(request, response);
 
         Assert.assertEquals(204, response.getStatus());
         
+        Subscription subscription = subscriptions.poll();
+        Assert.assertNotNull(subscription);
+        Assert.assertEquals(SUBSCRIPTION_CALLBACK, subscription.getCallback());
+        Assert.assertEquals(SUBSCRIPTION_TOPIC, subscription.getTopic());
+        Assert.assertEquals(123, subscription.getLeaseSeconds());
+        Assert.assertEquals("sekrit!", subscription.getSecret());
+        
         SubscriptionRequest subscriptionRequest = subscriptionRequests.poll();
 
+        Assert.assertEquals(SubscriptionMode.SUBSCRIBE, subscriptionRequest.getMode());
         Assert.assertEquals(SUBSCRIPTION_CALLBACK, subscriptionRequest.getCallback());
         Assert.assertEquals(SUBSCRIPTION_TOPIC, subscriptionRequest.getTopic());
         Assert.assertEquals(123, subscriptionRequest.getLeaseSeconds());
@@ -234,6 +253,49 @@ public class HubControllerTest {
         Assert.assertEquals(500, response.getStatus());
     }
 
+    @Test
+    public void unsubscribe() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/");
+        request.setParameter("hub.mode", "unsubscribe");
+        request.setParameter("hub.callback", SUBSCRIPTION_CALLBACK.toString());
+        request.setParameter("hub.topic", SUBSCRIPTION_TOPIC.toString());
+        request.setParameter("hub.verify", "sync");
+        request.setParameter("hub.verify_token", "token");
+        
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        
+        final LinkedBlockingQueue<Subscription> subscriptions = new LinkedBlockingQueue<Subscription>();
+        final LinkedBlockingQueue<SubscriptionRequest> subscriptionRequests = new LinkedBlockingQueue<SubscriptionRequest>();
+
+        controller.setSubscriptionService(new MockSubscriptionService() {
+            @Override
+            public void verify(SubscriptionRequest request) {
+                subscriptionRequests.add(request);
+            }
+
+            @Override
+            public Subscription subscribe(Subscription subscription) {
+                subscriptions.add(subscription);
+                return subscription;
+            }
+        });
+        
+        controller.post(request, response);
+
+        Assert.assertEquals(204, response.getStatus());
+        
+        Subscription subscription = subscriptions.poll();
+        Assert.assertNotNull(subscription);
+        Assert.assertEquals(SUBSCRIPTION_CALLBACK, subscription.getCallback());
+        Assert.assertEquals(SUBSCRIPTION_TOPIC, subscription.getTopic());
+        
+        SubscriptionRequest subscriptionRequest = subscriptionRequests.poll();
+
+        Assert.assertEquals(SubscriptionMode.UNSUBSCRIBE, subscriptionRequest.getMode());
+        Assert.assertEquals(SUBSCRIPTION_CALLBACK, subscriptionRequest.getCallback());
+        Assert.assertEquals(SUBSCRIPTION_TOPIC, subscriptionRequest.getTopic());
+        Assert.assertEquals("token", subscriptionRequest.getVerifyToken());
+    }
 
     
     @Test

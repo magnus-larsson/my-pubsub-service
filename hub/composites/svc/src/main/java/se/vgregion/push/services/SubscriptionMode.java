@@ -19,19 +19,8 @@
 
 package se.vgregion.push.services;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.List;
 
-import se.vgregion.push.types.Subscription;
-
-public interface SubscriptionService {
-
-    List<Subscription> getAllSubscriptionsForFeed(URI feed);
-    
-    void verify(SubscriptionRequest request) throws IOException;
-    
-    Subscription subscribe(Subscription subscription);
-    
-    Subscription unsubscribe(Subscription subscription);
+public enum SubscriptionMode {
+    SUBSCRIBE,
+    UNSUBSCRIBE
 }
