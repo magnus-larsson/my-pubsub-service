@@ -43,7 +43,7 @@ public class JpaSubscriptionRepository extends DefaultJpaRepository<Subscription
     @Transactional(propagation=Propagation.REQUIRED)
     public void remove(Subscription entity) {
 //        entityManager.remove(entityManager.merge(entity));
-        entityManager.remove(entity);
+        super.remove(entity);
         
         // need to flush or DefaultPushService.subscribe() will cause
         // constraint violation

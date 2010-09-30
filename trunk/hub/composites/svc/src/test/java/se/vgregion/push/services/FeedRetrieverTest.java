@@ -25,22 +25,19 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.entity.StringEntity;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import se.vgregion.push.services.DistributionRequest;
-import se.vgregion.push.services.FeedRetriever;
-import se.vgregion.push.services.RetrievalRequest;
+import se.vgregion.push.types.SomeFeeds;
 
 
 public class FeedRetrieverTest {
 
     private static final File TMP = new File("target/test-tmp");
     private static final URI TEST_URI = URI.create("http://example.com");
-    private static final HttpEntity TEST_ENTITY = Utils.createEntity("Hello world");
+    private static final HttpEntity TEST_ENTITY = Utils.createEntity(SomeFeeds.ATOM);
     
     private LinkedBlockingQueue<RetrievalRequest> retrievalQueue = new LinkedBlockingQueue<RetrievalRequest>();
     private LinkedBlockingQueue<DistributionRequest> distributionQueue = new LinkedBlockingQueue<DistributionRequest>();
@@ -66,7 +63,7 @@ public class FeedRetrieverTest {
         
         Assert.assertNotNull(distributionRequest);
         Assert.assertEquals(TEST_URI, distributionRequest.getFeed().getUrl());
-        Assert.assertEquals(TEST_ENTITY.getContentLength(), distributionRequest.getFeed().getContent().available());
+        Assert.assertNotNull(distributionRequest.getFeed().getDocument());
     }
     
     @After

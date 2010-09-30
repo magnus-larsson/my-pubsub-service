@@ -43,7 +43,12 @@
 			<version>1.2.14</version>
 			<!-- 1.2.15 drags down non-optional deps -->
 		</dependency>
-
+		<dependency>
+		    <groupId>xom</groupId>
+		    <artifactId>xom</artifactId>
+		    <version>1.2.5</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

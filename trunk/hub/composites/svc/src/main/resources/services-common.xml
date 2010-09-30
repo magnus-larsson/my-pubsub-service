@@ -27,11 +27,6 @@
 
 	<tx:annotation-driven />
 
- 	<bean id="feedDirectory"
-		class="java.io.File">
-		<constructor-arg value="/tmp/test-repo" />
-	</bean>
-
  	<bean id="retrieveQueue"
 		class="java.util.concurrent.LinkedBlockingQueue" >
 	</bean>
@@ -40,16 +35,10 @@
 		class="java.util.concurrent.LinkedBlockingQueue">
 	</bean>
 
- 	<bean id="feedRepository"
-		class="se.vgregion.push.repository.jpa.FileSystemFeedRepository">
-		<constructor-arg ref="feedDirectory" />
-	</bean>
-
  	<bean id="pushService"
 		class="se.vgregion.push.services.DefaultPushService"
 		autowire="constructor"
 		>
-		<constructor-arg ref="feedRepository" index="1" />
 	</bean>
 
  	<bean id="feedDistributor"
