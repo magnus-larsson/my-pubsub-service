@@ -26,22 +26,31 @@ import java.util.List;
 import javax.persistence.NoResultException;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import se.vgregion.portal.core.infrastructure.persistence.jpa.JpaRepository;
+import se.vgregion.portal.core.infrastructure.persistence.jpa.DefaultJpaRepository;
 import se.vgregion.push.repository.SubscriptionRepository;
 import se.vgregion.push.types.Subscription;
     
 @Repository
-public class JpaSubscriptionRepository extends JpaRepository<Subscription, Long> implements SubscriptionRepository {
+public class JpaSubscriptionRepository extends DefaultJpaRepository<Subscription> implements SubscriptionRepository {
     
     public JpaSubscriptionRepository() {
-        super(Subscription.class);
+       setType(Subscription.class);
     }
 
-    public void removeEntity(Subscription entity) {
-        entityManager.remove(entityManager.merge(entity));
+    @Transactional(propagation=Propagation.REQUIRED)
+    public void remove(Subscription entity) {
+//        entityManager.remove(entityManager.merge(entity));
+        entityManager.remove(entity);
+        
+        // need to flush or DefaultPushService.subscribe() will cause
+        // constraint violation
+        entityManager.flush();
     }
     
+    @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
     @SuppressWarnings("unchecked")
     public List<Subscription> findByTopic(URI topic) {
         try {
@@ -52,6 +61,7 @@ public class JpaSubscriptionRepository extends JpaRepository<Subscription, Long>
         }
     }   
 
+    @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
     public Subscription findByTopicAndCallback(URI topic, URI callback) {
         try {
             return (Subscription) entityManager.createQuery("select l from Subscription l where l.topic = :topic " +
