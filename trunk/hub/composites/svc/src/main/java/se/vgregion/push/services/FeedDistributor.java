@@ -81,12 +81,14 @@ public class FeedDistributor {
                                     HttpResponse response = null;
                                     try {
                                         response = httpclient.execute(post);
-                                        if(response.getStatusLine().getStatusCode() == 200) {
+                                        if(HttpUtil.successStatus(response)) {
                                             LOG.debug("Succeeded distributing to subscriber {}", subscription.getCallback());
                                         } else {
+                                            // TODO handle retrying
                                             LOG.debug("Failed distributing to subscriber \"{}\" with error \"{}\"", subscription.getCallback(), response.getStatusLine());
                                         }
                                     } catch(IOException e) {
+                                        // TODO handle retrying
                                         LOG.debug("Failed distributing to subscriber: " + subscription.getCallback(), e);
                                     } finally {
                                         if(response != null) {
@@ -96,7 +98,6 @@ public class FeedDistributor {
                                             }
                                         }
                                     }
-                                    // TODO handle retries
                                 }
                                 LOG.info("Feed distributed to {} subscribers: {}", subscribers.size(), request.getFeed().getUrl());
                             } catch (IOException e) {
