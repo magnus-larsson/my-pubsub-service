@@ -99,7 +99,8 @@ public class DefaultPushService implements PushService {
         Subscription existing = subscriptionRepository.findByTopicAndCallback(subscription.getTopic(), subscription.getCallback());
         
         if(existing != null) {
-            subscriptionRepository.removeEntity(existing);
+            
+            subscriptionRepository.remove(existing);
         }
         return existing;
     }
