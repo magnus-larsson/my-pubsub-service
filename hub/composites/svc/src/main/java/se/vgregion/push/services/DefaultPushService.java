@@ -71,8 +71,8 @@ public class DefaultPushService implements PushService {
         
         HttpResponse response = httpclient.execute(get);
         
-        if(successStatus(response.getStatusLine().getStatusCode())) {
-            String returnedChallenge = readContent(response.getEntity());
+        if(HttpUtil.successStatus(response)) {
+            String returnedChallenge = HttpUtil.readContent(response.getEntity());
             
             if(challenge.equals(returnedChallenge)) {
                 // all okay
@@ -85,17 +85,7 @@ public class DefaultPushService implements PushService {
         }
     }
     
-    private String readContent(HttpEntity entity) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        entity.writeTo(out);
-        
-        return out.toString("UTF-8");
-    }
     
-    private boolean successStatus(int status) {
-        return status >= 200 && status <300;
-    }
-
     @Override
     public Subscription subscribe(Subscription subscription) {
         // if subscription already exist, replace it
