@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
@@ -76,7 +76,7 @@ public class FeedDistributor {
                                     // TODO get from feed
                                     post.addHeader(new BasicHeader("Content-Type", "application/atom+xm"));
                                     
-                                    post.setEntity(new InputStreamEntity(request.getFeed().getContent(), request.getFeed().getContent().available()));
+                                    post.setEntity(new StringEntity(request.getFeed().getDocument().toXML(), "UTF-8"));
                                     
                                     HttpResponse response = null;
                                     try {

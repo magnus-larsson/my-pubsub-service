@@ -25,5 +25,7 @@
              version="1.0">
     <persistence-unit name="PuSH">
         <class>se.vgregion.push.types.Subscription</class>
+        <class>se.vgregion.push.types.Feed</class>
+        <class>se.vgregion.push.types.Entry</class>
     </persistence-unit>
 </persistence>

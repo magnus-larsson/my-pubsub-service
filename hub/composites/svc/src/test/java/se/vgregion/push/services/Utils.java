@@ -31,7 +31,7 @@ public class Utils {
 
     public static HttpEntity createEntity(String s) {
         try {
-            return new StringEntity(s);
+            return new StringEntity(s, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
@@ -43,7 +43,7 @@ public class Utils {
                 Assert.assertTrue(file.delete());
             }
             Assert.assertTrue(dir.delete());
-        }        
+        }
     }
     
     public static void assertEquals(HttpEntity expected, HttpEntity actual) {

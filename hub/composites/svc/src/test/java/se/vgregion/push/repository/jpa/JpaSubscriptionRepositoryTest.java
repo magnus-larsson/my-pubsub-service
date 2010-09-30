@@ -51,7 +51,7 @@ public class JpaSubscriptionRepositoryTest {
     
     @Test
     public void findByPk() {
-        Subscription loaded = repository.findByPk(sub1.getId());
+        Subscription loaded = repository.find(sub1.getId());
         
         Assert.assertEquals(CALLBACK, loaded.getCallback());
     }

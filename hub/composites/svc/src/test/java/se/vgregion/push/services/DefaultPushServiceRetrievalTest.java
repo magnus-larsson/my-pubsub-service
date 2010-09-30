@@ -19,7 +19,6 @@
 
 package se.vgregion.push.services;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -36,29 +35,18 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import se.vgregion.push.repository.jpa.FileSystemFeedRepository;
-import se.vgregion.push.services.DefaultPushService;
 import se.vgregion.push.types.Feed;
-
+import se.vgregion.push.types.SomeFeeds;
 
 public class DefaultPushServiceRetrievalTest {
 
-    private static final File TMP = new File("target/test-tmp");
-    private static final File FEEDS = new File("target/test-feeds");
-    
-    private FileSystemFeedRepository feedRepository = new FileSystemFeedRepository(FEEDS, TMP);
+    private MockFeedRepository feedRepository = new MockFeedRepository();
     private DefaultPushService service = new DefaultPushService(null, feedRepository);
     private LocalTestServer server = new LocalTestServer(null, null);
-    private HttpEntity testEntity = Utils.createEntity("hello world");
+    private HttpEntity testEntity = Utils.createEntity(SomeFeeds.ATOM);
     
     @Before
     public void before() throws Exception {
-        deleteDir(TMP);
-        deleteDir(FEEDS);
-
-        Assert.assertTrue("Failed to create " + TMP.getAbsolutePath(), TMP.mkdirs());
-        Assert.assertTrue("Failed to create " + FEEDS.getAbsolutePath(), FEEDS.mkdirs());
-
         server.start();
     }
     
@@ -78,7 +66,7 @@ public class DefaultPushServiceRetrievalTest {
         
         Feed downloaded = service.retrieve(buildTestUrl("/test"));
         
-        Assert.assertEquals(testEntity.getContentLength(), downloaded.getContent().available());
+        Assert.assertNotNull(downloaded.getDocument());
     }
 
     @Test(expected=IOException.class)
@@ -103,17 +91,5 @@ public class DefaultPushServiceRetrievalTest {
         } catch (Exception e) {
             // ignore
         }
-        
-        deleteDir(TMP);
-        deleteDir(FEEDS);
-    }
-    
-    private void deleteDir(File dir) {
-        if(dir.exists()) {
-            for(File file : dir.listFiles()) {
-                Assert.assertTrue(file.delete());
-            }
-            Assert.assertTrue(dir.delete());
-        }        
     }
 }

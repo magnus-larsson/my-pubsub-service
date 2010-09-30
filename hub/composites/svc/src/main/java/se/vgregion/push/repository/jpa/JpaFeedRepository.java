@@ -17,14 +17,20 @@
  *
  */
 
-package se.vgregion.push.repository;
+package se.vgregion.push.repository.jpa;
 
-import se.vgregion.portal.core.domain.patterns.repository.Repository;
+import org.springframework.stereotype.Repository;
+
+import se.vgregion.portal.core.infrastructure.persistence.jpa.DefaultJpaRepository;
+import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.types.Feed;
-import se.vgregion.push.types.Subscription;
-
-
     
-public interface FeedRepository extends Repository<Feed, Long> {
+@Repository
+public class JpaFeedRepository extends DefaultJpaRepository<Feed> implements FeedRepository {
+    
+    public JpaFeedRepository() {
+       setType(Feed.class);
+    }
+
 
 }
