@@ -20,12 +20,15 @@
 package se.vgregion.push.types;
 
 import java.net.URI;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
 import se.vgregion.portal.core.domain.patterns.entity.AbstractEntity;
@@ -52,6 +55,10 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
 
     @Column(nullable=false)
     private String topic;
+    
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastUpdated;
 
     /* Make JPA happy */
     protected Subscription() {
@@ -88,5 +95,13 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
 
     public String getSecret() {
         return secret;
+    }
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 }

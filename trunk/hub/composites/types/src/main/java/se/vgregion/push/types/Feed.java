@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -40,11 +41,12 @@ import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
 import nu.xom.ParsingException;
-import nu.xom.ValidityException;
 import se.vgregion.portal.core.domain.patterns.entity.AbstractEntity;
 
 @Entity
 public class Feed extends AbstractEntity<Feed, Long> {
+
+    public static final String NS_ATOM = "http://www.w3.org/2005/Atom";
 
     @Id
     @GeneratedValue
@@ -93,12 +95,12 @@ public class Feed extends AbstractEntity<Feed, Long> {
 
         // TODO add for RSS
         Element root = documentWithOutEntries.getRootElement();
-        Elements entryElms = root.getChildElements("entry","http://www.w3.org/2005/Atom");
+        Elements entryElms = root.getChildElements("entry",NS_ATOM);
         for(int i = 0; i<entryElms.size(); i++) {
             Element elm = entryElms.get(i);
             root.removeChild(elm);
             
-            entries.add(new Entry(elm.toXML()));
+            entries.add(new Entry(elm));
         }
         
         xml = documentWithOutEntries.toXML();
@@ -117,14 +119,16 @@ public class Feed extends AbstractEntity<Feed, Long> {
         return URI.create(url);
     }
     
-    public Document getDocument() {
+    public Document getDocument(Date updatedSince) {
 
         try {
             Builder parser = new Builder();
             // TODO cache
             Document document = parser.build(new StringReader(xml));
             for(Entry entry : entries) {
-                document.getRootElement().appendChild(entry.getElement().copy());
+                if(updatedSince == null || entry.isNewerThan(updatedSince)) {
+                    document.getRootElement().appendChild(entry.getElement().copy());
+                }
             }
             
             return document;
@@ -132,6 +136,11 @@ public class Feed extends AbstractEntity<Feed, Long> {
             // should never happen
             throw new RuntimeException(e);
         }
+        
+    }
+    
+    public Document getDocument() {
+        return getDocument(null);
     }
 
 }

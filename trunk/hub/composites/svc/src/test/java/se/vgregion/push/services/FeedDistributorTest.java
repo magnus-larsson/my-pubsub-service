@@ -19,31 +19,17 @@
 
 package se.vgregion.push.services;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpException;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.localserver.LocalTestServer;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpRequestHandler;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import se.vgregion.push.services.DistributionRequest;
-import se.vgregion.push.services.FeedDistributor;
 import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.SomeFeeds;
@@ -55,54 +41,38 @@ public class FeedDistributorTest {
     private static final URI FEED_URI = URI.create("http://example.com");
     private static final URI SUB_URI = URI.create("http://example.com/sub1");
 
-//    private static final HttpEntity TEST_ENTITY = Utils.createEntity(SomeFeeds.ATOM);
-    
     private LinkedBlockingQueue<DistributionRequest> distributionQueue = new LinkedBlockingQueue<DistributionRequest>();
     private FeedDistributor feedDistributor;
     
-    private LocalTestServer server = new LocalTestServer(null, null);
-    
-    @Before
-    public void before() throws Exception {
-        server.start();
-        
-        List<Subscription> subscriptions = new ArrayList<Subscription>();
-        Subscription sub1 = new Subscription(FEED_URI, buildSubscriptionUrl("/sub1"));
+    @Test
+    public void distribute() throws Exception {
+        final List<Subscription> subscriptions = new ArrayList<Subscription>();
+        Subscription sub1 = new Subscription(FEED_URI, SUB_URI);
         subscriptions.add(sub1);
+
         
-        MockSubscriptionService service = new MockSubscriptionService(subscriptions);
+        distributionQueue.put(new DistributionRequest(new Feed(FEED_URI, ContentType.ATOM, SomeFeeds.ATOM_DOCUMENT)));
+        
+        final LinkedBlockingQueue<DistributionRequest> issuedRequests = new LinkedBlockingQueue<DistributionRequest>();
+        
+        PushService service = new DefaultPushService(null, null) {
+            @Override
+            public List<Subscription> getAllSubscriptionsForFeed(URI feed) {
+                return subscriptions;
+            }
+
+            @Override
+            public void distribute(DistributionRequest request) throws IOException {
+                issuedRequests.add(request);
+            }
+        };
         
         feedDistributor = new FeedDistributor(distributionQueue, service);
         feedDistributor.start();
-    }
-    
-    
-    @Test
-    public void test() throws Exception {
-        distributionQueue.put(new DistributionRequest(new Feed(FEED_URI, ContentType.ATOM, SomeFeeds.ATOM_DOCUMENT)));
-        
-        final LinkedBlockingQueue<HttpRequest> issuedRequests = new LinkedBlockingQueue<HttpRequest>();
-        server.register("/*", new HttpRequestHandler() {
-            @Override
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException,
-                    IOException {
-                issuedRequests.add(request);
-            }
-        });
-        
-        HttpRequest request = issuedRequests.poll(10000, TimeUnit.MILLISECONDS);
+
+        DistributionRequest request = issuedRequests.poll(10000, TimeUnit.MILLISECONDS);
         Assert.assertNotNull(request);
-        Assert.assertEquals(ContentType.ATOM.toString(), request.getHeaders("Content-Type")[0].getValue());
-        Assert.assertTrue(request instanceof HttpEntityEnclosingRequest);
-        
-        HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();
-        
-        // TODO improve assertion
-        Assert.assertNotNull(entity);
-    }
-    
-    private URI buildSubscriptionUrl(String path) throws URISyntaxException {
-        return new URI("http://" + server.getServiceHostName() + ":" + server.getServicePort() + path);
+        Assert.assertEquals(FEED_URI, request.getFeed().getUrl());
     }
     
     @After

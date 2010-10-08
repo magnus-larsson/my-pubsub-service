@@ -49,25 +49,26 @@ public class MockFeedRetrieverService implements PushService {
 
     @Override
     public List<Subscription> getAllSubscriptionsForFeed(URI feed) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Subscription subscribe(Subscription subscription) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Subscription unsubscribe(Subscription subscription) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void verify(SubscriptionRequest request) throws IOException {
-        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void distribute(DistributionRequest request) throws IOException {
         
     }
 }
