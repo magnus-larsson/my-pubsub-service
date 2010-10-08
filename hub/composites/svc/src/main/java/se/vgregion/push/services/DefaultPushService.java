@@ -19,8 +19,9 @@
 
 package se.vgregion.push.services;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +31,10 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -143,6 +147,51 @@ public class DefaultPushService implements PushService {
         LOG.warn("Feed successfully retrived, putting for distribution: {}", url);
         
         return feed;
+    }
+
+    @Override
+    public void distribute(DistributionRequest request) throws IOException {
+        List<Subscription> subscribers = getAllSubscriptionsForFeed(request.getFeed().getUrl());
+        
+        if(!subscribers.isEmpty()) {
+            LOG.debug("Distributing " + request.getFeed().getUrl());
+            for(Subscription subscription : subscribers) {
+                distribute(request.getFeed(), subscription);
+            }
+            LOG.info("Feed distributed to {} subscribers: {}", subscribers.size(), request.getFeed().getUrl());
+        }
+    }
+
+    private void distribute(Feed feed, Subscription subscription) throws IOException {
+        LOG.debug("Distributing to " + subscription.getCallback());
+        HttpPost post = new HttpPost(subscription.getCallback());
+        
+        post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
+        
+        post.setEntity(new StringEntity(feed.getDocument().toXML(), "UTF-8"));
+        
+        HttpResponse response = null;
+        try {
+            response = httpclient.execute(post);
+            if(HttpUtil.successStatus(response)) {
+                LOG.debug("Succeeded distributing to subscriber {}", subscription.getCallback());
+            } else {
+                // TODO handle retrying
+                LOG.debug("Failed distributing to subscriber \"{}\" with error \"{}\"", subscription.getCallback(), response.getStatusLine());
+            }
+        } catch(IOException e) {
+            // TODO handle retrying
+            LOG.debug("Failed distributing to subscriber: " + subscription.getCallback(), e);
+        } finally {
+            if(response != null) {
+                if(response.getEntity() != null) {
+                    InputStream in = response.getEntity().getContent();
+                    try {
+                        if(in != null) in.close();
+                    } catch(IOException ignored) {}
+                }
+            }
+        }
     }
 
 }

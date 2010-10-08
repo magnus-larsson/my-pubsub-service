@@ -42,5 +42,8 @@ public interface PushService {
     Subscription unsubscribe(Subscription subscription);
     
     @Transactional
-    public abstract Feed retrieve(URI url) throws IOException;
+    Feed retrieve(URI url) throws IOException;
+    
+    void distribute(DistributionRequest request) throws IOException;
+    
 }

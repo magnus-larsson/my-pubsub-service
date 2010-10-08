@@ -61,4 +61,9 @@ public class MockSubscriptionService implements PushService {
         return null;
     }
 
+    @Override
+    public void distribute(DistributionRequest request) throws IOException {
+        
+    }
+
 }

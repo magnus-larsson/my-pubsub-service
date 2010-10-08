@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import se.vgregion.push.services.DistributionRequest;
 import se.vgregion.push.services.SubscriptionRequest;
 import se.vgregion.push.services.PushService;
 import se.vgregion.push.types.Feed;
@@ -56,5 +57,10 @@ public class MockPushService implements PushService {
     @Override
     public Feed retrieve(URI url) throws IOException {
         return null;
+    }
+
+    @Override
+    public void distribute(DistributionRequest request) throws IOException {
+        
     }
 }

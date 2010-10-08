@@ -63,48 +63,10 @@ public class FeedDistributor {
                 while(true) {
                     try {
                         DistributionRequest request = distributionQueue.take();
-                        
-                        List<Subscription> subscribers = subscriptionService.getAllSubscriptionsForFeed(request.getFeed().getUrl());
-                        
-                        if(!subscribers.isEmpty()) {
-                            LOG.debug("Distributing " + request.getFeed().getUrl());
-                            try {
-                                for(Subscription subscription : subscribers) {
-                                    LOG.debug("Distributing to " + subscription.getCallback());
-                                    HttpPost post = new HttpPost(subscription.getCallback());
-                                    
-                                    // TODO get from feed
-                                    post.addHeader(new BasicHeader("Content-Type", "application/atom+xm"));
-                                    
-                                    post.setEntity(new StringEntity(request.getFeed().getDocument().toXML(), "UTF-8"));
-                                    
-                                    HttpResponse response = null;
-                                    try {
-                                        response = httpclient.execute(post);
-                                        if(HttpUtil.successStatus(response)) {
-                                            LOG.debug("Succeeded distributing to subscriber {}", subscription.getCallback());
-                                        } else {
-                                            // TODO handle retrying
-                                            LOG.debug("Failed distributing to subscriber \"{}\" with error \"{}\"", subscription.getCallback(), response.getStatusLine());
-                                        }
-                                    } catch(IOException e) {
-                                        // TODO handle retrying
-                                        LOG.debug("Failed distributing to subscriber: " + subscription.getCallback(), e);
-                                    } finally {
-                                        if(response != null) {
-                                            if(response.getEntity() != null) {
-                                                InputStream in = response.getEntity().getContent();
-                                                if(in != null) in.close();
-                                            }
-                                        }
-                                    }
-                                }
-                                LOG.info("Feed distributed to {} subscribers: {}", subscribers.size(), request.getFeed().getUrl());
-                            } catch (IOException e) {
-                                LOG.debug("Failed to distribute feed: " + request.getFeed().getUrl(), e);
-                            }
-                        } else {
-                            LOG.debug("No subscribers for published feed, ignoring: {}", request.getFeed().getUrl());
+                        try {
+                            subscriptionService.distribute(request);
+                        } catch (IOException e) {
+                            LOG.debug("Failed to distribute feed: " + request.getFeed().getUrl(), e);
                         }
                     } catch (InterruptedException e) {
                         // shutting down

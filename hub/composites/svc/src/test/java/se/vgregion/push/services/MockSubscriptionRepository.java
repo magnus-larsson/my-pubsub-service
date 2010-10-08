@@ -19,21 +19,31 @@
 
 package se.vgregion.push.services;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import se.vgregion.push.repository.FeedRepository;
-import se.vgregion.push.types.Feed;
+import se.vgregion.push.repository.SubscriptionRepository;
+import se.vgregion.push.types.Subscription;
 
-public class MockFeedRepository implements FeedRepository {
+public class MockSubscriptionRepository implements SubscriptionRepository {
 
     @Override
-    public void clear() {
-        
+    public List<Subscription> findByTopic(URI url) {
+        return null;
     }
 
     @Override
-    public boolean contains(Feed entity) {
+    public Subscription findByTopicAndCallback(URI topic, URI callback) {
+        return null;
+    }
+
+    @Override
+    public void clear() {
+    }
+
+    @Override
+    public boolean contains(Subscription entity) {
         return false;
     }
 
@@ -42,61 +52,62 @@ public class MockFeedRepository implements FeedRepository {
     }
 
     @Override
-    public Feed find(Long id) {
+    public Subscription find(Long id) {
         return null;
     }
 
     @Override
-    public List<Feed> findAll() {
+    public List<Subscription> findAll() {
         return null;
     }
 
     @Override
-    public List<Feed> findByNamedQuery(String queryName, Map<String, ? extends Object> args) {
+    public List<Subscription> findByNamedQuery(String queryName, Map<String, ? extends Object> args) {
         return null;
     }
 
     @Override
-    public List<Feed> findByNamedQuery(String queryName, Object[] args) {
+    public List<Subscription> findByNamedQuery(String queryName, Object[] args) {
         return null;
     }
 
     @Override
-    public Feed findByPk(Long pk) {
+    public Subscription findByPk(Long pk) {
         return null;
     }
 
     @Override
-    public Feed findInstanceByNamedQuery(String queryName, Object[] args) {
+    public Subscription findInstanceByNamedQuery(String queryName, Object[] args) {
         return null;
     }
 
     @Override
-    public Feed findInstanceByNamedQuery(String queryName, Map<String, ? extends Object> args) {
+    public Subscription findInstanceByNamedQuery(String queryName, Map<String, ? extends Object> args) {
         return null;
     }
 
     @Override
     public void flush() {
-    }
-
-    @Override
-    public Feed merge(Feed object) {
-        return object;
-    }
-
-    @Override
-    public Feed persist(Feed object) {
-        return object;
-    }
-
-    @Override
-    public void refresh(Feed object) {
         
     }
 
     @Override
-    public void remove(Feed object) {
+    public Subscription merge(Subscription object) {
+        return object;
+    }
+
+    @Override
+    public Subscription persist(Subscription object) {
+        return object;
+    }
+
+    @Override
+    public void refresh(Subscription object) {
+        
+    }
+
+    @Override
+    public void remove(Subscription object) {
         
     }
 
@@ -106,8 +117,7 @@ public class MockFeedRepository implements FeedRepository {
     }
 
     @Override
-    public Feed store(Feed entity) {
+    public Subscription store(Subscription entity) {
         return entity;
     }
-
 }

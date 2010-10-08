@@ -44,11 +44,15 @@
 			<!-- 1.2.15 drags down non-optional deps -->
 		</dependency>
 		<dependency>
-		    <groupId>xom</groupId>
-		    <artifactId>xom</artifactId>
-		    <version>1.2.5</version>
+			<groupId>xom</groupId>
+			<artifactId>xom</artifactId>
+			<version>1.2.5</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>1.6.2</version>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
