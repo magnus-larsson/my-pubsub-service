@@ -28,9 +28,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import se.vgregion.push.repository.FeedRepository;
+import se.vgregion.push.services.SomeFeeds;
 import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
-import se.vgregion.push.types.SomeFeeds;
 
 
 public class JpaFeedRepositoryTest {

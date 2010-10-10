@@ -30,7 +30,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import se.vgregion.push.types.SomeFeeds;
 
 
 public class FeedRetrieverTest {

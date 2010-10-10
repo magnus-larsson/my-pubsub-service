@@ -23,8 +23,7 @@
                            http://www.springframework.org/schema/tx
                            http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-	<context:component-scan base-package="se.vgregion.push.repository.jpa" />
-
+	<context:annotation-config />
 	<tx:annotation-driven />
 
  	<bean id="retrieveQueue"
@@ -35,10 +34,13 @@
 		class="java.util.concurrent.LinkedBlockingQueue">
 	</bean>
 
+	<bean id="feedRepository" class="se.vgregion.push.repository.jpa.JpaFeedRepository"  />
+	<bean id="subscriptionRepository" class="se.vgregion.push.repository.jpa.JpaSubscriptionRepository" />
+
  	<bean id="pushService"
-		class="se.vgregion.push.services.DefaultPushService"
-		autowire="constructor"
-		>
+		class="se.vgregion.push.services.DefaultPushService">
+		<constructor-arg ref="subscriptionRepository" />
+		<constructor-arg ref="feedRepository" />
 	</bean>
 
  	<bean id="feedDistributor"
