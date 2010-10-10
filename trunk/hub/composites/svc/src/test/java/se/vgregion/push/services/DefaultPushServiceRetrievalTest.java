@@ -36,7 +36,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import se.vgregion.push.types.Feed;
-import se.vgregion.push.types.SomeFeeds;
 
 public class DefaultPushServiceRetrievalTest {
 
