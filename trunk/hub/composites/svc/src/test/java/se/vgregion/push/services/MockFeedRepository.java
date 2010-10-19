@@ -79,7 +79,7 @@ public class MockFeedRepository implements FeedRepository {
     }
 
     @Override
-    public void deleteEntriesOlderThan(Feed feed, DateTime date) {
+    public void deleteOutdatedEntries(Feed feed, DateTime date) {
         
     }
 

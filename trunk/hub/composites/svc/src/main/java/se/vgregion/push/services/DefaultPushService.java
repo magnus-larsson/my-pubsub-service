@@ -194,7 +194,7 @@ public class DefaultPushService implements PushService {
             }
             
             
-            feedRepository.deleteEntriesOlderThan(feed, oldestUpdated);
+            feedRepository.deleteOutdatedEntries(feed, oldestUpdated);
             LOG.info("Feed distributed to {} subscribers: {}", subscribers.size(), request.getFeed().getUrl());
         }
     }
