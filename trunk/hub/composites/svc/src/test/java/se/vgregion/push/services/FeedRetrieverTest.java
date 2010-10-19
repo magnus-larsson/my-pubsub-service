@@ -36,7 +36,7 @@ public class FeedRetrieverTest {
 
     private static final File TMP = new File("target/test-tmp");
     private static final URI TEST_URI = URI.create("http://example.com");
-    private static final HttpEntity TEST_ENTITY = Utils.createEntity(SomeFeeds.ATOM1.toXML());
+    private static final HttpEntity TEST_ENTITY = HttpUtil.createEntity(SomeFeeds.ATOM1.toXML());
     
     private LinkedBlockingQueue<RetrievalRequest> retrievalQueue = new LinkedBlockingQueue<RetrievalRequest>();
     private LinkedBlockingQueue<DistributionRequest> distributionQueue = new LinkedBlockingQueue<DistributionRequest>();

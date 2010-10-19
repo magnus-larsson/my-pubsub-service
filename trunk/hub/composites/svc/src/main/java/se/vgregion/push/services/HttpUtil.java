@@ -21,9 +21,13 @@ package se.vgregion.push.services;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
+import nu.xom.Document;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.entity.StringEntity;
 
 public class HttpUtil {
 
@@ -39,5 +43,27 @@ public class HttpUtil {
         return out.toString("UTF-8");
     }
 
+    public static HttpEntity createEntity(String s) {
+        try {
+            return new StringEntity(s, "UTF-8");
+        } catch (UnsupportedEncodingException shouldNeverHappen) {
+            throw new RuntimeException(shouldNeverHappen);
+        }
+    }
 
+    public static HttpEntity createEntity(Document doc) {
+        try {
+            return new StringEntity(doc.toXML(), "UTF-8");
+        } catch (UnsupportedEncodingException shouldNeverHappen) {
+            throw new RuntimeException(shouldNeverHappen);
+        }
+    }
+    
+    public static void closeQuitely(HttpResponse response) {
+        if(response != null && response.getEntity() != null) {
+            try {
+                response.getEntity().consumeContent();
+            } catch (IOException ignore) { }
+        }
+    }
 }
