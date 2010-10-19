@@ -35,15 +35,20 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.UniqueConstraint;
+
+import org.hibernate.annotations.Cascade;
 
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
 import nu.xom.ParsingException;
-import se.vgregion.portal.core.domain.patterns.entity.AbstractEntity;
+import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
+@UniqueConstraint(columnNames="url")
 public class Feed extends AbstractEntity<Feed, Long> {
 
     public static final String NS_ATOM = "http://www.w3.org/2005/Atom";
@@ -64,6 +69,9 @@ public class Feed extends AbstractEntity<Feed, Long> {
     
     // TODO remove eager loading
     @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    // TODO hack since JPA does not support deleting orphans
+    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+    @OrderBy("updated DESC")
     private List<Entry> entries = new ArrayList<Entry>();
     
     /* Make JPA happy */
@@ -119,8 +127,15 @@ public class Feed extends AbstractEntity<Feed, Long> {
         return URI.create(url);
     }
     
+    public List<Entry> getEntries() {
+        return entries;
+    }
+    
+    public void addEntry(Entry entry) {
+        entries.add(entry);
+    }
+    
     public Document getDocument(Date updatedSince) {
-
         try {
             Builder parser = new Builder();
             // TODO cache
@@ -142,5 +157,4 @@ public class Feed extends AbstractEntity<Feed, Long> {
     public Document getDocument() {
         return getDocument(null);
     }
-
 }

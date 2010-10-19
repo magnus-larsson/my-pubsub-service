@@ -42,7 +42,7 @@ public class DefaultPushServiceRetrievalTest {
     private MockFeedRepository feedRepository = new MockFeedRepository();
     private DefaultPushService service = new DefaultPushService(null, feedRepository);
     private LocalTestServer server = new LocalTestServer(null, null);
-    private HttpEntity testEntity = Utils.createEntity(SomeFeeds.ATOM);
+    private HttpEntity testEntity = Utils.createEntity(SomeFeeds.ATOM1.toXML());
     
     @Before
     public void before() throws Exception {

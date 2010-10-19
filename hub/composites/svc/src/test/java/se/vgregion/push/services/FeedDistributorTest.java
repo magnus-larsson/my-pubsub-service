@@ -50,7 +50,7 @@ public class FeedDistributorTest {
         subscriptions.add(sub1);
 
         
-        distributionQueue.put(new DistributionRequest(new Feed(FEED_URI, ContentType.ATOM, SomeFeeds.ATOM_DOCUMENT)));
+        distributionQueue.put(new DistributionRequest(new Feed(FEED_URI, ContentType.ATOM, SomeFeeds.ATOM1)));
         
         final LinkedBlockingQueue<DistributionRequest> issuedRequests = new LinkedBlockingQueue<DistributionRequest>();
         

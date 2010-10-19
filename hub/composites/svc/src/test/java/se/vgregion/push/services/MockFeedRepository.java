@@ -19,8 +19,9 @@
 
 package se.vgregion.push.services;
 
+import java.net.URI;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.types.Feed;
@@ -28,17 +29,8 @@ import se.vgregion.push.types.Feed;
 public class MockFeedRepository implements FeedRepository {
 
     @Override
-    public void clear() {
-        
-    }
-
-    @Override
     public boolean contains(Feed entity) {
         return false;
-    }
-
-    @Override
-    public void deleteByPk(Long pk) {
     }
 
     @Override
@@ -48,31 +40,6 @@ public class MockFeedRepository implements FeedRepository {
 
     @Override
     public List<Feed> findAll() {
-        return null;
-    }
-
-    @Override
-    public List<Feed> findByNamedQuery(String queryName, Map<String, ? extends Object> args) {
-        return null;
-    }
-
-    @Override
-    public List<Feed> findByNamedQuery(String queryName, Object[] args) {
-        return null;
-    }
-
-    @Override
-    public Feed findByPk(Long pk) {
-        return null;
-    }
-
-    @Override
-    public Feed findInstanceByNamedQuery(String queryName, Object[] args) {
-        return null;
-    }
-
-    @Override
-    public Feed findInstanceByNamedQuery(String queryName, Map<String, ? extends Object> args) {
         return null;
     }
 
@@ -108,6 +75,21 @@ public class MockFeedRepository implements FeedRepository {
     @Override
     public Feed store(Feed entity) {
         return entity;
+    }
+
+    @Override
+    public void deleteEntriesOlderThan(Feed feed, Date date) {
+        
+    }
+
+    @Override
+    public Feed findByUrl(URI url) {
+        return null;
+    }
+
+    @Override
+    public Feed persistOrUpdate(Feed feed) {
+        return feed;
     }
 
 }

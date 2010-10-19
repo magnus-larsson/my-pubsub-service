@@ -19,7 +19,12 @@
 
 package se.vgregion.push.services;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpEntity;
@@ -53,5 +58,25 @@ public class Utils {
         byte[] actualBytes = new byte[(int) actual.getContentLength()];
         
         Assert.assertArrayEquals(expectedBytes, actualBytes);
+    }
+    
+    public static String readFully(InputStream in) throws IOException {
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            
+            StringBuffer sb = new StringBuffer();
+            String line = reader.readLine();
+            while(line != null) {
+                sb.append(line);
+                line = reader.readLine();
+            }
+            return sb.toString();
+        } finally {
+            in.close();
+        }
+    }
+    
+    public static String readFully(File in) throws IOException {
+        return readFully(new FileInputStream(in));
     }
 }

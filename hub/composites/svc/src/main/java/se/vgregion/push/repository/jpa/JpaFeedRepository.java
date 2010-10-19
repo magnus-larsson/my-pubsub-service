@@ -19,10 +19,19 @@
 
 package se.vgregion.push.repository.jpa;
 
-import org.springframework.stereotype.Repository;
+import java.net.URI;
+import java.util.Date;
+import java.util.List;
 
-import se.vgregion.portal.core.infrastructure.persistence.jpa.DefaultJpaRepository;
+import javax.persistence.NoResultException;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import se.vgregion.dao.domain.patterns.repository.db.jpa.DefaultJpaRepository;
 import se.vgregion.push.repository.FeedRepository;
+import se.vgregion.push.types.Entry;
 import se.vgregion.push.types.Feed;
     
 @Repository
@@ -32,5 +41,56 @@ public class JpaFeedRepository extends DefaultJpaRepository<Feed> implements Fee
        setType(Feed.class);
     }
 
+    @Transactional
+    public void deleteEntriesOlderThan(Feed feed, Date date) {
+        List<Entry> entries = feed.getEntries();
+        for(int i = 0; i < entries.size(); i++) {
+            Entry entry = entries.get(i);
+            if(!entry.isNewerThan(date)) {
+                entries.remove(entry);
+            }
+        }
 
+        store(feed);
+    }
+
+    @Transactional(propagation=Propagation.REQUIRED)
+    @Override
+    public Feed persistOrUpdate(Feed feed) {
+        Feed existing = findByUrl(feed.getUrl());
+        if(existing != null) {
+            // feed already exists, merge
+            List<Entry> existingEntries = existing.getEntries();
+            List<Entry> newEntries = feed.getEntries();
+            
+            for(Entry newEntry : newEntries) {
+                if(!existsByAtomId(existingEntries, newEntry)) {
+                    existing.addEntry(newEntry);
+                }
+            }
+            
+            return store(existing);
+        } else {
+            return persist(feed);
+        }
+    }
+    
+    private boolean existsByAtomId(List<Entry> existingEntries, Entry toSearchFor) {
+        for(Entry existing : existingEntries) {
+            if(existing.getAtomId().equals(toSearchFor.getAtomId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
+    public Feed findByUrl(URI url) {
+        try {
+            return (Feed) entityManager.createQuery("select l from Feed l where l.url = :url")
+                .setParameter("url", url.toString()).getSingleResult();
+        } catch(NoResultException e) {
+            return null;
+        }
+    }   
 }

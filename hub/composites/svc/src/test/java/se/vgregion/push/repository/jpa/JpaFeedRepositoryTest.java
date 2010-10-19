@@ -20,6 +20,9 @@
 package se.vgregion.push.repository.jpa;
 
 import java.net.URI;
+import java.util.Date;
+
+import nu.xom.tests.XOMTestCase;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,17 +47,63 @@ public class JpaFeedRepositoryTest {
     
     @Before
     public void setup() {
-        Feed feed = new Feed(URL, ContentType.ATOM, SomeFeeds.ATOM_DOCUMENT);
+        Feed feed = new Feed(URL, ContentType.ATOM, SomeFeeds.ATOM1);
         feed1 = repository.persist(feed);
-        System.out.println(feed1.getId());
     }
     
     @Test
-    public void test() {
+    public void findByPk() {
         Feed feed = repository.find(feed1.getId());
         
-        // TODO fix, very dependent on XML serializtion details
-        Assert.assertEquals(SomeFeeds.ATOM, feed.getDocument().toXML());
+        Assert.assertEquals(SomeFeeds.ATOM1.toXML(), feed.getDocument().toXML());
+        XOMTestCase.assertEquals(SomeFeeds.ATOM1, feed.getDocument());
     }
+
+    @Test
+    public void findByUrl() {
+        Feed feed = repository.findByUrl(URL);
+        
+        Assert.assertEquals(SomeFeeds.ATOM1.toXML(), feed.getDocument().toXML());
+        XOMTestCase.assertEquals(SomeFeeds.ATOM1, feed.getDocument());
+    }
+
+    
+    @Test
+    public void testDeleteOldEntries() {
+        Feed feed = repository.find(feed1.getId());
+        
+        repository.deleteEntriesOlderThan(feed, new Date(110, 1, 1));
+        
+        repository.store(feed);
+        
+        Feed storedFeed = repository.find(feed1.getId());
+        
+        Assert.assertEquals(1, storedFeed.getEntries().size());
+    }
+
+    @Test
+    public void persistOrUpdateWithNonExistingFeed() {
+        URI otherUri = URI.create("http://dummy.com");
+        Feed feed2 = new Feed(otherUri, ContentType.ATOM, SomeFeeds.ATOM2);
+        
+        repository.persistOrUpdate(feed2);
+        
+        Feed storedFeed = repository.findByUrl(otherUri);
+        System.out.println(storedFeed);
+        Assert.assertEquals(2, storedFeed.getEntries().size());
+    }
+
+    
+    @Test
+    public void persistOrUpdateWithExistingFeed() {
+        Feed feed2 = new Feed(URL, ContentType.ATOM, SomeFeeds.ATOM2);
+        
+        repository.persistOrUpdate(feed2);
+        
+        Feed storedFeed = repository.find(feed1.getId());
+        Assert.assertEquals(3, storedFeed.getEntries().size());
+    }
+    
+        
     
 }
