@@ -20,10 +20,7 @@
 package se.vgregion.push.services;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +30,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.params.HttpConnectionParams;
@@ -98,10 +94,7 @@ public class DefaultPushService implements PushService {
                 throw new IOException("Failed to verify subscription, status: " + response.getStatusLine().getStatusCode() + " : " + response.getStatusLine().getReasonPhrase());
             }
         } finally {
-            try {
-                response.getEntity().consumeContent();
-            } catch(IOException ignored) {}
-
+            HttpUtil.closeQuitely(response);
         }
     }
     
@@ -156,10 +149,8 @@ public class DefaultPushService implements PushService {
 
         Feed feed = new Feed(url, contentType, entity.getContent());
 
-        try {
-            entity.consumeContent();
-        } catch(IOException ignore) {}
-        
+        HttpUtil.closeQuitely(response);
+
         feed = feedRepository.persistOrUpdate(feed);
         
         LOG.debug("Feed downloaded: {}", url);
@@ -205,12 +196,7 @@ public class DefaultPushService implements PushService {
         
         post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
         
-        try {
-            post.setEntity(new StringEntity(feed.createDocument(subscription.getLastUpdated()).toXML(), "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-        
+        post.setEntity(HttpUtil.createEntity(feed.createDocument(subscription.getLastUpdated())));
         
         HttpResponse response = null;
         try {
@@ -229,14 +215,7 @@ public class DefaultPushService implements PushService {
             // TODO handle retrying
             throw new FailedDistributionException("Failed distributing to subscriber: " + subscription.getCallback(), e);
         } finally {
-            if(response != null) {
-                if(response.getEntity() != null) {
-                    try {
-                        InputStream in = response.getEntity().getContent();
-                        if(in != null) in.close();
-                    } catch(IOException ignored) {}
-                }
-            }
+            HttpUtil.closeQuitely(response);
         }
     }
 

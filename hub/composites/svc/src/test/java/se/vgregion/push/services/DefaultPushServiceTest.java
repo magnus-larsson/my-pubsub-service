@@ -121,7 +121,7 @@ public class DefaultPushServiceTest {
             @Override
             public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException,
                     IOException {
-                response.setEntity(Utils.createEntity("dummy"));
+                response.setEntity(HttpUtil.createEntity("dummy"));
             }});
 
         service.verify(subscriptionRequest);
