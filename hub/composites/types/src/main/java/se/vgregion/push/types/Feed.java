@@ -39,6 +39,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cascade;
+import org.joda.time.DateTime;
 
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -135,7 +136,7 @@ public class Feed extends AbstractEntity<Feed, Long> {
         entries.add(entry);
     }
     
-    public Document getDocument(Date updatedSince) {
+    public Document createDocument(DateTime updatedSince) {
         try {
             Builder parser = new Builder();
             // TODO cache
@@ -154,7 +155,7 @@ public class Feed extends AbstractEntity<Feed, Long> {
         
     }
     
-    public Document getDocument() {
-        return getDocument(null);
+    public Document createDocument() {
+        return createDocument(null);
     }
 }

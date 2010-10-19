@@ -20,11 +20,11 @@
 package se.vgregion.push.repository.jpa;
 
 import java.net.URI;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.NoResultException;
 
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +42,7 @@ public class JpaFeedRepository extends DefaultJpaRepository<Feed> implements Fee
     }
 
     @Transactional
-    public void deleteEntriesOlderThan(Feed feed, Date date) {
+    public void deleteEntriesOlderThan(Feed feed, DateTime date) {
         List<Entry> entries = feed.getEntries();
         for(int i = 0; i < entries.size(); i++) {
             Entry entry = entries.get(i);

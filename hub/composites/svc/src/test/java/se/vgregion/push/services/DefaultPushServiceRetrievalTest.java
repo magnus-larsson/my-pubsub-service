@@ -65,7 +65,7 @@ public class DefaultPushServiceRetrievalTest {
         
         Feed downloaded = service.retrieve(buildTestUrl("/test"));
         
-        Assert.assertNotNull(downloaded.getDocument());
+        Assert.assertNotNull(downloaded.createDocument());
     }
 
     @Test(expected=IOException.class)

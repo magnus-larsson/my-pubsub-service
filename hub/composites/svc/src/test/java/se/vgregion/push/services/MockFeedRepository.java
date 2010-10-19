@@ -20,8 +20,9 @@
 package se.vgregion.push.services;
 
 import java.net.URI;
-import java.util.Date;
 import java.util.List;
+
+import org.joda.time.DateTime;
 
 import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.types.Feed;
@@ -78,7 +79,7 @@ public class MockFeedRepository implements FeedRepository {
     }
 
     @Override
-    public void deleteEntriesOlderThan(Feed feed, Date date) {
+    public void deleteEntriesOlderThan(Feed feed, DateTime date) {
         
     }
 
