@@ -32,7 +32,8 @@ public class FeedTest {
 
     @Test
     public void getDocument() throws Exception {
-        Feed feed = new Feed(URI.create("http://example.com"), ContentType.ATOM, SomeFeeds.ATOM_DOCUMENT);
+        
+        Feed feed = new Feed(URI.create("http://example.com"), ContentType.ATOM, SomeFeeds.ATOM1);
         
         Document actualDoc = feed.createDocument();
         Assert.assertEquals(2, actualDoc.getRootElement().getChildElements("entry", Feed.NS_ATOM).size());
@@ -40,13 +41,27 @@ public class FeedTest {
 
     @Test
     public void updatedSince() throws Exception {
-        Feed feed = new Feed(URI.create("http://example.com"), ContentType.ATOM, SomeFeeds.ATOM_DOCUMENT);
+        Feed feed = new Feed(URI.create("http://example.com"), ContentType.ATOM, SomeFeeds.ATOM1);
         
         DateTime dt = new DateTime(2010, 9, 14, 18, 30, 2, 0);
         
         Document actualDoc = feed.createDocument(dt);
         
         Assert.assertEquals(1, actualDoc.getRootElement().getChildElements("entry", Feed.NS_ATOM).size());
+    }
+    
+    @Test
+    public void merge() {
+        Feed feed = new Feed(URI.create("http://example.com"), ContentType.ATOM, SomeFeeds.ATOM1);
+        Feed feed2 = new Feed(URI.create("http://example.com"), ContentType.ATOM, SomeFeeds.ATOM2);
+        
+        feed.merge(feed2);
+        
+        // verify that the feed level elements has been updated
+        Assert.assertEquals("urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af8", feed.getAtomId());
+        
+        // verify that the entries as been updated
+        Assert.assertEquals(3, feed.getEntries().size());
         
     }
 

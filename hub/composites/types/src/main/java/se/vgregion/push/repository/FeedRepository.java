@@ -30,7 +30,7 @@ import se.vgregion.push.types.Feed;
     
 public interface FeedRepository extends Repository<Feed, Long> {
 
-    void deleteEntriesOlderThan(Feed feed, DateTime date);
+    void deleteOutdatedEntries(Feed feed, DateTime date);
 
     Feed findByUrl(URI url);
     

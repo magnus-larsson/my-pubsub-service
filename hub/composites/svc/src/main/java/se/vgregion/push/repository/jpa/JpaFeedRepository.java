@@ -42,7 +42,7 @@ public class JpaFeedRepository extends DefaultJpaRepository<Feed> implements Fee
     }
 
     @Transactional
-    public void deleteEntriesOlderThan(Feed feed, DateTime date) {
+    public void deleteOutdatedEntries(Feed feed, DateTime date) {
         List<Entry> entries = feed.getEntries();
         for(int i = 0; i < entries.size(); i++) {
             Entry entry = entries.get(i);
@@ -60,14 +60,7 @@ public class JpaFeedRepository extends DefaultJpaRepository<Feed> implements Fee
         Feed existing = findByUrl(feed.getUrl());
         if(existing != null) {
             // feed already exists, merge
-            List<Entry> existingEntries = existing.getEntries();
-            List<Entry> newEntries = feed.getEntries();
-            
-            for(Entry newEntry : newEntries) {
-                if(!existsByAtomId(existingEntries, newEntry)) {
-                    existing.addEntry(newEntry);
-                }
-            }
+            existing.merge(feed);
             
             return store(existing);
         } else {
@@ -75,15 +68,6 @@ public class JpaFeedRepository extends DefaultJpaRepository<Feed> implements Fee
         }
     }
     
-    private boolean existsByAtomId(List<Entry> existingEntries, Entry toSearchFor) {
-        for(Entry existing : existingEntries) {
-            if(existing.getAtomId().equals(toSearchFor.getAtomId())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
     public Feed findByUrl(URI url) {
         try {

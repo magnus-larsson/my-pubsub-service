@@ -75,7 +75,7 @@ public class DefaultPushServiceDistributionTest {
             public List<Subscription> findByTopic(URI url) {
                 try {
                     Subscription sub = new Subscription(FEED_URI, buildTestUrl("/sub"));
-                    sub.setLastUpdated(new DateTime(2110, 1, 1, 0, 0, 0, 0));
+                    sub.setLastUpdated(new DateTime(2010, 1, 1, 0, 0, 0, 0));
                     return Arrays.asList(sub);
                 } catch (URISyntaxException e) {
                     throw new RuntimeException(e);
@@ -109,6 +109,7 @@ public class DefaultPushServiceDistributionTest {
         Assert.assertNotNull(entity);
         
         Document actualAtom = new Builder().build(new ByteArrayInputStream(issuedRequestBodies.poll()));
+
         Assert.assertEquals(1, actualAtom.getRootElement().getChildElements("entry", Feed.NS_ATOM).size());
     }
     

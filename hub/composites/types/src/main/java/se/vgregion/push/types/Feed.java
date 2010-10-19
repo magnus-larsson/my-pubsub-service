@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -36,30 +35,36 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.Cascade;
-import org.joda.time.DateTime;
 
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
 import nu.xom.ParsingException;
+
+import org.hibernate.annotations.Cascade;
+import org.joda.time.DateTime;
+
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
-@UniqueConstraint(columnNames="url")
 public class Feed extends AbstractEntity<Feed, Long> {
 
     public static final String NS_ATOM = "http://www.w3.org/2005/Atom";
+
+    private static final Builder PARSER = new Builder();;
 
     @Id
     @GeneratedValue
     private long id;
 
-    @Column
+    @Column(unique=true)
     private String url;
+
+    @Column
+    private String atomId;
     
     @Column
     private ContentType contentType;
@@ -74,6 +79,7 @@ public class Feed extends AbstractEntity<Feed, Long> {
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
     @OrderBy("updated DESC")
     private List<Entry> entries = new ArrayList<Entry>();
+
     
     /* Make JPA happy */
     protected Feed() {
@@ -87,7 +93,9 @@ public class Feed extends AbstractEntity<Feed, Long> {
         this.url = url.toString();
         this.contentType = contentType;
         
-        extractXml(document);
+        parseEntries(document);
+        this.xml = parseXmlWithoutEntries(document).toXML();
+        this.atomId = parseAtomId(document);
     }
     
     private static Document streamToDocument(InputStream in) throws IOException {
@@ -99,7 +107,22 @@ public class Feed extends AbstractEntity<Feed, Long> {
         }
     }
 
-    private void extractXml(Document document) {
+    private void parseEntries(Document document) {
+        // TODO add for RSS
+        Element root = document.getRootElement();
+        Elements entryElms = root.getChildElements("entry",NS_ATOM);
+        for(int i = 0; i<entryElms.size(); i++) {
+            Element elm = entryElms.get(i);
+            
+            entries.add(new Entry(elm));
+        }
+    }
+
+    private String parseAtomId(Document document) {
+        return document.getRootElement().getFirstChildElement("id", Feed.NS_ATOM).getValue();
+    }
+    
+    private Document parseXmlWithoutEntries(Document document) {
         Document documentWithOutEntries = new Document(document);
 
         // TODO add for RSS
@@ -108,18 +131,17 @@ public class Feed extends AbstractEntity<Feed, Long> {
         for(int i = 0; i<entryElms.size(); i++) {
             Element elm = entryElms.get(i);
             root.removeChild(elm);
-            
-            entries.add(new Entry(elm));
         }
         
-        xml = documentWithOutEntries.toXML();
+        return documentWithOutEntries;
     }
 
+    
     @Override
     public Long getId() {
         return id;
     }
-
+    
     public ContentType getContentType() {
         return contentType;
     }
@@ -127,7 +149,11 @@ public class Feed extends AbstractEntity<Feed, Long> {
     public URI getUrl() {
         return URI.create(url);
     }
-    
+
+    public String getAtomId() {
+        return atomId;
+    }
+
     public List<Entry> getEntries() {
         return entries;
     }
@@ -135,15 +161,27 @@ public class Feed extends AbstractEntity<Feed, Long> {
     public void addEntry(Entry entry) {
         entries.add(entry);
     }
+
+    /**
+     * Replace entry with same entry ID
+     */
+    public void addOrReplaceEntry(Entry newEntry) {
+        Entry existingEntry = findEntryByAtomId(newEntry.getAtomId());
+        
+        if(existingEntry != null) {
+            entries.remove(existingEntry);
+        }
+        entries.add(newEntry);
+    }
+
     
     public Document createDocument(DateTime updatedSince) {
         try {
-            Builder parser = new Builder();
             // TODO cache
-            Document document = parser.build(new StringReader(xml));
+            Document document = PARSER.build(new StringReader(xml));
             for(Entry entry : entries) {
                 if(updatedSince == null || entry.isNewerThan(updatedSince)) {
-                    document.getRootElement().appendChild(entry.getElement().copy());
+                    document.getRootElement().appendChild(entry.toElement().copy());
                 }
             }
             
@@ -158,4 +196,27 @@ public class Feed extends AbstractEntity<Feed, Long> {
     public Document createDocument() {
         return createDocument(null);
     }
+    
+    public void merge(Feed other) {
+        this.xml = other.xml;
+        this.atomId = other.getAtomId();
+        
+        List<Entry> otherEntries = other.getEntries();
+
+        //System.out.println(other.createDocument().toXML());
+        for(Entry otherEntry : otherEntries) {
+            addOrReplaceEntry(otherEntry);
+        }
+    }
+    
+    private Entry findEntryByAtomId(String atomId) {
+        for(Entry entry : entries) {
+            if(entry.getAtomId().equals(atomId)) {
+                return entry;
+            }
+        }
+        return null;
+    }
+
+
 }

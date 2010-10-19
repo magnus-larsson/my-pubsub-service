@@ -72,7 +72,7 @@ public class JpaFeedRepositoryTest {
     public void testDeleteOldEntries() {
         Feed feed = repository.find(feed1.getId());
         
-        repository.deleteEntriesOlderThan(feed, new DateTime(2110, 1, 1, 0, 0, 0, 0));
+        repository.deleteOutdatedEntries(feed, new DateTime(2110, 1, 1, 0, 0, 0, 0));
         
         repository.store(feed);
         

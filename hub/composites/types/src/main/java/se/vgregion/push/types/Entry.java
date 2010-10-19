@@ -43,6 +43,8 @@ import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 @Entity
 public class Entry extends AbstractEntity<Entry, Long> {
 
+    private static final Builder PARSER = new Builder();
+    
     @Id
     @GeneratedValue
     private long id;
@@ -64,7 +66,8 @@ public class Entry extends AbstractEntity<Entry, Long> {
     }
     
     public Entry(Element elm) {
-        this.xml = elm.toXML();
+        // hack to preserve namespace declarations
+        this.xml = new Document((Element)elm.copy()).toXML();
         
         atomId = elm.getChildElements("id", Feed.NS_ATOM).get(0).getValue();
         
@@ -92,10 +95,9 @@ public class Entry extends AbstractEntity<Entry, Long> {
         return this.getUpdated().isAfter(other);
     }
 
-    public Element getElement() {
+    public Element toElement() {
         try {
-            Builder parser = new Builder();
-            Document doc = parser.build(new StringReader(xml));
+            Document doc = PARSER.build(new StringReader(xml));
             return doc.getRootElement();
         } catch (Exception e) {
             throw new RuntimeException(e);

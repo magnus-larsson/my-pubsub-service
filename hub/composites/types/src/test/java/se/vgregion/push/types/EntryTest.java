@@ -27,7 +27,7 @@ public class EntryTest {
 
     @Test
     public void atomId() throws Exception {
-        Entry entry = new Entry(SomeFeeds.ATOM_DOCUMENT.getRootElement().getFirstChildElement("entry", Feed.NS_ATOM));
+        Entry entry = new Entry(SomeFeeds.ATOM1.getRootElement().getFirstChildElement("entry", Feed.NS_ATOM));
         
         Assert.assertEquals("urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a", entry.getAtomId());
     }
