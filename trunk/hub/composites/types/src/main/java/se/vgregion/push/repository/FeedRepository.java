@@ -19,12 +19,20 @@
 
 package se.vgregion.push.repository;
 
-import se.vgregion.portal.core.domain.patterns.repository.Repository;
+import java.net.URI;
+import java.util.Date;
+
+import se.vgregion.dao.domain.patterns.repository.Repository;
 import se.vgregion.push.types.Feed;
-import se.vgregion.push.types.Subscription;
 
 
     
 public interface FeedRepository extends Repository<Feed, Long> {
 
+    void deleteEntriesOlderThan(Feed feed, Date date);
+
+    Feed findByUrl(URI url);
+    
+    Feed persistOrUpdate(Feed feed2);
+    
 }

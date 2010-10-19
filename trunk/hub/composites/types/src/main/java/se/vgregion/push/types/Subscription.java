@@ -31,7 +31,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
-import se.vgregion.portal.core.domain.patterns.entity.AbstractEntity;
+import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
 @Table(

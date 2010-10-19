@@ -19,13 +19,19 @@
 
 package se.vgregion.push.services;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import nu.xom.Builder;
+import nu.xom.Document;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -67,22 +73,30 @@ public class DefaultPushServiceDistributionTest {
             @Override
             public List<Subscription> findByTopic(URI url) {
                 try {
-                    return Arrays.asList(new Subscription(FEED_URI, buildTestUrl("/sub")));
+                    Subscription sub = new Subscription(FEED_URI, buildTestUrl("/sub"));
+                    sub.setLastUpdated(new Date(110, 1, 1));
+                    return Arrays.asList(sub);
                 } catch (URISyntaxException e) {
                     throw new RuntimeException(e);
                 }
             }}, feedRepository);
         
         final LinkedBlockingQueue<HttpRequest> issuedRequests = new LinkedBlockingQueue<HttpRequest>();
+        final LinkedBlockingQueue<byte[]> issuedRequestBodies = new LinkedBlockingQueue<byte[]>();
         server.register("/*", new HttpRequestHandler() {
             @Override
             public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException,
                     IOException {
                 issuedRequests.add(request);
+                
+                HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                entity.writeTo(buffer);
+                issuedRequestBodies.add(buffer.toByteArray());
             }
         });
         
-        service.distribute(new DistributionRequest(new Feed(FEED_URI, ContentType.ATOM, SomeFeeds.ATOM_DOCUMENT)));
+        service.distribute(new DistributionRequest(new Feed(FEED_URI, ContentType.ATOM, SomeFeeds.ATOM1)));
         
         HttpRequest request = issuedRequests.poll(10000, TimeUnit.MILLISECONDS);
         Assert.assertNotNull(request);
@@ -91,9 +105,10 @@ public class DefaultPushServiceDistributionTest {
         
         HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();
         
-        // TODO improve assertion
         Assert.assertNotNull(entity);
-
+        
+        Document actualAtom = new Builder().build(new ByteArrayInputStream(issuedRequestBodies.poll()));
+        Assert.assertEquals(1, actualAtom.getRootElement().getChildElements("entry", Feed.NS_ATOM).size());
     }
     
     @After

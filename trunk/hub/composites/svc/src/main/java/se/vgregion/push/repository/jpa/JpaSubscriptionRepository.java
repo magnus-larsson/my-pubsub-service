@@ -29,7 +29,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import se.vgregion.portal.core.infrastructure.persistence.jpa.DefaultJpaRepository;
+import se.vgregion.dao.domain.patterns.repository.db.jpa.DefaultJpaRepository;
 import se.vgregion.push.repository.SubscriptionRepository;
 import se.vgregion.push.types.Subscription;
     

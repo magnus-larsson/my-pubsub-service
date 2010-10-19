@@ -37,7 +37,7 @@ import nu.xom.Element;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
-import se.vgregion.portal.core.domain.patterns.entity.AbstractEntity;
+import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
 public class Entry extends AbstractEntity<Entry, Long> {
@@ -49,6 +49,9 @@ public class Entry extends AbstractEntity<Entry, Long> {
     @Column(nullable=false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
+
+    @Column(nullable=false)
+    private String atomId;
     
     @Column(nullable=false)
     @Lob
@@ -62,6 +65,8 @@ public class Entry extends AbstractEntity<Entry, Long> {
     public Entry(Element elm) {
         this.xml = elm.toXML();
         
+        atomId = elm.getChildElements("id", Feed.NS_ATOM).get(0).getValue();
+        
         // TODO add exception handling
         String updateString = elm.getChildElements("updated", Feed.NS_ATOM).get(0).getValue();
         
@@ -72,6 +77,10 @@ public class Entry extends AbstractEntity<Entry, Long> {
     @Override
     public Long getId() {
         return id;
+    }
+
+    public String getAtomId() {
+        return atomId;
     }
 
     public Date getDate() {

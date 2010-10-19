@@ -21,7 +21,6 @@ package se.vgregion.push.services;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 import se.vgregion.push.repository.SubscriptionRepository;
 import se.vgregion.push.types.Subscription;
@@ -39,16 +38,8 @@ public class MockSubscriptionRepository implements SubscriptionRepository {
     }
 
     @Override
-    public void clear() {
-    }
-
-    @Override
     public boolean contains(Subscription entity) {
         return false;
-    }
-
-    @Override
-    public void deleteByPk(Long pk) {
     }
 
     @Override
@@ -58,31 +49,6 @@ public class MockSubscriptionRepository implements SubscriptionRepository {
 
     @Override
     public List<Subscription> findAll() {
-        return null;
-    }
-
-    @Override
-    public List<Subscription> findByNamedQuery(String queryName, Map<String, ? extends Object> args) {
-        return null;
-    }
-
-    @Override
-    public List<Subscription> findByNamedQuery(String queryName, Object[] args) {
-        return null;
-    }
-
-    @Override
-    public Subscription findByPk(Long pk) {
-        return null;
-    }
-
-    @Override
-    public Subscription findInstanceByNamedQuery(String queryName, Object[] args) {
-        return null;
-    }
-
-    @Override
-    public Subscription findInstanceByNamedQuery(String queryName, Map<String, ? extends Object> args) {
         return null;
     }
 

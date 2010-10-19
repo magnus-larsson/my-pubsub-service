@@ -21,7 +21,9 @@ package se.vgregion.push.services;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -139,7 +141,7 @@ public class DefaultPushService implements PushService {
 
         Feed feed = new Feed(url, contentType, entity.getContent());
         
-        feed = feedRepository.persist(feed);
+        feed = feedRepository.persistOrUpdate(feed);
         
         LOG.debug("Feed downloaded: {}", url);
 
@@ -152,40 +154,66 @@ public class DefaultPushService implements PushService {
     public void distribute(DistributionRequest request) throws IOException {
         List<Subscription> subscribers = getAllSubscriptionsForFeed(request.getFeed().getUrl());
         
+        Feed feed = request.getFeed();
+        
         if(!subscribers.isEmpty()) {
             LOG.debug("Distributing " + request.getFeed().getUrl());
+            Date oldestUpdated = new Date(0, 1, 1);
+
             for(Subscription subscription : subscribers) {
-                distribute(request.getFeed(), subscription);
+                try {
+                    distribute(feed, subscription);
+                    
+                    // purge old feed entries based on the subscriber which is furthers behind
+                    if(subscription.getLastUpdated().before(oldestUpdated)) {
+                        oldestUpdated = subscription.getLastUpdated();
+                    }
+                    
+                } catch(FailedDistributionException e) {
+                    LOG.info(e.getMessage(), e);
+                }
             }
+            
+            
+            feedRepository.deleteEntriesOlderThan(feed, oldestUpdated);
             LOG.info("Feed distributed to {} subscribers: {}", subscribers.size(), request.getFeed().getUrl());
         }
     }
 
-    private void distribute(Feed feed, Subscription subscription) throws IOException {
+    private void distribute(Feed feed, Subscription subscription) throws FailedDistributionException {
         LOG.debug("Distributing to " + subscription.getCallback());
         HttpPost post = new HttpPost(subscription.getCallback());
         
         post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
         
-        post.setEntity(new StringEntity(feed.getDocument().toXML(), "UTF-8"));
+        try {
+            post.setEntity(new StringEntity(feed.getDocument(subscription.getLastUpdated()).toXML(), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        
         
         HttpResponse response = null;
         try {
             response = httpclient.execute(post);
             if(HttpUtil.successStatus(response)) {
                 LOG.debug("Succeeded distributing to subscriber {}", subscription.getCallback());
+                
+                // update last update
+                subscription.setLastUpdated(new Date());
+                subscriptionRepository.store(subscription);
             } else {
                 // TODO handle retrying
-                LOG.debug("Failed distributing to subscriber \"{}\" with error \"{}\"", subscription.getCallback(), response.getStatusLine());
+                throw new FailedDistributionException("Failed distributing to subscriber \"" + subscription.getCallback() + "\" with error \"" + response.getStatusLine() + "\"");
             }
         } catch(IOException e) {
             // TODO handle retrying
-            LOG.debug("Failed distributing to subscriber: " + subscription.getCallback(), e);
+            throw new FailedDistributionException("Failed distributing to subscriber: " + subscription.getCallback(), e);
         } finally {
             if(response != null) {
                 if(response.getEntity() != null) {
-                    InputStream in = response.getEntity().getContent();
                     try {
+                        InputStream in = response.getEntity().getContent();
                         if(in != null) in.close();
                     } catch(IOException ignored) {}
                 }

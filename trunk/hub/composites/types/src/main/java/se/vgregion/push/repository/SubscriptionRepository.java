@@ -22,7 +22,7 @@ package se.vgregion.push.repository;
 import java.net.URI;
 import java.util.List;
 
-import se.vgregion.portal.core.domain.patterns.repository.Repository;
+import se.vgregion.dao.domain.patterns.repository.Repository;
 import se.vgregion.push.types.Subscription;
     
 public interface SubscriptionRepository extends Repository<Subscription, Long> {
