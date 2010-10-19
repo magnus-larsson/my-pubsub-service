@@ -41,6 +41,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.localserver.LocalTestServer;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -74,7 +75,7 @@ public class DefaultPushServiceDistributionTest {
             public List<Subscription> findByTopic(URI url) {
                 try {
                     Subscription sub = new Subscription(FEED_URI, buildTestUrl("/sub"));
-                    sub.setLastUpdated(new Date(110, 1, 1));
+                    sub.setLastUpdated(new DateTime(2110, 1, 1, 0, 0, 0, 0));
                     return Arrays.asList(sub);
                 } catch (URISyntaxException e) {
                     throw new RuntimeException(e);

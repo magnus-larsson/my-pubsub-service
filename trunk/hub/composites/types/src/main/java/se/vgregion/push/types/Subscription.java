@@ -31,6 +31,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
+import org.joda.time.DateTime;
+
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
@@ -97,11 +99,11 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
         return secret;
     }
 
-    public Date getLastUpdated() {
-        return lastUpdated;
+    public DateTime getLastUpdated() {
+        return new DateTime(lastUpdated);
     }
 
-    public void setLastUpdated(Date lastUpdated) {
-        this.lastUpdated = lastUpdated;
+    public void setLastUpdated(DateTime lastUpdated) {
+        this.lastUpdated = lastUpdated.toDate();
     }
 }

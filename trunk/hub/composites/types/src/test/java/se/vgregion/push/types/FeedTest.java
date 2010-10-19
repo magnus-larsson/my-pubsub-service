@@ -34,7 +34,7 @@ public class FeedTest {
     public void getDocument() throws Exception {
         Feed feed = new Feed(URI.create("http://example.com"), ContentType.ATOM, SomeFeeds.ATOM_DOCUMENT);
         
-        Document actualDoc = feed.getDocument();
+        Document actualDoc = feed.createDocument();
         Assert.assertEquals(2, actualDoc.getRootElement().getChildElements("entry", Feed.NS_ATOM).size());
     }
 
@@ -44,7 +44,7 @@ public class FeedTest {
         
         DateTime dt = new DateTime(2010, 9, 14, 18, 30, 2, 0);
         
-        Document actualDoc = feed.getDocument(dt.toDate());
+        Document actualDoc = feed.createDocument(dt);
         
         Assert.assertEquals(1, actualDoc.getRootElement().getChildElements("entry", Feed.NS_ATOM).size());
         

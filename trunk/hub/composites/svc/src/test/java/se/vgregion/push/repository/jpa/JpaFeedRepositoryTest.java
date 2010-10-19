@@ -20,10 +20,10 @@
 package se.vgregion.push.repository.jpa;
 
 import java.net.URI;
-import java.util.Date;
 
 import nu.xom.tests.XOMTestCase;
 
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,16 +55,16 @@ public class JpaFeedRepositoryTest {
     public void findByPk() {
         Feed feed = repository.find(feed1.getId());
         
-        Assert.assertEquals(SomeFeeds.ATOM1.toXML(), feed.getDocument().toXML());
-        XOMTestCase.assertEquals(SomeFeeds.ATOM1, feed.getDocument());
+        Assert.assertEquals(SomeFeeds.ATOM1.toXML(), feed.createDocument().toXML());
+        XOMTestCase.assertEquals(SomeFeeds.ATOM1, feed.createDocument());
     }
 
     @Test
     public void findByUrl() {
         Feed feed = repository.findByUrl(URL);
         
-        Assert.assertEquals(SomeFeeds.ATOM1.toXML(), feed.getDocument().toXML());
-        XOMTestCase.assertEquals(SomeFeeds.ATOM1, feed.getDocument());
+        Assert.assertEquals(SomeFeeds.ATOM1.toXML(), feed.createDocument().toXML());
+        XOMTestCase.assertEquals(SomeFeeds.ATOM1, feed.createDocument());
     }
 
     
@@ -72,7 +72,7 @@ public class JpaFeedRepositoryTest {
     public void testDeleteOldEntries() {
         Feed feed = repository.find(feed1.getId());
         
-        repository.deleteEntriesOlderThan(feed, new Date(110, 1, 1));
+        repository.deleteEntriesOlderThan(feed, new DateTime(2110, 1, 1, 0, 0, 0, 0));
         
         repository.store(feed);
         

@@ -62,7 +62,7 @@ public class FeedRetrieverTest {
         
         Assert.assertNotNull(distributionRequest);
         Assert.assertEquals(TEST_URI, distributionRequest.getFeed().getUrl());
-        Assert.assertNotNull(distributionRequest.getFeed().getDocument());
+        Assert.assertNotNull(distributionRequest.getFeed().createDocument());
     }
     
     @After

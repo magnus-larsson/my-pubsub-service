@@ -34,6 +34,7 @@ import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
 
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -83,12 +84,12 @@ public class Entry extends AbstractEntity<Entry, Long> {
         return atomId;
     }
 
-    public Date getDate() {
-        return (Date) updated.clone();
+    public DateTime getUpdated() {
+        return new DateTime(updated);
     }
     
-    public boolean isNewerThan(Date other) {
-        return this.updated.after(other);
+    public boolean isNewerThan(DateTime other) {
+        return this.getUpdated().isAfter(other);
     }
 
     public Element getElement() {

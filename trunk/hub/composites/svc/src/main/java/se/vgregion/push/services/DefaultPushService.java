@@ -36,6 +36,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -60,6 +63,11 @@ public class DefaultPushService implements PushService {
     public DefaultPushService(SubscriptionRepository subscriptionRepository, FeedRepository feedRepository) {
         this.subscriptionRepository = subscriptionRepository;
         this.feedRepository = feedRepository;
+        
+        // configure timeouts
+        HttpParams params = httpclient.getParams();
+        HttpConnectionParams.setConnectionTimeout(params, 10000);
+        HttpConnectionParams.setSoTimeout(params, 10000);
     }
 
     @Transactional(readOnly=true)
@@ -73,20 +81,27 @@ public class DefaultPushService implements PushService {
         String challenge = UUID.randomUUID().toString();
         
         HttpGet get = new HttpGet(request.getVerificationUrl(challenge));
-        
+
         HttpResponse response = httpclient.execute(get);
-        
-        if(HttpUtil.successStatus(response)) {
-            String returnedChallenge = HttpUtil.readContent(response.getEntity());
+        try {
             
-            if(challenge.equals(returnedChallenge)) {
-                // all okay
+            if(HttpUtil.successStatus(response)) {
+                String returnedChallenge = HttpUtil.readContent(response.getEntity());
+                
+                if(challenge.equals(returnedChallenge)) {
+                    // all okay
+                } else {
+                    throw new IOException("Challenge did not match");
+                }
+                
             } else {
-                throw new IOException("Challenge did not match");
+                throw new IOException("Failed to verify subscription, status: " + response.getStatusLine().getStatusCode() + " : " + response.getStatusLine().getReasonPhrase());
             }
-            
-        } else {
-            throw new IOException("Failed to verify subscription, status: " + response.getStatusLine().getStatusCode() + " : " + response.getStatusLine().getReasonPhrase());
+        } finally {
+            try {
+                response.getEntity().consumeContent();
+            } catch(IOException ignored) {}
+
         }
     }
     
@@ -140,6 +155,10 @@ public class DefaultPushService implements PushService {
         }
 
         Feed feed = new Feed(url, contentType, entity.getContent());
+
+        try {
+            entity.consumeContent();
+        } catch(IOException ignore) {}
         
         feed = feedRepository.persistOrUpdate(feed);
         
@@ -158,14 +177,14 @@ public class DefaultPushService implements PushService {
         
         if(!subscribers.isEmpty()) {
             LOG.debug("Distributing " + request.getFeed().getUrl());
-            Date oldestUpdated = new Date(0, 1, 1);
+            DateTime oldestUpdated = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 
             for(Subscription subscription : subscribers) {
                 try {
                     distribute(feed, subscription);
                     
                     // purge old feed entries based on the subscriber which is furthers behind
-                    if(subscription.getLastUpdated().before(oldestUpdated)) {
+                    if(subscription.getLastUpdated().isBefore(oldestUpdated)) {
                         oldestUpdated = subscription.getLastUpdated();
                     }
                     
@@ -187,7 +206,7 @@ public class DefaultPushService implements PushService {
         post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
         
         try {
-            post.setEntity(new StringEntity(feed.getDocument(subscription.getLastUpdated()).toXML(), "UTF-8"));
+            post.setEntity(new StringEntity(feed.createDocument(subscription.getLastUpdated()).toXML(), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
@@ -200,7 +219,7 @@ public class DefaultPushService implements PushService {
                 LOG.debug("Succeeded distributing to subscriber {}", subscription.getCallback());
                 
                 // update last update
-                subscription.setLastUpdated(new Date());
+                subscription.setLastUpdated(new DateTime());
                 subscriptionRepository.store(subscription);
             } else {
                 // TODO handle retrying

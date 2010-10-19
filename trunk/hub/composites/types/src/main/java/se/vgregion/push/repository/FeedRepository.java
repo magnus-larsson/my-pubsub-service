@@ -20,7 +20,8 @@
 package se.vgregion.push.repository;
 
 import java.net.URI;
-import java.util.Date;
+
+import org.joda.time.DateTime;
 
 import se.vgregion.dao.domain.patterns.repository.Repository;
 import se.vgregion.push.types.Feed;
@@ -29,7 +30,7 @@ import se.vgregion.push.types.Feed;
     
 public interface FeedRepository extends Repository<Feed, Long> {
 
-    void deleteEntriesOlderThan(Feed feed, Date date);
+    void deleteEntriesOlderThan(Feed feed, DateTime date);
 
     Feed findByUrl(URI url);
     
