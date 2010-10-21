@@ -62,8 +62,9 @@ public class HttpUtil {
     public static void closeQuitely(HttpResponse response) {
         if(response != null && response.getEntity() != null) {
             try {
-                response.getEntity().consumeContent();
-            } catch (IOException ignore) { }
+                response.getEntity().getContent().close();
+            } catch (IOException ignore) { 
+            } catch (IllegalStateException ignore) { }
         }
     }
 }
