@@ -30,8 +30,16 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.params.ConnManagerParams;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.joda.time.DateTime;
@@ -54,16 +62,25 @@ public class DefaultPushService implements PushService {
     private SubscriptionRepository subscriptionRepository;
     private FeedRepository feedRepository;
 
-    private HttpClient httpclient = new DefaultHttpClient();
+    private HttpClient httpclient;
     
     public DefaultPushService(SubscriptionRepository subscriptionRepository, FeedRepository feedRepository) {
         this.subscriptionRepository = subscriptionRepository;
         this.feedRepository = feedRepository;
+
+        SchemeRegistry schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
         
         // configure timeouts
-        HttpParams params = httpclient.getParams();
+        HttpParams params = new BasicHttpParams();
+        ConnManagerParams.setMaxTotalConnections(params, 100);
         HttpConnectionParams.setConnectionTimeout(params, 10000);
         HttpConnectionParams.setSoTimeout(params, 10000);
+
+        ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
+
+        httpclient = new DefaultHttpClient(cm, params);
     }
 
     @Transactional(readOnly=true)
@@ -112,7 +129,6 @@ public class DefaultPushService implements PushService {
         Subscription existing = subscriptionRepository.findByTopicAndCallback(subscription.getTopic(), subscription.getCallback());
         
         if(existing != null) {
-            
             subscriptionRepository.remove(existing);
         }
         return existing;
