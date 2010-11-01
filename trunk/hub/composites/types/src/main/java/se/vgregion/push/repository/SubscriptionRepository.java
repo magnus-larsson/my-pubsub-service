@@ -20,14 +20,18 @@
 package se.vgregion.push.repository;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
 
-import se.vgregion.dao.domain.patterns.repository.Repository;
+import org.joda.time.DateTime;
+
+import se.vgregion.dao.domain.patterns.repository.db.DatabaseRepository;
 import se.vgregion.push.types.Subscription;
     
-public interface SubscriptionRepository extends Repository<Subscription, Long> {
+public interface SubscriptionRepository extends DatabaseRepository<Subscription, Long, Long> {
 
-    List<Subscription> findByTopic(URI url);
+    Collection<Subscription> findByTopic(URI url);
     
     Subscription findByTopicAndCallback(URI topic, URI callback);
+    
+    Collection<Subscription> findTimedOutBy(DateTime timeOut);
 }

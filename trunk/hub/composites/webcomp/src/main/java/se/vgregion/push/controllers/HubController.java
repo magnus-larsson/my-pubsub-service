@@ -82,7 +82,7 @@ public class HubController {
                     String leaseSecondsString = request.getParameter("hub.lease_seconds");
                     
                     try {
-                        long leaseSeconds = leaseSecondsString != null ? Long.parseLong(leaseSecondsString) : 0;
+                        int leaseSeconds = leaseSecondsString != null ? Integer.parseInt(leaseSecondsString) : 0;
                         
                         String secret = request.getParameter("hub.secret");
                         String verifyToken = request.getParameter("hub.verify_token");
@@ -92,7 +92,7 @@ public class HubController {
                         try {
                             subscriptionService.verify(subscriptionRequest);
                             
-                            Subscription subscription = new Subscription(topic, callback, leaseSeconds, secret);
+                            Subscription subscription = new Subscription(topic, callback, leaseSeconds, secret, verifyToken);
                             
                             subscriptionService.subscribe(subscription);
                             

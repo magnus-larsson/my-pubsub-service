@@ -135,7 +135,6 @@ public class HubControllerTest {
         Assert.assertNotNull(subscription);
         Assert.assertEquals(SUBSCRIPTION_CALLBACK, subscription.getCallback());
         Assert.assertEquals(SUBSCRIPTION_TOPIC, subscription.getTopic());
-        Assert.assertEquals(123, subscription.getLeaseSeconds());
         Assert.assertEquals("sekrit!", subscription.getSecret());
         
         SubscriptionRequest subscriptionRequest = subscriptionRequests.poll();

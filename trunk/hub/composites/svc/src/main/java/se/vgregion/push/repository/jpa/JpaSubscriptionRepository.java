@@ -20,11 +20,12 @@
 package se.vgregion.push.repository.jpa;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import javax.persistence.NoResultException;
 
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +53,7 @@ public class JpaSubscriptionRepository extends DefaultJpaRepository<Subscription
     
     @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
     @SuppressWarnings("unchecked")
-    public List<Subscription> findByTopic(URI topic) {
+    public Collection<Subscription> findByTopic(URI topic) {
         try {
             return entityManager.createQuery("select l from Subscription l where l.topic = :topic")
                 .setParameter("topic", topic.toString()).getResultList();
@@ -72,6 +73,16 @@ public class JpaSubscriptionRepository extends DefaultJpaRepository<Subscription
         } catch(NoResultException e) {
             return null;
         }
-    }   
+    }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<Subscription> findTimedOutBy(DateTime timeOut) {
+        try {
+            return entityManager.createQuery("select l from Subscription l where l.leaseTimeout < :leaseTimeout")
+                .setParameter("leaseTimeout", timeOut.toDate()).getResultList();
+        } catch(NoResultException e) {
+            return Collections.EMPTY_LIST;
+        }
+    }   
 }

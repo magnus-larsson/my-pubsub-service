@@ -20,10 +20,11 @@
 package se.vgregion.push.repository.jpa;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
 
 import javax.persistence.PersistenceException;
 
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +38,7 @@ import se.vgregion.push.types.Subscription;
 public class JpaSubscriptionRepositoryTest {
 
     private static final URI CALLBACK = URI.create("http://example.com/sub11");
+    private static final URI CALLBACK2 = URI.create("http://example.com/sub22");
     private static final URI TOPIC = URI.create("http://example.com/feed");
     
     private ApplicationContext ctx = new ClassPathXmlApplicationContext("services-test.xml");
@@ -58,10 +60,10 @@ public class JpaSubscriptionRepositoryTest {
 
     @Test
     public void findByTopic() {
-        List<Subscription> loaded = repository.findByTopic(TOPIC);
+        Collection<Subscription> loaded = repository.findByTopic(TOPIC);
         
         Assert.assertEquals(1, loaded.size());
-        Assert.assertEquals(CALLBACK, loaded.get(0).getCallback());
+        Assert.assertEquals(CALLBACK, loaded.iterator().next().getCallback());
     }
     
     @Test
@@ -87,4 +89,23 @@ public class JpaSubscriptionRepositoryTest {
         repository.persist(new Subscription(TOPIC, CALLBACK));
         repository.persist(new Subscription(TOPIC, CALLBACK));
     }
+
+    @Test
+    public void findTimedOut() {
+        repository.persist(new Subscription(TOPIC, CALLBACK2, 100, "sekrit", "token"));
+        
+        Collection<Subscription> timedOut = repository.findTimedOutBy(new DateTime().plusHours(1));
+        
+        Assert.assertEquals(1, timedOut.size());
+        Assert.assertEquals("sekrit", timedOut.iterator().next().getSecret());
+    }
+
+    @Test
+    public void findNoneTimedOut() {
+        repository.persist(new Subscription(TOPIC, CALLBACK2, 100, "sekrit", "token"));
+        
+        Collection<Subscription> timedOut = repository.findTimedOutBy(new DateTime());
+        Assert.assertTrue(timedOut.isEmpty());
+    }
+
 }

@@ -150,10 +150,10 @@ public class DefaultPushServiceTest {
     public void subscribeWithExisting() {
         repository.persist(new Subscription(TOPIC, CALLBACK));
         
-        service.subscribe(new Subscription(TOPIC, CALLBACK, 123, "sekrit"));
+        service.subscribe(new Subscription(TOPIC, CALLBACK, 123, "sekrit", "token"));
         
         Assert.assertEquals(1, repository.findAll().size());
-        Assert.assertEquals(123, repository.findByTopicAndCallback(TOPIC, CALLBACK).getLeaseSeconds());
+        Assert.assertEquals("sekrit", repository.findByTopicAndCallback(TOPIC, CALLBACK).getSecret());
     }
 
     @Test
