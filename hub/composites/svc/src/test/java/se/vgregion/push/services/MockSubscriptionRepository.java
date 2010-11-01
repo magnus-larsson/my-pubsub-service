@@ -20,7 +20,10 @@
 package se.vgregion.push.services;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
+
+import org.joda.time.DateTime;
 
 import se.vgregion.push.repository.SubscriptionRepository;
 import se.vgregion.push.types.Subscription;
@@ -85,5 +88,20 @@ public class MockSubscriptionRepository implements SubscriptionRepository {
     @Override
     public Subscription store(Subscription entity) {
         return entity;
+    }
+
+    @Override
+    public Collection<Subscription> findTimedOutBy(DateTime timeOut) {
+        return null;
+    }
+
+    @Override
+    public Subscription findByPrimaryKey(Long pk) {
+        return null;
+    }
+
+    @Override
+    public void removeByPrimaryKey(Long pk) {
+        
     }
 }

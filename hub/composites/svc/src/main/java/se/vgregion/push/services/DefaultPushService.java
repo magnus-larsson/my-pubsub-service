@@ -21,12 +21,13 @@ package se.vgregion.push.services;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
 import java.util.UUID;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -85,12 +86,12 @@ public class DefaultPushService implements PushService {
 
     @Transactional(readOnly=true)
     @Override
-    public List<Subscription> getAllSubscriptionsForFeed(URI feed) {
+    public Collection<Subscription> getAllSubscriptionsForFeed(URI feed) {
         return subscriptionRepository.findByTopic(feed);
     }
-
+    
     @Override
-    public void verify(SubscriptionRequest request) throws IOException {
+    public void verify(SubscriptionRequest request) throws FailedSubscriberVerificationException, IOException {
         String challenge = UUID.randomUUID().toString();
         
         HttpGet get = new HttpGet(request.getVerificationUrl(challenge));
@@ -104,11 +105,11 @@ public class DefaultPushService implements PushService {
                 if(challenge.equals(returnedChallenge)) {
                     // all okay
                 } else {
-                    throw new IOException("Challenge did not match");
+                    throw new FailedSubscriberVerificationException("Challenge did not match");
                 }
                 
             } else {
-                throw new IOException("Failed to verify subscription, status: " + response.getStatusLine().getStatusCode() + " : " + response.getStatusLine().getReasonPhrase());
+                throw new FailedSubscriberVerificationException("Failed to verify subscription, status: " + response.getStatusLine().getStatusCode() + " : " + response.getStatusLine().getReasonPhrase());
             }
         } finally {
             HttpUtil.closeQuitely(response);
@@ -178,7 +179,7 @@ public class DefaultPushService implements PushService {
 
     @Override
     public void distribute(DistributionRequest request) throws IOException {
-        List<Subscription> subscribers = getAllSubscriptionsForFeed(request.getFeed().getUrl());
+        Collection<Subscription> subscribers = getAllSubscriptionsForFeed(request.getFeed().getUrl());
         
         Feed feed = request.getFeed();
         

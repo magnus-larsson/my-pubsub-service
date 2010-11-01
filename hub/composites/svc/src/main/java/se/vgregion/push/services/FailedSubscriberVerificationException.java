@@ -19,31 +19,23 @@
 
 package se.vgregion.push.services;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Collection;
+@SuppressWarnings("serial")
+public class FailedSubscriberVerificationException extends Exception {
 
-import org.springframework.transaction.annotation.Transactional;
+    public FailedSubscriberVerificationException() {
+        super();
+    }
 
-import se.vgregion.push.types.Feed;
-import se.vgregion.push.types.Subscription;
+    public FailedSubscriberVerificationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-public interface PushService {
+    public FailedSubscriberVerificationException(String message) {
+        super(message);
+    }
 
-    @Transactional
-    Collection<Subscription> getAllSubscriptionsForFeed(URI feed);
-    
-    void verify(SubscriptionRequest request) throws FailedSubscriberVerificationException, IOException;
-    
-    @Transactional
-    Subscription subscribe(Subscription subscription);
-    
-    @Transactional
-    Subscription unsubscribe(Subscription subscription);
-    
-    @Transactional
-    Feed retrieve(URI url) throws IOException;
-    
-    void distribute(DistributionRequest request) throws IOException;
-    
+    public FailedSubscriberVerificationException(Throwable cause) {
+        super(cause);
+    }
+
 }

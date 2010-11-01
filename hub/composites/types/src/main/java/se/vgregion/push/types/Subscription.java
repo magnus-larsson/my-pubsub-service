@@ -42,6 +42,11 @@ import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
     )
 public class Subscription extends AbstractEntity<Subscription, Long> {
 
+    private static final int MAX_RENEWAL_TRIES = 3;
+
+    // 24 hours
+    public static final int DEFAULT_LEASE_SECONDS = 60*60*24;
+    
     @Id
     @GeneratedValue
     private long id;
@@ -50,7 +55,8 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     private String callback;
     
     @Column
-    private long leaseSeconds;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date leaseTimeout;
     
     @Column
     private String secret;
@@ -62,6 +68,12 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdated;
 
+    @Column
+    private String verifyToken;
+    
+    @Column
+    private int failedVerifications = 0;
+    
     /* Make JPA happy */
     protected Subscription() {
     }
@@ -69,13 +81,15 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     public Subscription(URI topic, URI callback) {
         this.topic = topic.toString();
         this.callback = callback.toString();
+        this.leaseTimeout = new DateTime().plusSeconds(DEFAULT_LEASE_SECONDS).toDate();
     }
 
-    public Subscription(URI topic, URI callback, long leaseSeconds, String secret) {
+    public Subscription(URI topic, URI callback, int leaseSeconds, String secret, String verifyToken) {
         this.topic = topic.toString();
         this.callback = callback.toString();
-        this.leaseSeconds = leaseSeconds;
+        this.leaseTimeout = new DateTime().plusSeconds(leaseSeconds).toDate();
         this.secret = secret;
+        this.verifyToken = verifyToken;
     }
 
     
@@ -91,18 +105,43 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
         return URI.create(topic);
     }
 
-    public long getLeaseSeconds() {
-        return leaseSeconds;
+    public DateTime getLeaseTimeout() {
+        return new DateTime(leaseTimeout);
     }
 
+    public void setLeaseTimeout(DateTime timeOut) {
+        this.leaseTimeout = timeOut.toDate();
+    }
+    
     public String getSecret() {
         return secret;
+    }
+    
+    public String getVerifyToken() {
+        return verifyToken;
     }
 
     public DateTime getLastUpdated() {
         return new DateTime(lastUpdated);
     }
+    
+    public int getFailedVerifications() {
+        return failedVerifications;
+    }
 
+    public void increaseFailedVerifications() {
+        this.failedVerifications++;
+    }
+
+    public void resetFailedVerifications() {
+        this.failedVerifications = 0;
+    }
+
+    public boolean isFailed() {
+        return this.failedVerifications > MAX_RENEWAL_TRIES;
+    }
+
+    
     public void setLastUpdated(DateTime lastUpdated) {
         this.lastUpdated = lastUpdated.toDate();
     }
