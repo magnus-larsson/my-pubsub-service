@@ -22,8 +22,6 @@ package se.vgregion.push.repository;
 import java.net.URI;
 import java.util.Collection;
 
-import org.joda.time.DateTime;
-
 import se.vgregion.dao.domain.patterns.repository.db.DatabaseRepository;
 import se.vgregion.push.types.Subscription;
     
@@ -32,6 +30,4 @@ public interface SubscriptionRepository extends DatabaseRepository<Subscription,
     Collection<Subscription> findByTopic(URI url);
     
     Subscription findByTopicAndCallback(URI topic, URI callback);
-    
-    Collection<Subscription> findForVerification(DateTime timeOut);
 }

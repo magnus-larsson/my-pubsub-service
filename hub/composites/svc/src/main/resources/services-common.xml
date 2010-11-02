@@ -73,15 +73,6 @@
 		<constructor-arg ref="pushService" />
 	</bean>
 
- 	<bean id="subscriptionRenewer"
-		class="se.vgregion.push.services.SubscriptionRenewer">
-		<constructor-arg ref="pushService" />
-	</bean>
-
-	<task:scheduled-tasks>
-	    <task:scheduled ref="subscriptionRenewer" method="renew" cron="3/10 * * * * ?"/>
-	</task:scheduled-tasks>
-
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="entityManagerFactory" />
 	</bean>

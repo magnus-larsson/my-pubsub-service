@@ -207,7 +207,18 @@ public class DefaultPushService implements PushService {
     }
 
     private void distribute(Feed feed, Subscription subscription) throws FailedDistributionException {
-        LOG.debug("Distributing to " + subscription.getCallback());
+        LOG.debug("Checking subscription if verification is needed {}", subscription);
+        
+        // TODO the spec (6.3) requires a time out to be verified *before* it times out,
+        // we do it after. Needs redesign but works for now
+        if(subscription.isNeedsVerification()) {
+            if(!renewSubcription(subscription)) {
+                LOG.debug("Subscription verification failed, will not distributed content to subscription {}", subscription);
+                return;
+            }
+        }
+        
+        LOG.debug("Distributing to {}", subscription.getCallback());
         HttpPost post = new HttpPost(subscription.getCallback());
         
         post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
@@ -240,38 +251,41 @@ public class DefaultPushService implements PushService {
         }
     }
 
-    @Override
-    public void renewSubscriptions() {
-        Collection<Subscription> timedOutSubscriptions = subscriptionRepository.findForVerification(new DateTime());
+    public boolean renewSubcription(Subscription subscription) {
+        LOG.info("Renewing subscription {}", subscription);
         
-        for(Subscription timedOutSubscription : timedOutSubscriptions) {
-            LOG.info("Renewing subscription {}", timedOutSubscription);
+        SubscriptionRequest request = new SubscriptionRequest(SubscriptionMode.SUBSCRIBE, 
+                subscription.getCallback(), 
+                subscription.getTopic(), 
+                subscription.getLeaseSeconds(), 
+                subscription.getVerifyToken());
+        
+        boolean result = false;
+        try {
+            verify(request);
             
-            SubscriptionRequest request = new SubscriptionRequest(SubscriptionMode.SUBSCRIBE, 
-                    timedOutSubscription.getCallback(), 
-                    timedOutSubscription.getTopic(), 
-                    Subscription.DEFAULT_LEASE_SECONDS, 
-                    timedOutSubscription.getVerifyToken());
+            // success
+            subscription.successfullyVerified();
             
-            try {
-                verify(request);
-                
-                // success, update timeout
-                timedOutSubscription.setLeaseTimeout(new DateTime().plusSeconds(Subscription.DEFAULT_LEASE_SECONDS));
-                timedOutSubscription.resetFailedVerifications();
-            } catch (Exception e) {
-                // failed verification
-                LOG.info("Failed to renew subscription {}", timedOutSubscription);
-                timedOutSubscription.increaseFailedVerifications();
-            }
-
-            if(timedOutSubscription.isFailed()) {
-                LOG.info("Subscription reached renewal limit, removed {}", timedOutSubscription);
-                subscriptionRepository.removeByPrimaryKey(timedOutSubscription.getId());
-            } else {
-                subscriptionRepository.store(timedOutSubscription);
-            }
+            result = true;
+        } catch (FailedSubscriberVerificationException e) {
+            // failed verification
+            LOG.info("Failed to renew subscription {}", subscription);
+            subscription.failedVerified();
+        } catch (IOException e) {
+            // failed verification
+            LOG.info("Failed to renew subscription {}", subscription);
+            subscription.failedVerified();
         }
+
+        if(subscription.isFailed()) {
+            LOG.info("Subscription reached renewal limit, removed {}", subscription);
+            subscriptionRepository.removeByPrimaryKey(subscription.getId());
+        } else {
+            subscriptionRepository.store(subscription);
+        }
+        
+        return result;
     }
 
 }
