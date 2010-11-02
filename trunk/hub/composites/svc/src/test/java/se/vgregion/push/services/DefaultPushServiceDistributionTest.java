@@ -19,12 +19,13 @@
 
 package se.vgregion.push.services;
 
+import static org.mockito.Mockito.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -47,6 +48,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import se.vgregion.push.repository.FeedRepository;
+import se.vgregion.push.repository.SubscriptionRepository;
 import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
@@ -55,7 +58,6 @@ public class DefaultPushServiceDistributionTest {
 
     private static final URI FEED_URI = URI.create("http://example.com");
     
-    private MockFeedRepository feedRepository = new MockFeedRepository();
     private DefaultPushService service;
     private LocalTestServer server = new LocalTestServer(null, null);
     
@@ -70,17 +72,13 @@ public class DefaultPushServiceDistributionTest {
     
     @Test
     public void test() throws Exception {
-        service = new DefaultPushService(new MockSubscriptionRepository() {
-            @Override
-            public List<Subscription> findByTopic(URI url) {
-                try {
-                    Subscription sub = new Subscription(FEED_URI, buildTestUrl("/sub"));
-                    sub.setLastUpdated(new DateTime(2010, 1, 1, 0, 0, 0, 0));
-                    return Arrays.asList(sub);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            }}, feedRepository);
+        SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);
+
+        Subscription sub = new Subscription(FEED_URI, buildTestUrl("/sub"));
+        sub.setLastUpdated(new DateTime(2010, 1, 1, 0, 0, 0, 0));
+        when(subscriptionRepository.findByTopic(any(URI.class))).thenReturn(Arrays.asList(sub));
+        
+        service = new DefaultPushService(subscriptionRepository, mock(FeedRepository.class));
         
         final LinkedBlockingQueue<HttpRequest> issuedRequests = new LinkedBlockingQueue<HttpRequest>();
         final LinkedBlockingQueue<byte[]> issuedRequestBodies = new LinkedBlockingQueue<byte[]>();

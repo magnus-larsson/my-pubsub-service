@@ -76,7 +76,6 @@
  	<bean id="subscriptionRenewer"
 		class="se.vgregion.push.services.SubscriptionRenewer">
 		<constructor-arg ref="pushService" />
-		<constructor-arg ref="subscriptionRepository" />
 	</bean>
 
 	<task:scheduled-tasks>

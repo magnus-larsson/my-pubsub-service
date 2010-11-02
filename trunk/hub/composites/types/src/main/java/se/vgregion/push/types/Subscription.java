@@ -73,6 +73,10 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     
     @Column
     private int failedVerifications = 0;
+
+    @Column
+    private boolean needsVerification = false;
+
     
     /* Make JPA happy */
     protected Subscription() {
@@ -135,8 +139,17 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
 
     public void resetFailedVerifications() {
         this.failedVerifications = 0;
+        this.needsVerification = false;
+    }
+    
+    public void markForVerification() {
+        this.needsVerification = true;
     }
 
+    public boolean isNeedsVerification() {
+        return needsVerification;
+    }
+    
     public boolean isFailed() {
         return this.failedVerifications > MAX_RENEWAL_TRIES;
     }

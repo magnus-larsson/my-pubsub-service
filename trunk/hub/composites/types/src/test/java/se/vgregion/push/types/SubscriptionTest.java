@@ -46,6 +46,19 @@ public class SubscriptionTest {
         subscription.resetFailedVerifications();
         Assert.assertEquals(0, subscription.getFailedVerifications());
     }
+
+    @Test
+    public void needsVerifications() throws Exception {
+        Subscription subscription = new Subscription(TOPIC, CALLBACK);
+        Assert.assertFalse(subscription.isNeedsVerification());
+        
+        subscription.markForVerification();
+        Assert.assertTrue(subscription.isNeedsVerification());
+
+        subscription.resetFailedVerifications();
+        Assert.assertFalse(subscription.isNeedsVerification());
+    }
+
     
     @Test
     public void defaultLeaseTimeout() throws Exception {

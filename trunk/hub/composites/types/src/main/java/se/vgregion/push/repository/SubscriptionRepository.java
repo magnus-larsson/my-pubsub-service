@@ -33,5 +33,5 @@ public interface SubscriptionRepository extends DatabaseRepository<Subscription,
     
     Subscription findByTopicAndCallback(URI topic, URI callback);
     
-    Collection<Subscription> findTimedOutBy(DateTime timeOut);
+    Collection<Subscription> findForVerification(DateTime timeOut);
 }

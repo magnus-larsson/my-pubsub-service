@@ -19,6 +19,11 @@
 
 package se.vgregion.push.controllers;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+
 import java.net.URI;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -26,9 +31,11 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import se.vgregion.push.services.PushService;
 import se.vgregion.push.services.RetrievalRequest;
 import se.vgregion.push.services.SubscriptionMode;
 import se.vgregion.push.services.SubscriptionRequest;
@@ -109,35 +116,24 @@ public class HubControllerTest {
         
         MockHttpServletResponse response = new MockHttpServletResponse();
         
-        final LinkedBlockingQueue<Subscription> subscriptions = new LinkedBlockingQueue<Subscription>();
-        final LinkedBlockingQueue<SubscriptionRequest> subscriptionRequests = new LinkedBlockingQueue<SubscriptionRequest>();
-
-        controller.setSubscriptionService(new MockPushService() {
-            @Override
-            public void verify(SubscriptionRequest request) {
-                subscriptionRequests.add(request);
-            }
-
-            @Override
-            public Subscription subscribe(Subscription subscription) {
-                subscriptions.add(subscription);
-                return subscription;
-            }
-            
-            
-        });
+        PushService pushService = mock(PushService.class);
+        controller.setSubscriptionService(pushService);
         
         controller.post(request, response);
 
         Assert.assertEquals(204, response.getStatus());
         
-        Subscription subscription = subscriptions.poll();
+        ArgumentCaptor<Subscription> subscriptionCaptor = ArgumentCaptor.forClass(Subscription.class);
+        verify(pushService).subscribe(subscriptionCaptor.capture());
+        Subscription subscription = subscriptionCaptor.getValue();
         Assert.assertNotNull(subscription);
         Assert.assertEquals(SUBSCRIPTION_CALLBACK, subscription.getCallback());
         Assert.assertEquals(SUBSCRIPTION_TOPIC, subscription.getTopic());
         Assert.assertEquals("sekrit!", subscription.getSecret());
         
-        SubscriptionRequest subscriptionRequest = subscriptionRequests.poll();
+        ArgumentCaptor<SubscriptionRequest> subscriptionRequestCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
+        verify(pushService).verify(subscriptionRequestCaptor.capture());
+        SubscriptionRequest subscriptionRequest = subscriptionRequestCaptor.getValue();
 
         Assert.assertEquals(SubscriptionMode.SUBSCRIBE, subscriptionRequest.getMode());
         Assert.assertEquals(SUBSCRIPTION_CALLBACK, subscriptionRequest.getCallback());
@@ -263,32 +259,25 @@ public class HubControllerTest {
         
         MockHttpServletResponse response = new MockHttpServletResponse();
         
-        final LinkedBlockingQueue<Subscription> subscriptions = new LinkedBlockingQueue<Subscription>();
-        final LinkedBlockingQueue<SubscriptionRequest> subscriptionRequests = new LinkedBlockingQueue<SubscriptionRequest>();
-
-        controller.setSubscriptionService(new MockPushService() {
-            @Override
-            public void verify(SubscriptionRequest request) {
-                subscriptionRequests.add(request);
-            }
-
-            @Override
-            public Subscription subscribe(Subscription subscription) {
-                subscriptions.add(subscription);
-                return subscription;
-            }
-        });
+        PushService pushService = mock(PushService.class);
+        controller.setSubscriptionService(pushService);
         
         controller.post(request, response);
 
         Assert.assertEquals(204, response.getStatus());
         
-        Subscription subscription = subscriptions.poll();
+        ArgumentCaptor<Subscription> subscriptionCaptor = ArgumentCaptor.forClass(Subscription.class);
+        verify(pushService).subscribe(subscriptionCaptor.capture());
+
+        Subscription subscription = subscriptionCaptor.getValue();
         Assert.assertNotNull(subscription);
         Assert.assertEquals(SUBSCRIPTION_CALLBACK, subscription.getCallback());
         Assert.assertEquals(SUBSCRIPTION_TOPIC, subscription.getTopic());
         
-        SubscriptionRequest subscriptionRequest = subscriptionRequests.poll();
+        ArgumentCaptor<SubscriptionRequest> subscriptionRequestCaptor = ArgumentCaptor.forClass(SubscriptionRequest.class);
+        verify(pushService).verify(subscriptionRequestCaptor.capture());
+        SubscriptionRequest subscriptionRequest = subscriptionRequestCaptor.getValue();
+
 
         Assert.assertEquals(SubscriptionMode.UNSUBSCRIBE, subscriptionRequest.getMode());
         Assert.assertEquals(SUBSCRIPTION_CALLBACK, subscriptionRequest.getCallback());

@@ -19,7 +19,10 @@
 
 package se.vgregion.push.services;
 
-import java.io.File;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.net.URI;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -30,11 +33,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-
+import se.vgregion.push.types.ContentType;
+import se.vgregion.push.types.Feed;
 
 public class FeedRetrieverTest {
 
-    private static final File TMP = new File("target/test-tmp");
     private static final URI TEST_URI = URI.create("http://example.com");
     private static final HttpEntity TEST_ENTITY = HttpUtil.createEntity(SomeFeeds.ATOM1.toXML());
     
@@ -45,10 +48,8 @@ public class FeedRetrieverTest {
     
     @Before
     public void before() throws Exception {
-        Utils.deleteDir(TMP);
-        Assert.assertTrue("Failed to create " + TMP.getAbsolutePath(), TMP.mkdirs());
-
-        MockFeedRetrieverService service = new MockFeedRetrieverService(TMP, TEST_ENTITY);
+        PushService service = mock(PushService.class);
+        when(service.retrieve(any(URI.class))).thenReturn(new Feed(TEST_URI, ContentType.ATOM, TEST_ENTITY.getContent()));
 
         feedRetriever = new FeedRetriever(retrievalQueue, distributionQueue, service);
         feedRetriever.start();
@@ -68,7 +69,5 @@ public class FeedRetrieverTest {
     @After
     public void after() {
         feedRetriever.stop();
-        
-        Utils.deleteDir(TMP);
     }
 }
