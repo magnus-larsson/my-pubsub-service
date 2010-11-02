@@ -25,7 +25,6 @@ import java.util.Collections;
 
 import javax.persistence.NoResultException;
 
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

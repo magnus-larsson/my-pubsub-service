@@ -40,9 +40,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import se.vgregion.push.repository.SubscriptionRepository;
-import se.vgregion.push.services.SubscriptionMode;
-import se.vgregion.push.services.SubscriptionRequest;
-import se.vgregion.push.services.PushService;
 import se.vgregion.push.types.Subscription;
 
 

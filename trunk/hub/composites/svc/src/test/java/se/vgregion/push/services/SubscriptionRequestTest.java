@@ -26,9 +26,6 @@ import java.net.URLEncoder;
 import org.junit.Assert;
 import org.junit.Test;
 
-import se.vgregion.push.services.SubscriptionMode;
-import se.vgregion.push.services.SubscriptionRequest;
-
 
 public class SubscriptionRequestTest {
 

@@ -37,10 +37,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import se.vgregion.push.services.RetrievalRequest;
-import se.vgregion.push.services.SubscriptionRequest;
 import se.vgregion.push.services.PushService;
+import se.vgregion.push.services.RetrievalRequest;
 import se.vgregion.push.services.SubscriptionMode;
+import se.vgregion.push.services.SubscriptionRequest;
 import se.vgregion.push.types.Subscription;
 
 @Controller
