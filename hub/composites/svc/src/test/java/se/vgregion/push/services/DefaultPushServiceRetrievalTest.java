@@ -19,6 +19,7 @@
 
 package se.vgregion.push.services;
 
+import static org.mockito.Mockito.mock;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,12 +36,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.types.Feed;
 
 public class DefaultPushServiceRetrievalTest {
 
-    private MockFeedRepository feedRepository = new MockFeedRepository();
-    private DefaultPushService service = new DefaultPushService(null, feedRepository);
+    private DefaultPushService service = new DefaultPushService(null, mock(FeedRepository.class));
     private LocalTestServer server = new LocalTestServer(null, null);
     private HttpEntity testEntity = HttpUtil.createEntity(SomeFeeds.ATOM1.toXML());
     

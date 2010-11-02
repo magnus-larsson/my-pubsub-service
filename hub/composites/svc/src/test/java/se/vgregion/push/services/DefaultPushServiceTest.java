@@ -103,7 +103,7 @@ public class DefaultPushServiceTest {
         Assert.assertEquals(subscriptionRequest.getVerifyToken(), getQueryParamValue(requestUri, "hub.verify_token"));
     }
 
-    @Test(expected=IOException.class)
+    @Test(expected=FailedSubscriberVerificationException.class)
     public void verifyWithMissingChallenge() throws Exception {
         server.register("/*", new HttpRequestHandler() {
             @Override
@@ -115,7 +115,7 @@ public class DefaultPushServiceTest {
         service.verify(subscriptionRequest);
     }
 
-    @Test(expected=IOException.class)
+    @Test(expected=FailedSubscriberVerificationException.class)
     public void verifyWithInvalidChallenge() throws Exception {
         server.register("/*", new HttpRequestHandler() {
             @Override
@@ -127,7 +127,7 @@ public class DefaultPushServiceTest {
         service.verify(subscriptionRequest);
     }
 
-    @Test(expected=IOException.class)
+    @Test(expected=FailedSubscriberVerificationException.class)
     public void verifyWithError() throws Exception {
         server.register("/*", new HttpRequestHandler() {
             @Override

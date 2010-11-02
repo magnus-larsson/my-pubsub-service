@@ -77,9 +77,10 @@ public class JpaSubscriptionRepository extends DefaultJpaRepository<Subscription
 
     @SuppressWarnings("unchecked")
     @Override
-    public Collection<Subscription> findTimedOutBy(DateTime timeOut) {
+    @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
+    public Collection<Subscription> findForVerification(DateTime timeOut) {
         try {
-            return entityManager.createQuery("select l from Subscription l where l.leaseTimeout < :leaseTimeout")
+            return entityManager.createQuery("select l from Subscription l where l.leaseTimeout < :leaseTimeout or l.needsVerification = true")
                 .setParameter("leaseTimeout", timeOut.toDate()).getResultList();
         } catch(NoResultException e) {
             return Collections.EMPTY_LIST;

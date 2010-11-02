@@ -27,7 +27,6 @@ import java.util.UUID;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -168,7 +167,7 @@ public class DefaultPushService implements PushService {
 
         HttpUtil.closeQuitely(response);
 
-        feed = feedRepository.persistOrUpdate(feed);
+        feedRepository.persistOrUpdate(feed);
         
         LOG.debug("Feed downloaded: {}", url);
 
@@ -223,16 +222,55 @@ public class DefaultPushService implements PushService {
                 
                 // update last update
                 subscription.setLastUpdated(new DateTime());
-                subscriptionRepository.store(subscription);
             } else {
+                subscription.markForVerification();
+                
                 // TODO handle retrying
                 throw new FailedDistributionException("Failed distributing to subscriber \"" + subscription.getCallback() + "\" with error \"" + response.getStatusLine() + "\"");
             }
         } catch(IOException e) {
+            subscription.markForVerification();
+            
             // TODO handle retrying
             throw new FailedDistributionException("Failed distributing to subscriber: " + subscription.getCallback(), e);
         } finally {
             HttpUtil.closeQuitely(response);
+
+            subscriptionRepository.store(subscription);
+        }
+    }
+
+    @Override
+    public void renewSubscriptions() {
+        Collection<Subscription> timedOutSubscriptions = subscriptionRepository.findForVerification(new DateTime());
+        
+        for(Subscription timedOutSubscription : timedOutSubscriptions) {
+            LOG.info("Renewing subscription {}", timedOutSubscription);
+            
+            SubscriptionRequest request = new SubscriptionRequest(SubscriptionMode.SUBSCRIBE, 
+                    timedOutSubscription.getCallback(), 
+                    timedOutSubscription.getTopic(), 
+                    Subscription.DEFAULT_LEASE_SECONDS, 
+                    timedOutSubscription.getVerifyToken());
+            
+            try {
+                verify(request);
+                
+                // success, update timeout
+                timedOutSubscription.setLeaseTimeout(new DateTime().plusSeconds(Subscription.DEFAULT_LEASE_SECONDS));
+                timedOutSubscription.resetFailedVerifications();
+            } catch (Exception e) {
+                // failed verification
+                LOG.info("Failed to renew subscription {}", timedOutSubscription);
+                timedOutSubscription.increaseFailedVerifications();
+            }
+
+            if(timedOutSubscription.isFailed()) {
+                LOG.info("Subscription reached renewal limit, removed {}", timedOutSubscription);
+                subscriptionRepository.removeByPrimaryKey(timedOutSubscription.getId());
+            } else {
+                subscriptionRepository.store(timedOutSubscription);
+            }
         }
     }
 
