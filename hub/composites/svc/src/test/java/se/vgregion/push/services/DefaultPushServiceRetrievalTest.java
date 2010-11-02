@@ -20,6 +20,7 @@
 package se.vgregion.push.services;
 
 import static org.mockito.Mockito.mock;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;

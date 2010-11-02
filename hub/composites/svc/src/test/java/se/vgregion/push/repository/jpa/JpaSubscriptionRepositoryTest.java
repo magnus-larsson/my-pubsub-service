@@ -24,7 +24,6 @@ import java.util.Collection;
 
 import javax.persistence.PersistenceException;
 
-import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +37,6 @@ import se.vgregion.push.types.Subscription;
 public class JpaSubscriptionRepositoryTest {
 
     private static final URI CALLBACK = URI.create("http://example.com/sub11");
-    private static final URI CALLBACK2 = URI.create("http://example.com/sub22");
     private static final URI TOPIC = URI.create("http://example.com/feed");
     
     private ApplicationContext ctx = new ClassPathXmlApplicationContext("services-test.xml");

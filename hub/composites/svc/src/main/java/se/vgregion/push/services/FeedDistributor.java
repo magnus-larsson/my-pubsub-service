@@ -20,21 +20,13 @@
 package se.vgregion.push.services;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import se.vgregion.push.types.Subscription;
 
 public class FeedDistributor {
 
