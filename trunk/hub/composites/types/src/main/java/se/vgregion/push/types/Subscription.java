@@ -56,7 +56,10 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private Date leaseTimeout;
+    private Date leaseRenewedAt;
+
+    @Column
+    private int leaseSeconds;
     
     @Column
     private String secret;
@@ -83,15 +86,14 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     }
 
     public Subscription(URI topic, URI callback) {
-        this.topic = topic.toString();
-        this.callback = callback.toString();
-        this.leaseTimeout = new DateTime().plusSeconds(DEFAULT_LEASE_SECONDS).toDate();
+        this(topic, callback, DEFAULT_LEASE_SECONDS, null, null);
     }
 
     public Subscription(URI topic, URI callback, int leaseSeconds, String secret, String verifyToken) {
         this.topic = topic.toString();
         this.callback = callback.toString();
-        this.leaseTimeout = new DateTime().plusSeconds(leaseSeconds).toDate();
+        this.leaseSeconds = leaseSeconds;
+        this.leaseRenewedAt = new DateTime().toDate();
         this.secret = secret;
         this.verifyToken = verifyToken;
     }
@@ -108,13 +110,17 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     public URI getTopic() {
         return URI.create(topic);
     }
-
-    public DateTime getLeaseTimeout() {
-        return new DateTime(leaseTimeout);
+    
+    public int getLeaseSeconds() {
+        return leaseSeconds;
     }
 
-    public void setLeaseTimeout(DateTime timeOut) {
-        this.leaseTimeout = timeOut.toDate();
+    public DateTime getLeaseRenewedAt() {
+        return new DateTime(leaseRenewedAt);
+    }
+
+    public void setLeaseRenewedAt(DateTime leaseRenewedAt) {
+        this.leaseRenewedAt = leaseRenewedAt.toDate();
     }
     
     public String getSecret() {
@@ -129,17 +135,18 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
         return new DateTime(lastUpdated);
     }
     
-    public int getFailedVerifications() {
+    protected int getFailedVerifications() {
         return failedVerifications;
     }
 
-    public void increaseFailedVerifications() {
-        this.failedVerifications++;
-    }
-
-    public void resetFailedVerifications() {
+    public void successfullyVerified() {
         this.failedVerifications = 0;
         this.needsVerification = false;
+        setLeaseRenewedAt(new DateTime());
+    }
+
+    public void failedVerified() {
+        this.failedVerifications++;
     }
     
     public void markForVerification() {
@@ -147,7 +154,7 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     }
 
     public boolean isNeedsVerification() {
-        return needsVerification;
+        return needsVerification || getLeaseRenewedAt().plusSeconds(leaseSeconds).isBefore(new DateTime());
     }
     
     public boolean isFailed() {

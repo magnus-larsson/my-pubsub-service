@@ -89,35 +89,4 @@ public class JpaSubscriptionRepositoryTest {
         repository.persist(new Subscription(TOPIC, CALLBACK));
         repository.persist(new Subscription(TOPIC, CALLBACK));
     }
-
-    @Test
-    public void findTimedOut() {
-        repository.persist(new Subscription(TOPIC, CALLBACK2, 100, "sekrit", "token"));
-        
-        Collection<Subscription> timedOut = repository.findForVerification(new DateTime().plusHours(1));
-        
-        Assert.assertEquals(1, timedOut.size());
-        Assert.assertEquals(CALLBACK2, timedOut.iterator().next().getCallback());
-    }
-
-    @Test
-    public void findNoneTimedOut() {
-        repository.persist(new Subscription(TOPIC, CALLBACK2, 100, "sekrit", "token"));
-        
-        Collection<Subscription> timedOut = repository.findForVerification(new DateTime());
-        Assert.assertTrue(timedOut.isEmpty());
-    }
-
-    @Test
-    public void findMarkedForVerification() {
-        Subscription subscription = new Subscription(TOPIC, CALLBACK2);
-        subscription.markForVerification();
-        repository.persist(subscription);
-        
-        Collection<Subscription> timedOut = repository.findForVerification(new DateTime());
-        
-        Assert.assertEquals(1, timedOut.size());
-        Assert.assertEquals(CALLBACK2, timedOut.iterator().next().getCallback());
-    }
-
 }

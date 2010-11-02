@@ -45,6 +45,4 @@ public interface PushService {
     Feed retrieve(URI url) throws IOException;
     
     void distribute(DistributionRequest request) throws IOException;
- 
-    void renewSubscriptions();
 }

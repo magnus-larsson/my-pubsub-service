@@ -37,47 +37,50 @@ public class SubscriptionTest {
         Subscription subscription = new Subscription(TOPIC, CALLBACK);
         Assert.assertEquals(0, subscription.getFailedVerifications());
         
-        subscription.increaseFailedVerifications();
+        subscription.failedVerified();
         Assert.assertEquals(1, subscription.getFailedVerifications());
 
-        subscription.increaseFailedVerifications();
+        subscription.failedVerified();
         Assert.assertEquals(2, subscription.getFailedVerifications());
 
-        subscription.resetFailedVerifications();
+        subscription.successfullyVerified();
         Assert.assertEquals(0, subscription.getFailedVerifications());
     }
 
     @Test
-    public void needsVerifications() throws Exception {
+    public void needsVerification() throws Exception {
         Subscription subscription = new Subscription(TOPIC, CALLBACK);
         Assert.assertFalse(subscription.isNeedsVerification());
         
         subscription.markForVerification();
         Assert.assertTrue(subscription.isNeedsVerification());
 
-        subscription.resetFailedVerifications();
+        subscription.successfullyVerified();
         Assert.assertFalse(subscription.isNeedsVerification());
+    }
+
+    @Test
+    public void needsVerificationByTimeout() throws Exception {
+        // hack using negative timeout
+        Subscription subscription = new Subscription(TOPIC, CALLBACK, -100, "sekrit", "token");
+        Assert.assertTrue(subscription.isNeedsVerification());
     }
 
     
     @Test
-    public void defaultLeaseTimeout() throws Exception {
-        DateTime testTime = new DateTime();
-        
-        DateTimeUtils.setCurrentMillisFixed(testTime.getMillis());
+    public void defaultLeaseSeconds() throws Exception {
         Subscription subscription = new Subscription(TOPIC, CALLBACK);
         
-        Assert.assertEquals(testTime.plusSeconds(Subscription.DEFAULT_LEASE_SECONDS), subscription.getLeaseTimeout());
+        Assert.assertEquals(Subscription.DEFAULT_LEASE_SECONDS, subscription.getLeaseSeconds());
     }
 
     @Test
     public void setLeaseTimeout() throws Exception {
         DateTime testTime = new DateTime();
         
-        DateTimeUtils.setCurrentMillisFixed(testTime.getMillis());
         Subscription subscription = new Subscription(TOPIC, CALLBACK);
-        subscription.setLeaseTimeout(testTime);
-        Assert.assertEquals(testTime, subscription.getLeaseTimeout());
+        subscription.setLeaseRenewedAt(testTime);
+        Assert.assertEquals(testTime, subscription.getLeaseRenewedAt());
     }
 
     
