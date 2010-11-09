@@ -68,21 +68,4 @@
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 
-
-  <!--
-    Map all url:s beginning with "resources" to /resources/* for loading from
-    web composite jars on the classpath rather than the web-inf directory.
-    Typical examples are images, javascript and css-files.
-
-    See: http://static.springframework.org/spring-webflow/docs/2.0.x/reference/html/ch11s02.html
-  -->
-  <servlet>
-    <servlet-name>Resource Servlet</servlet-name>
-    <servlet-class>org.springframework.js.resource.ResourceServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>Resource Servlet</servlet-name>
-    <url-pattern>/resources/*</url-pattern>
-  </servlet-mapping>
 </web-app>

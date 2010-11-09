@@ -44,36 +44,20 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>pubsubhubbub-hub-composite-webcomp</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<!-- Use the resource-loading servlet from Spring-JS -->
-			<groupId>org.springframework.webflow</groupId>
-			<artifactId>org.springframework.js</artifactId>
-			<version>2.0.5.RELEASE</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
 			<groupId>hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<version>3.4.0.GA</version>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
-			<version>1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>1.8.0.10</version>
 			<!--
 				TODO compile only during testing, remove when going into production
 			-->

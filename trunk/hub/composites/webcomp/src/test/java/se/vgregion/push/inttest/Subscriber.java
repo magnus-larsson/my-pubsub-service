@@ -69,7 +69,7 @@ public class Subscriber {
         });
         server.start();
         
-        HttpPost post = new HttpPost("http://localhost:8080/pubsubhubbub-hub-module-web/");
+        HttpPost post = new HttpPost("http://localhost:8080/");
         
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
         parameters.add(new BasicNameValuePair("hub.callback", buildTestUrl(server, "/").toString()));

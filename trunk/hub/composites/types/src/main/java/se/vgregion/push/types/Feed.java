@@ -172,12 +172,23 @@ public class Feed extends AbstractEntity<Feed, Long> {
         entries.add(newEntry);
     }
 
+    public boolean hasUpdates(DateTime updatedSince) {
+        for(Entry entry : entries) {
+            if(updatedSince == null || entry.isNewerThan(updatedSince)) {
+                return true;
+            }
+        }
+        
+        return false;
+        
+    }
     
     public Document createDocument(DateTime updatedSince) {
         try {
             // TODO cache
             Document document = PARSER.build(new StringReader(xml));
             for(Entry entry : entries) {
+
                 if(updatedSince == null || entry.isNewerThan(updatedSince)) {
                     document.getRootElement().appendChild(entry.toElement().copy());
                 }
@@ -201,8 +212,7 @@ public class Feed extends AbstractEntity<Feed, Long> {
         
         List<Entry> otherEntries = other.getEntries();
 
-        //System.out.println(other.createDocument().toXML());
-        for(Entry otherEntry : otherEntries) {
+        for(Entry otherEntry : new ArrayList<Entry>(otherEntries)) {
             addOrReplaceEntry(otherEntry);
         }
     }

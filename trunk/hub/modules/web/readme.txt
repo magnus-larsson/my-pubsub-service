@@ -29,6 +29,6 @@ cd to test-repo
 python -m SimpleHTTPServer
 
 Test publishing:
-curl http://localhost:8080/pubsubhubbub-hub-module-web/ -v -d hub.mode=publish -d hub.url=http://localhost:8000/0e1383718a2889c12af18febb1a2e3de
+curl http://localhost:8080/ -v -d hub.mode=publish -d hub.url=http://localhost:8000/0e1383718a2889c12af18febb1a2e3de
 
-curl http://localhost:8080/pubsubhubbub-hub-module-web/ -v -d hub.mode=publish -d hub.url=http://feeds.feedburner.com/protocol7/main
+curl http://localhost:8080/ -v -d hub.mode=publish -d hub.url=http://feeds.feedburner.com/protocol7/main
