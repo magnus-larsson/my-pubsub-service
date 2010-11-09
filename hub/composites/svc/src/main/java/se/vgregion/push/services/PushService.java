@@ -23,26 +23,22 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
 
 public interface PushService {
 
-    @Transactional
     Collection<Subscription> getAllSubscriptionsForFeed(URI feed);
     
     void verify(SubscriptionRequest request) throws FailedSubscriberVerificationException, IOException;
     
-    @Transactional
     Subscription subscribe(Subscription subscription);
     
-    @Transactional
     Subscription unsubscribe(Subscription subscription);
     
-    @Transactional
     Feed retrieve(URI url) throws IOException;
+    
+    boolean renewSubcription(Subscription subscription);
     
     void distribute(DistributionRequest request) throws IOException;
 }

@@ -129,7 +129,7 @@ public class DefaultPushService implements PushService {
         Subscription existing = subscriptionRepository.findByTopicAndCallback(subscription.getTopic(), subscription.getCallback());
         
         if(existing != null) {
-            subscriptionRepository.remove(existing);
+            subscriptionRepository.removeByPrimaryKey(existing.getId());
         }
         return existing;
     }
@@ -164,6 +164,12 @@ public class DefaultPushService implements PushService {
         }
 
         Feed feed = new Feed(url, contentType, entity.getContent());
+        Feed existing = feedRepository.findByUrl(url);
+        
+        if(existing != null) {
+            existing.merge(feed);
+            feed = existing;
+        }
 
         HttpUtil.closeQuitely(response);
 
@@ -218,43 +224,48 @@ public class DefaultPushService implements PushService {
             }
         }
         
-        LOG.debug("Distributing to {}", subscription.getCallback());
-        HttpPost post = new HttpPost(subscription.getCallback());
-        
-        post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
-        
-        post.setEntity(HttpUtil.createEntity(feed.createDocument(subscription.getLastUpdated())));
-        
-        HttpResponse response = null;
-        try {
-            response = httpclient.execute(post);
-            if(HttpUtil.successStatus(response)) {
-                LOG.debug("Succeeded distributing to subscriber {}", subscription.getCallback());
-                
-                // update last update
-                subscription.setLastUpdated(new DateTime());
-            } else {
+        if(feed.hasUpdates(subscription.getLastUpdated())) {
+            LOG.info("Distributing to {}", subscription.getCallback());
+            HttpPost post = new HttpPost(subscription.getCallback());
+            
+            post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
+            
+            post.setEntity(HttpUtil.createEntity(feed.createDocument(subscription.getLastUpdated())));
+            
+            HttpResponse response = null;
+            try {
+                response = httpclient.execute(post);
+                if(HttpUtil.successStatus(response)) {
+                    LOG.debug("Succeeded distributing to subscriber {}", subscription.getCallback());
+                    
+                    // update last update
+                    subscription.setLastUpdated(new DateTime());
+                } else {
+                    subscription.markForVerification();
+                    
+                    // TODO handle retrying
+                    throw new FailedDistributionException("Failed distributing to subscriber \"" + subscription.getCallback() + "\" with error \"" + response.getStatusLine() + "\"");
+                }
+            } catch(IOException e) {
                 subscription.markForVerification();
                 
                 // TODO handle retrying
-                throw new FailedDistributionException("Failed distributing to subscriber \"" + subscription.getCallback() + "\" with error \"" + response.getStatusLine() + "\"");
+                throw new FailedDistributionException("Failed distributing to subscriber: " + subscription.getCallback(), e);
+            } finally {
+                HttpUtil.closeQuitely(response);
+    
+                subscriptionRepository.store(subscription);
             }
-        } catch(IOException e) {
-            subscription.markForVerification();
-            
-            // TODO handle retrying
-            throw new FailedDistributionException("Failed distributing to subscriber: " + subscription.getCallback(), e);
-        } finally {
-            HttpUtil.closeQuitely(response);
-
-            subscriptionRepository.store(subscription);
+        } else {
+            LOG.info("No updates for subscriber {}", subscription);
         }
     }
 
     public boolean renewSubcription(Subscription subscription) {
         LOG.info("Renewing subscription {}", subscription);
         
-        SubscriptionRequest request = new SubscriptionRequest(SubscriptionMode.SUBSCRIBE, 
+        SubscriptionRequest request = new SubscriptionRequest(
+                SubscriptionMode.SUBSCRIBE, 
                 subscription.getCallback(), 
                 subscription.getTopic(), 
                 subscription.getLeaseSeconds(), 

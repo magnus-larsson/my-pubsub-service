@@ -82,7 +82,7 @@ public class HubController {
                     String leaseSecondsString = request.getParameter("hub.lease_seconds");
                     
                     try {
-                        int leaseSeconds = leaseSecondsString != null ? Integer.parseInt(leaseSecondsString) : 0;
+                        int leaseSeconds = leaseSecondsString != null ? Integer.parseInt(leaseSecondsString) : Subscription.DEFAULT_LEASE_SECONDS;
                         
                         String secret = request.getParameter("hub.secret");
                         String verifyToken = request.getParameter("hub.verify_token");

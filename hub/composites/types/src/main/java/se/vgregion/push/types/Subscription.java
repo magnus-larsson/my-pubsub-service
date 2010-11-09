@@ -42,7 +42,7 @@ import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
     )
 public class Subscription extends AbstractEntity<Subscription, Long> {
 
-    private static final int MAX_RENEWAL_TRIES = 3;
+    public static final int MAX_RENEWAL_TRIES = 3;
 
     // 24 hours
     public static final int DEFAULT_LEASE_SECONDS = 60*60*24;
@@ -132,7 +132,11 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     }
 
     public DateTime getLastUpdated() {
-        return new DateTime(lastUpdated);
+        if(lastUpdated != null) {
+            return new DateTime(lastUpdated);
+        } else {
+            return null;
+        }
     }
     
     protected int getFailedVerifications() {
@@ -165,4 +169,11 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     public void setLastUpdated(DateTime lastUpdated) {
         this.lastUpdated = lastUpdated.toDate();
     }
+
+    @Override
+    public String toString() {
+        return "[" + topic + ", " + callback + "]";
+    }
+    
+    
 }
