@@ -72,10 +72,7 @@ public class Entry extends AbstractEntity<Entry, Long> {
         atomId = elm.getChildElements("id", Feed.NS_ATOM).get(0).getValue();
         
         // TODO add exception handling
-        String updateString = elm.getChildElements("updated", Feed.NS_ATOM).get(0).getValue();
-        
-        DateTimeFormatter fmt = ISODateTimeFormat.dateTimeParser();
-        updated = fmt.parseDateTime(updateString).toDate();
+        updated = FeedHelper.parseDateTime(elm.getChildElements("updated", Feed.NS_ATOM).get(0).getValue()).toDate();
     }
 
     @Override

@@ -17,25 +17,30 @@
  *
  */
 
-package se.vgregion.push.repository;
+package se.vgregion.push.services;
 
-import java.net.URI;
-import java.util.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import org.joda.time.DateTime;
+@Service
+public class DistributionRetryer {
 
-import se.vgregion.dao.domain.patterns.repository.Repository;
-import se.vgregion.push.types.Feed;
-
-
+    private Logger log = LoggerFactory.getLogger(DistributionRetryer.class);
     
-public interface FeedRepository extends Repository<Feed, Long> {
-
-    void deleteOutdatedEntries(Feed feed, DateTime date);
-
-    Feed findByUrl(URI url);
+    private PushService pushService;
     
-    Feed persistOrUpdate(Feed feed2);
+    public DistributionRetryer(PushService pushService) {
+        this.pushService = pushService;
+    }
+
+    public void retry() {
+        log.info("Starting retrying failed distributions");
+
+        pushService.retryDistributions();
+        
+        log.info("Done retrying failed distributions");
+    }
     
-    Collection<Feed> findFeedsWithBehindSubscriptions();
+    
 }

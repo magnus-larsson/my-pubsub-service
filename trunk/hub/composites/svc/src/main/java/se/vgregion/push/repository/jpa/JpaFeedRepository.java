@@ -20,6 +20,8 @@
 package se.vgregion.push.repository.jpa;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.NoResultException;
@@ -75,6 +77,19 @@ public class JpaFeedRepository extends DefaultJpaRepository<Feed> implements Fee
                 .setParameter("url", url.toString()).getSingleResult();
         } catch(NoResultException e) {
             return null;
+        }
+    }
+
+    @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
+    @Override
+    public Collection<Feed> findFeedsWithBehindSubscriptions() {
+        try {
+            return entityManager.createNativeQuery("SELECT f.* FROM FEED AS f, SUBSCRIPTION AS s " +
+            		"WHERE f.url = s.topic AND f.updated > s.lastUpdated", Feed.class).getResultList();
+//            return entityManager.createQuery("select f from Feed f where f.updated > :since")
+//                .setParameter("since", since.toDate()).getResultList();
+        } catch(NoResultException e) {
+            return Collections.EMPTY_LIST;
         }
     }   
 }

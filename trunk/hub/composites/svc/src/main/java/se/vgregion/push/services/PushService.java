@@ -41,4 +41,6 @@ public interface PushService {
     boolean renewSubcription(Subscription subscription);
     
     void distribute(DistributionRequest request) throws IOException;
+    
+    void retryDistributions();
 }
