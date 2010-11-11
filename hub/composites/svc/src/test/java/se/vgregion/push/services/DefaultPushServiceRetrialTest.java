@@ -29,7 +29,6 @@ import se.vgregion.push.TestConstants;
 import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.repository.SubscriptionRepository;
 import se.vgregion.push.repository.jpa.AtomFeedBuilder;
-import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
 
@@ -40,9 +39,9 @@ public class DefaultPushServiceRetrialTest {
 
     @Before
     public void before() {
-        Feed feed1 = new AtomFeedBuilder(TestConstants.TOPIC, ContentType.ATOM).id("f1").updated(TestConstants.UPDATED1)
+        Feed feed1 = new AtomFeedBuilder(TestConstants.TOPIC).id("f1").updated(TestConstants.UPDATED1)
                 .entry("e1", TestConstants.UPDATED1).build();
-        Feed feed2 = new AtomFeedBuilder(TestConstants.TOPIC2, ContentType.ATOM).id("f2").updated(TestConstants.UPDATED3)
+        Feed feed2 = new AtomFeedBuilder(TestConstants.TOPIC2).id("f2").updated(TestConstants.UPDATED3)
                 .entry("e3", TestConstants.UPDATED3).build();
 
         Subscription subscription = new Subscription(TestConstants.TOPIC, TestConstants.CALLBACK);

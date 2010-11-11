@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import se.vgregion.push.TestConstants;
 import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.services.SomeFeeds;
 import se.vgregion.push.types.ContentType;
@@ -47,24 +48,25 @@ public class JpaFeedRepositoryTest {
     
     @Before
     public void setup() {
-        Feed feed = new Feed(URL, ContentType.ATOM, SomeFeeds.ATOM1);
-        feed1 = repository.persist(feed);
+        feed1 = new AtomFeedBuilder(URL).id("f1").updated(TestConstants.UPDATED1)
+            .entry("e1", TestConstants.UPDATED1)
+            .entry("e2", TestConstants.UPDATED1)
+            .build();
+        repository.persist(feed1);
     }
     
     @Test
     public void findByPk() {
         Feed feed = repository.find(feed1.getId());
         
-        Assert.assertEquals(SomeFeeds.ATOM1.toXML(), feed.createDocument().toXML());
-        XOMTestCase.assertEquals(SomeFeeds.ATOM1, feed.createDocument());
+        XOMTestCase.assertEquals(feed1.createDocument(), feed.createDocument());
     }
 
     @Test
     public void findByUrl() {
         Feed feed = repository.findByUrl(URL);
         
-        Assert.assertEquals(SomeFeeds.ATOM1.toXML(), feed.createDocument().toXML());
-        XOMTestCase.assertEquals(SomeFeeds.ATOM1, feed.createDocument());
+        XOMTestCase.assertEquals(feed1.createDocument(), feed.createDocument());
     }
 
     
@@ -96,8 +98,11 @@ public class JpaFeedRepositoryTest {
     
     @Test
     public void persistOrUpdateWithExistingFeed() {
-        Feed feed2 = new Feed(URL, ContentType.ATOM, SomeFeeds.ATOM2);
-        
+        Feed feed2 = new AtomFeedBuilder(URL).id("f1").updated(TestConstants.UPDATED1)
+            .entry("e3", TestConstants.UPDATED1)
+            .entry("e2", TestConstants.UPDATED1) // duplicated entry
+            .build();
+            
         repository.persistOrUpdate(feed2);
         
         Feed storedFeed = repository.find(feed1.getId());

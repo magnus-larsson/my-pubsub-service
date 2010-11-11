@@ -12,12 +12,11 @@ import se.vgregion.push.types.Feed;
 public class AtomFeedBuilder extends AtomBuilder<AtomFeedBuilder> {
 
     private URI url;
-    private ContentType type;
+    private ContentType type = ContentType.ATOM;
     
-    public AtomFeedBuilder(URI url, ContentType type) {
+    public AtomFeedBuilder(URI url) {
         super("feed");
         this.url= url;
-        this.type= type;
     }
     
     public AtomFeedBuilder entry(String id, DateTime updated) {
