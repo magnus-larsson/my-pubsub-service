@@ -2,9 +2,9 @@ package se.vgregion.push.repository.jpa;
 
 import nu.xom.Element;
 
-public class EntryBuilder extends AtomBuilder<EntryBuilder> {
+public class AtomEntryBuilder extends AtomBuilder<AtomEntryBuilder> {
 
-    public EntryBuilder() {
+    public AtomEntryBuilder() {
         super("entry");
     }
     
