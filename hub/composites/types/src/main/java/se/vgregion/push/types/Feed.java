@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -35,6 +36,8 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -70,6 +73,10 @@ public class Feed extends AbstractEntity<Feed, Long> {
     @Column
     @Lob
     private String xml;
+
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updated;
     
     // TODO remove eager loading
     @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
@@ -93,7 +100,8 @@ public class Feed extends AbstractEntity<Feed, Long> {
         
         parseEntries(document);
         this.xml = parseXmlWithoutEntries(document).toXML();
-        this.atomId = parseAtomId(document);
+        this.atomId = parseValue(document, "id");
+        this.updated = FeedHelper.parseDateTime(parseValue(document, "updated")).toDate();
     }
     
     private static Document streamToDocument(InputStream in) throws IOException {
@@ -116,8 +124,8 @@ public class Feed extends AbstractEntity<Feed, Long> {
         }
     }
 
-    private String parseAtomId(Document document) {
-        return document.getRootElement().getFirstChildElement("id", Feed.NS_ATOM).getValue();
+    private String parseValue(Document document, String topLevelElement) {
+        return document.getRootElement().getFirstChildElement(topLevelElement, Feed.NS_ATOM).getValue();
     }
     
     private Document parseXmlWithoutEntries(Document document) {
@@ -150,6 +158,10 @@ public class Feed extends AbstractEntity<Feed, Long> {
 
     public String getAtomId() {
         return atomId;
+    }
+    
+    public DateTime getUpdated() {
+        return new DateTime(updated);
     }
 
     public List<Entry> getEntries() {

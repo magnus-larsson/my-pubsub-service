@@ -57,6 +57,8 @@ import se.vgregion.push.types.Subscription;
 @Service
 public class DefaultPushService implements PushService {
     
+    private static final int RETRY_DELAY = 5;
+
     private final static Logger LOG = LoggerFactory.getLogger(DefaultPushService.class);
 
     private SubscriptionRepository subscriptionRepository;
@@ -212,7 +214,7 @@ public class DefaultPushService implements PushService {
         }
     }
 
-    private void distribute(Feed feed, Subscription subscription) throws FailedDistributionException {
+    protected void distribute(Feed feed, Subscription subscription) throws FailedDistributionException {
         LOG.debug("Checking subscription if verification is needed {}", subscription);
         
         // TODO the spec (6.3) requires a time out to be verified *before* it times out,
@@ -243,13 +245,11 @@ public class DefaultPushService implements PushService {
                 } else {
                     subscription.markForVerification();
                     
-                    // TODO handle retrying
                     throw new FailedDistributionException("Failed distributing to subscriber \"" + subscription.getCallback() + "\" with error \"" + response.getStatusLine() + "\"");
                 }
             } catch(IOException e) {
                 subscription.markForVerification();
                 
-                // TODO handle retrying
                 throw new FailedDistributionException("Failed distributing to subscriber: " + subscription.getCallback(), e);
             } finally {
                 HttpUtil.closeQuitely(response);
@@ -299,4 +299,29 @@ public class DefaultPushService implements PushService {
         return result;
     }
 
+    @Override
+    public void retryDistributions() {
+        
+        Collection<Feed> behindFeeds = feedRepository.findFeedsWithBehindSubscriptions();
+        
+        for(Feed behindFeed : behindFeeds) {
+            Collection<Subscription> subscriptionsForFeed = subscriptionRepository.findByTopic(behindFeed.getUrl());
+            
+            for(Subscription subscriptionForFeed : subscriptionsForFeed) {
+                DateTime subUpdated = subscriptionForFeed.getLastUpdated();
+                DateTime feedUpdated = behindFeed.getUpdated();
+                
+                if(subUpdated == null || subUpdated.plusMinutes(RETRY_DELAY).isBefore(feedUpdated)) {
+                    try {
+                        distribute(behindFeed, subscriptionForFeed);
+                    } catch (FailedDistributionException e) {
+                        LOG.info(e.getMessage());
+
+                        subscriptionForFeed.markForVerification();
+                        subscriptionRepository.store(subscriptionForFeed);
+                    }
+                }
+            }
+        }
+    }
 }

@@ -52,6 +52,16 @@
 			</map>
 		</property>
 	</bean>
+	
+	<bean id="distributionRetryer"
+		class="se.vgregion.push.services.DistributionRetryer">
+		<constructor-arg ref="pushService" />
+	</bean>
+
+	<task:scheduled-tasks>
+	    <task:scheduled ref="distributionRetryer" method="retry" cron="/10 * * * * ?"/>
+	</task:scheduled-tasks>
+	
 
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
