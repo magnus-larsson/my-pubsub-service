@@ -166,12 +166,12 @@ public class DefaultPushService implements PushService {
         }
 
         Feed feed = new Feed(url, contentType, entity.getContent());
-        Feed existing = feedRepository.findByUrl(url);
-        
-        if(existing != null) {
-            existing.merge(feed);
-            feed = existing;
-        }
+//        Feed existing = feedRepository.findByUrl(url);
+//        
+//        if(existing != null) {
+//            existing.merge(feed);
+//            feed = existing;
+//        }
 
         HttpUtil.closeQuitely(response);
 

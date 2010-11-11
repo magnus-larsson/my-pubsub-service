@@ -29,7 +29,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import se.vgregion.push.TestConstants;
 import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.repository.SubscriptionRepository;
-import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
 
@@ -42,12 +41,12 @@ public class SubscriptionAndFeedRepositoryTest {
     
     @Test
     public void findBehindSubscription() {
-        Feed feed1 = new AtomFeedBuilder(TestConstants.TOPIC, ContentType.ATOM)
+        Feed feed1 = new AtomFeedBuilder(TestConstants.TOPIC)
             .id("f1").updated(TestConstants.UPDATED1)
             .entry("e1", TestConstants.UPDATED1).entry("e2", TestConstants.UPDATED3).build();
         feedRepository.persist(feed1);
 
-        Feed feed2 = new AtomFeedBuilder(TestConstants.TOPIC2, ContentType.ATOM)
+        Feed feed2 = new AtomFeedBuilder(TestConstants.TOPIC2)
             .id("f2").updated(TestConstants.UPDATED3)
             .entry("e3", TestConstants.UPDATED3).build();
         feedRepository.persist(feed2);
@@ -64,12 +63,12 @@ public class SubscriptionAndFeedRepositoryTest {
 
     @Test
     public void findBehindSubscriptionMultiple() {
-        Feed feed1 = new AtomFeedBuilder(TestConstants.TOPIC, ContentType.ATOM)
+        Feed feed1 = new AtomFeedBuilder(TestConstants.TOPIC)
             .id("f1").updated(TestConstants.UPDATED1)
             .entry("e1", TestConstants.UPDATED1).entry("e2", TestConstants.UPDATED3).build();
         feedRepository.persist(feed1);
 
-        Feed feed2 = new AtomFeedBuilder(TestConstants.TOPIC2, ContentType.ATOM)
+        Feed feed2 = new AtomFeedBuilder(TestConstants.TOPIC2)
             .id("f2").updated(TestConstants.UPDATED1)
             .entry("e3", TestConstants.UPDATED1).build();
         feedRepository.persist(feed2);
