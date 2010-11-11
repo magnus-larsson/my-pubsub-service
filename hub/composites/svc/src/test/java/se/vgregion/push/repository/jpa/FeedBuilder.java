@@ -2,9 +2,10 @@ package se.vgregion.push.repository.jpa;
 
 import java.net.URI;
 
+import nu.xom.Document;
+
 import org.joda.time.DateTime;
 
-import nu.xom.Document;
 import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 

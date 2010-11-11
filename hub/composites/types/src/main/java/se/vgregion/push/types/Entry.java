@@ -35,8 +35,6 @@ import nu.xom.Document;
 import nu.xom.Element;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 

@@ -19,10 +19,8 @@
 
 package se.vgregion.push.repository.jpa;
 
-import java.net.URI;
 import java.util.Collection;
 
-import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
