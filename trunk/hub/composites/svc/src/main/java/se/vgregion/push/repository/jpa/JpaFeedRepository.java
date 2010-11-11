@@ -80,14 +80,13 @@ public class JpaFeedRepository extends DefaultJpaRepository<Feed> implements Fee
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Transactional(propagation=Propagation.REQUIRED, readOnly=true)
     @Override
     public Collection<Feed> findFeedsWithBehindSubscriptions() {
         try {
             return entityManager.createNativeQuery("SELECT f.* FROM FEED AS f, SUBSCRIPTION AS s " +
             		"WHERE f.url = s.topic AND f.updated > s.lastUpdated", Feed.class).getResultList();
-//            return entityManager.createQuery("select f from Feed f where f.updated > :since")
-//                .setParameter("since", since.toDate()).getResultList();
         } catch(NoResultException e) {
             return Collections.EMPTY_LIST;
         }

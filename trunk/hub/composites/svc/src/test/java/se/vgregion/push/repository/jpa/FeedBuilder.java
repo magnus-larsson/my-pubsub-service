@@ -1,32 +1,24 @@
 package se.vgregion.push.repository.jpa;
 
-import java.net.URI;
-
-import nu.xom.Document;
+import nu.xom.Element;
 
 import org.joda.time.DateTime;
 
-import se.vgregion.push.types.ContentType;
-import se.vgregion.push.types.Feed;
+public abstract class FeedBuilder<T extends FeedBuilder<?>> {
 
-public class FeedBuilder extends AtomBuilder<FeedBuilder> {
+    protected Element root;
+    
+    public FeedBuilder(String rootName, String ns) {
+        this.root = new Element(rootName, ns);
+    }
+    
+    protected Element createElement(String localName, String ns, String text) {
+        Element elm = new Element(localName, ns);
+        elm.appendChild(text);
+        return elm;
+    }
+    
+    public abstract T id(String id);
 
-    private URI url;
-    private ContentType type;
-    
-    public FeedBuilder(URI url, ContentType type) {
-        super("feed");
-        this.url= url;
-        this.type= type;
-    }
-    
-    public FeedBuilder entry(String id, DateTime updated) {
-        EntryBuilder entryBuilder = new EntryBuilder();
-        root.appendChild(entryBuilder.id(id).updated(updated).build());
-        return this;
-    }
-    
-    public Feed build() {
-        return new Feed(url, type, new Document(root));
-    }
+    public abstract T updated(DateTime updated);
 }
