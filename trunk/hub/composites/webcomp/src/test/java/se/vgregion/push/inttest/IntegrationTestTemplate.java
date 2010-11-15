@@ -44,7 +44,7 @@ public class IntegrationTestTemplate {
         
         publisher = new Publisher();
         
-        Subscriber subscriber = new Subscriber();
+        Subscriber subscriber = new Subscriber(createSubscriberResult());
         subscriber.addListener(new PublicationListener() {
             @Override
             public void published(Feed feed) {
@@ -54,6 +54,10 @@ public class IntegrationTestTemplate {
         
         subscriber.subscribe(hubUrl, publisher.getUrl());
         
+    }
+    
+    protected SubscriberResult createSubscriberResult() {
+        return null;
     }
     
     @After

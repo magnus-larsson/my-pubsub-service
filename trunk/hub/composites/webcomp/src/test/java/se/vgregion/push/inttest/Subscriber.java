@@ -51,6 +51,10 @@ public class Subscriber {
     private LocalTestServer server;
     
     public Subscriber() throws Exception {
+        this(null);
+    }
+    
+    public Subscriber(final SubscriberResult result) throws Exception {
         server = new LocalTestServer(null, null);
         
         server.register("/*", new HttpRequestHandler() {
@@ -63,6 +67,9 @@ public class Subscriber {
                     // subscription verification, confirm
                     response.setEntity(new StringEntity(challenge));
                 } else if(request instanceof HttpEntityEnclosingRequest) {
+                    if(result.fail()) {
+                        response.setStatusCode(500);
+                    }
                     HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();
                     publish(entity);
                 } else {
