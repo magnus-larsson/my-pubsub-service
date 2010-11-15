@@ -40,18 +40,14 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
 
-import se.vgregion.push.types.AbstractParser;
-import se.vgregion.push.types.ContentType;
-import se.vgregion.push.types.Feed;
+import se.vgregion.push.services.HttpUtil;
 
 
-public class Subscriber {
+public class SubscriberRunner {
 
-    private List<PublicationListener> listeners = new ArrayList<PublicationListener>();
-    private LocalTestServer server;
-    
-    public Subscriber() throws Exception {
-        server = new LocalTestServer(null, null);
+    public static void main(String[] args) throws Exception {
+        
+        LocalTestServer server = new LocalTestServer(null, null);
         
         server.register("/*", new HttpRequestHandler() {
             @Override
@@ -61,49 +57,30 @@ public class Subscriber {
                 
                 if(challenge != null) {
                     // subscription verification, confirm
+                    System.out.println("Respond to challenge");
                     response.setEntity(new StringEntity(challenge));
                 } else if(request instanceof HttpEntityEnclosingRequest) {
                     HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();
-                    publish(entity);
+                    System.out.println(HttpUtil.readContent(entity));
                 } else {
                     System.err.println("Unknown request");
                 }
             }
         });
         server.start();
-    }
-    
-    private void publish(HttpEntity entity) {
-        ContentType contentType = ContentType.fromValue(entity.getContentType().getValue());
-        Feed feed;
-        try {
-            feed = AbstractParser.create(contentType).parse(URI.create("http://example.com"), entity.getContent());
-            for(PublicationListener listener : listeners) {
-                listener.published(feed);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
         
-    }
-    
-    public void subscribe(URI hub, URI topic) throws URISyntaxException, IOException {
-        HttpPost post = new HttpPost(hub);
+        HttpPost post = new HttpPost("http://localhost:8080/");
         
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
         parameters.add(new BasicNameValuePair("hub.callback", buildTestUrl(server, "/").toString()));
         parameters.add(new BasicNameValuePair("hub.mode", "subscribe"));
-        parameters.add(new BasicNameValuePair("hub.topic", topic.toString()));
+        parameters.add(new BasicNameValuePair("hub.topic", "http://feeds.feedburner.com/protocol7/main"));
         parameters.add(new BasicNameValuePair("hub.verify", "sync"));
         
         post.setEntity(new UrlEncodedFormEntity(parameters));
         
         DefaultHttpClient client = new DefaultHttpClient();
         client.execute(post);
-    }
-    
-    public void addListener(PublicationListener listener) {
-        this.listeners.add(listener);
     }
     
     private static URI buildTestUrl(LocalTestServer server, String path) throws URISyntaxException {

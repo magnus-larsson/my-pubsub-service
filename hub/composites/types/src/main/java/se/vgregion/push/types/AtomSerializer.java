@@ -7,7 +7,7 @@ import nu.xom.Element;
 
 import org.joda.time.DateTime;
 
-public class AtomSerializer extends AbstractSerializer {
+public class AtomSerializer extends FeedSerializer {
 
     public Document print(Feed feed, EntryFilter entryFilter) {
         Element feedElm = new Element("feed", Feed.NS_ATOM);
