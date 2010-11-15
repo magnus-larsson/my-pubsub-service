@@ -47,7 +47,7 @@ import se.vgregion.push.types.Feed;
 
 public class Subscriber {
 
-    private List<PublicationListener> listeners = new ArrayList<PublicationListener>();
+    private List<SubscriberListener> listeners = new ArrayList<SubscriberListener>();
     private LocalTestServer server;
     
     public Subscriber() throws Exception {
@@ -64,6 +64,7 @@ public class Subscriber {
                 String challenge = getQueryParamValue(request.getRequestLine().getUri(), "hub.challenge");
                 
                 if(challenge != null) {
+                    doVerify();
                     // subscription verification, confirm
                     response.setEntity(new StringEntity(challenge));
                 } else if(request instanceof HttpEntityEnclosingRequest) {
@@ -71,7 +72,7 @@ public class Subscriber {
                         response.setStatusCode(500);
                     }
                     HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();
-                    publish(entity);
+                    doPublish(entity);
                 } else {
                     System.err.println("Unknown request");
                 }
@@ -80,12 +81,12 @@ public class Subscriber {
         server.start();
     }
     
-    private void publish(HttpEntity entity) {
+    private void doPublish(HttpEntity entity) {
         ContentType contentType = ContentType.fromValue(entity.getContentType().getValue());
         Feed feed;
         try {
             feed = AbstractParser.create(contentType).parse(URI.create("http://example.com"), entity.getContent());
-            for(PublicationListener listener : listeners) {
+            for(SubscriberListener listener : listeners) {
                 listener.published(feed);
             }
         } catch (Exception e) {
@@ -93,6 +94,13 @@ public class Subscriber {
         }
         
     }
+
+    private void doVerify() {
+        for(SubscriberListener listener : listeners) {
+            listener.verified();
+        }
+    }
+
     
     public void subscribe(URI hub, URI topic) throws URISyntaxException, IOException {
         HttpPost post = new HttpPost(hub);
@@ -109,7 +117,7 @@ public class Subscriber {
         client.execute(post);
     }
     
-    public void addListener(PublicationListener listener) {
+    public void addListener(SubscriberListener listener) {
         this.listeners.add(listener);
     }
     

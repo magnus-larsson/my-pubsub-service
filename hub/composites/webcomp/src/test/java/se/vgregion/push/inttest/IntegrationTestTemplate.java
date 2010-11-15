@@ -17,6 +17,7 @@ import se.vgregion.push.types.Feed;
 public class IntegrationTestTemplate {
 
     private Server server;
+    protected BlockingQueue<Boolean> verifications = new LinkedBlockingQueue<Boolean>();
     protected BlockingQueue<Feed> publishedFeeds = new LinkedBlockingQueue<Feed>();
     protected Publisher publisher;
     protected URI hubUrl;
@@ -45,10 +46,15 @@ public class IntegrationTestTemplate {
         publisher = new Publisher();
         
         Subscriber subscriber = new Subscriber(createSubscriberResult());
-        subscriber.addListener(new PublicationListener() {
+        subscriber.addListener(new SubscriberListener() {
             @Override
             public void published(Feed feed) {
                 publishedFeeds.add(feed);
+            }
+
+            @Override
+            public void verified() {
+                verifications.add(true);                
             }
         });
         
