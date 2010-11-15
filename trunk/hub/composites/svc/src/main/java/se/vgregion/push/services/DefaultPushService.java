@@ -24,6 +24,8 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.UUID;
 
+import nu.xom.Document;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -51,9 +53,9 @@ import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.repository.SubscriptionRepository;
 import se.vgregion.push.types.AbstractParser;
-import se.vgregion.push.types.FeedSerializer;
 import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
+import se.vgregion.push.types.FeedSerializer;
 import se.vgregion.push.types.Subscription;
 
 @Service
@@ -196,7 +198,7 @@ public class DefaultPushService implements PushService {
         Collection<Subscription> subscribers = getAllSubscriptionsForFeed(request.getFeed().getUrl());
         
         Feed feed = request.getFeed();
-        
+
         if(!subscribers.isEmpty()) {
             LOG.debug("Distributing " + request.getFeed().getUrl());
             DateTime oldestUpdated = new DateTime(1970, 1, 1, 0, 0, 0, 0);
@@ -232,15 +234,17 @@ public class DefaultPushService implements PushService {
                 return;
             }
         }
-        
         if(feed.hasUpdates(subscription.getLastUpdated())) {
             LOG.info("Distributing to {}", subscription.getCallback());
             HttpPost post = new HttpPost(subscription.getCallback());
             
             post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
             
-            post.setEntity(HttpUtil.createEntity(FeedSerializer.create(feed.getContentType()).print(feed, 
-                    new UpdatedSinceEntryFilter(subscription.getLastUpdated()))));
+            Document doc = FeedSerializer.create(feed.getContentType()).print(feed, 
+                    new UpdatedSinceEntryFilter(subscription.getLastUpdated()));
+System.out.println(subscription.getLastUpdated());
+System.out.println(doc.toXML());
+            post.setEntity(HttpUtil.createEntity(doc));
             
             HttpResponse response = null;
             try {
