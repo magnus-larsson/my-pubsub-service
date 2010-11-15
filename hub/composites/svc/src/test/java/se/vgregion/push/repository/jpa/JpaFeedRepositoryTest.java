@@ -19,8 +19,6 @@
 
 package se.vgregion.push.repository.jpa;
 
-import java.net.URI;
-
 import nu.xom.tests.XOMTestCase;
 
 import org.joda.time.DateTime;
@@ -32,7 +30,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import se.vgregion.push.UnitTestConstants;
 import se.vgregion.push.repository.FeedRepository;
-import se.vgregion.push.services.SomeFeeds;
 import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Entry.EntryBuilder;

@@ -27,16 +27,12 @@ import java.net.URI;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.HttpEntity;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import se.vgregion.push.UnitTestConstants;
-import se.vgregion.push.types.AbstractSerializer;
-import se.vgregion.push.types.ContentType;
-import se.vgregion.push.types.Feed;
 
 public class FeedRetrieverTest {
 

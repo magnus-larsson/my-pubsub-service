@@ -52,10 +52,8 @@ import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.repository.SubscriptionRepository;
 import se.vgregion.push.types.AbstractParser;
 import se.vgregion.push.types.AbstractSerializer;
-import se.vgregion.push.types.AtomParser;
 import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
-import se.vgregion.push.types.Rss2Parser;
 import se.vgregion.push.types.Subscription;
 
 @Service

@@ -1,20 +1,10 @@
 package se.vgregion.push.types;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 
-import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
-import nu.xom.ParsingException;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
-
 import se.vgregion.push.types.Entry.EntryBuilder;
 import se.vgregion.push.types.Feed.FeedBuilder;
 
