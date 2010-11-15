@@ -8,7 +8,7 @@ import nu.xom.Element;
 
 import org.joda.time.DateTime;
 
-public class Rss2Serializer extends AbstractSerializer {
+public class Rss2Serializer extends FeedSerializer {
 
     public Document print(Feed feed, EntryFilter entryFilter) {
         Element feedElm = new Element("rss");

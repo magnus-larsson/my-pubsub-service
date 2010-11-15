@@ -8,15 +8,24 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
-public abstract class AbstractSerializer {
+public abstract class FeedSerializer {
 
-    public static AbstractSerializer create(ContentType type) {
+    public static FeedSerializer create(ContentType type) {
         if(type == ContentType.ATOM) {
             return new AtomSerializer();
         } else {
             return new Rss2Serializer();
         }
     }
+    
+    public static Document printFeed(Feed feed) {
+        return create(feed.getContentType()).print(feed);
+    }
+
+    public static Document printFeed(Feed feed, EntryFilter entryFilter) {
+        return create(feed.getContentType()).print(feed, entryFilter);
+    }
+
     
     public Document print(Feed feed) {
         return print(feed, null);

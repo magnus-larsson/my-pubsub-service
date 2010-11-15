@@ -66,7 +66,7 @@ public class FeedRetriever {
 
                             Feed feed = pushService.retrieve(request.getUrl());
                             
-                            LOG.warn("Feed successfully retrived, putting for distribution: {}", request.getUrl());
+                            LOG.info("Feed successfully retrived, putting for distribution: {}", request.getUrl());
                             
                             DistributionRequest distributionRequest = new DistributionRequest(feed);
                             
