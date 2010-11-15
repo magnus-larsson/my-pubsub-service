@@ -24,6 +24,8 @@ public class FailingSubscriberIntegrationTest extends IntegrationTestTemplate {
                 UnitTestConstants.UPDATED1).entry(
                 new EntryBuilder().id("e3").updated(UnitTestConstants.UPDATED1).build()).build();
 
+        Assert.assertTrue(verifications.poll(5000, TimeUnit.MILLISECONDS));
+        Assert.assertTrue(verifications.isEmpty());
         
         publisher.publish(hubUrl, feed);
 
@@ -36,6 +38,9 @@ public class FailingSubscriberIntegrationTest extends IntegrationTestTemplate {
 
         publisher.publish(hubUrl, feed2);
 
+        // since it failed last time, it should now be verified
+        Assert.assertTrue(verifications.poll(5000, TimeUnit.MILLISECONDS));
+        
         // this time, all entries should come again
         publishedFeed = publishedFeeds.poll(5000, TimeUnit.MILLISECONDS);
 
