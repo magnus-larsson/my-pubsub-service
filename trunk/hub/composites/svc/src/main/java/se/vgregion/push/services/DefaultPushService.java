@@ -50,8 +50,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.repository.SubscriptionRepository;
+import se.vgregion.push.types.AbstractParser;
+import se.vgregion.push.types.AbstractSerializer;
+import se.vgregion.push.types.AtomParser;
 import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
+import se.vgregion.push.types.Rss2Parser;
 import se.vgregion.push.types.Subscription;
 
 @Service
@@ -165,7 +169,12 @@ public class DefaultPushService implements PushService {
             }
         }
 
-        Feed feed = new Feed(url, contentType, entity.getContent());
+        Feed feed;
+        try {
+            feed = AbstractParser.create(contentType).parse(url, entity.getContent());
+        } catch (Exception e) {
+            throw new IOException("Failed to parse feed", e);
+        }
 //        Feed existing = feedRepository.findByUrl(url);
 //        
 //        if(existing != null) {
@@ -232,7 +241,8 @@ public class DefaultPushService implements PushService {
             
             post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
             
-            post.setEntity(HttpUtil.createEntity(feed.createDocument(subscription.getLastUpdated())));
+            post.setEntity(HttpUtil.createEntity(AbstractSerializer.create(feed.getContentType()).print(feed, 
+                    new UpdatedSinceEntryFilter(subscription.getLastUpdated()))));
             
             HttpResponse response = null;
             try {

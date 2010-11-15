@@ -19,12 +19,8 @@
 
 package se.vgregion.push.types;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -36,26 +32,57 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
-import nu.xom.Elements;
-import nu.xom.ParsingException;
 
 import org.hibernate.annotations.Cascade;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
 public class Feed extends AbstractEntity<Feed, Long> {
 
+    private static final Builder PARSER = new Builder();
+    
     public static final String NS_ATOM = "http://www.w3.org/2005/Atom";
 
-    private static final Builder PARSER = new Builder();;
+    public static class FeedBuilder {
+        
+        private Feed feed;
+        
+        public FeedBuilder(URI url, ContentType type) {
+            feed = new Feed(url, type);
+        }
+        
+        public FeedBuilder id(String id) {
+            feed.feedId = id;
+            return this;
+        }
+
+        public FeedBuilder updated(DateTime updated) {
+            feed.updated = updated.getMillis();
+            return this;
+        }
+        
+        public FeedBuilder custom(Element elm) {
+            // TODO ugly hack, fix
+            feed.xml += new Document((Element) elm.copy()).toXML().replaceFirst("<.+>", "");
+            return this;
+        }
+
+        public FeedBuilder entry(Entry entry) {
+            feed.entries.add(entry);
+            return this;
+        }
+        
+        public Feed build() {
+            return feed;
+        }
+    }
 
     @Id
     @GeneratedValue
@@ -65,18 +92,17 @@ public class Feed extends AbstractEntity<Feed, Long> {
     private String url;
 
     @Column
-    private String atomId;
+    private String feedId;
     
     @Column
     private ContentType contentType;
     
-    @Column
+    @Column(nullable=true)
     @Lob
-    private String xml;
+    private String xml = "";
 
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updated;
+    private long updated;
     
     // TODO remove eager loading
     @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
@@ -90,58 +116,10 @@ public class Feed extends AbstractEntity<Feed, Long> {
     protected Feed() {
     }
     
-    public Feed(URI url, ContentType contentType, InputStream in) throws IOException {
-        this(url, contentType, streamToDocument(in));
-    }
-
-    public Feed(URI url, ContentType contentType, Document document) {
+    public Feed(URI url, ContentType contentType) {
         this.url = url.toString();
         this.contentType = contentType;
-        
-        parseEntries(document);
-        this.xml = parseXmlWithoutEntries(document).toXML();
-        this.atomId = parseValue(document, "id");
-        this.updated = FeedHelper.parseDateTime(parseValue(document, "updated")).toDate();
     }
-    
-    private static Document streamToDocument(InputStream in) throws IOException {
-        Builder parser = new Builder();
-        try {
-            return parser.build(in);
-        } catch (ParsingException e) {
-            throw new IOException(e);
-        }
-    }
-
-    private void parseEntries(Document document) {
-        // TODO add for RSS
-        Element root = document.getRootElement();
-        Elements entryElms = root.getChildElements("entry",NS_ATOM);
-        for(int i = 0; i<entryElms.size(); i++) {
-            Element elm = entryElms.get(i);
-            
-            entries.add(new Entry(elm));
-        }
-    }
-
-    private String parseValue(Document document, String topLevelElement) {
-        return document.getRootElement().getFirstChildElement(topLevelElement, Feed.NS_ATOM).getValue();
-    }
-    
-    private Document parseXmlWithoutEntries(Document document) {
-        Document documentWithOutEntries = new Document(document);
-
-        // TODO add for RSS
-        Element root = documentWithOutEntries.getRootElement();
-        Elements entryElms = root.getChildElements("entry",NS_ATOM);
-        for(int i = 0; i<entryElms.size(); i++) {
-            Element elm = entryElms.get(i);
-            root.removeChild(elm);
-        }
-        
-        return documentWithOutEntries;
-    }
-
     
     @Override
     public Long getId() {
@@ -156,16 +134,20 @@ public class Feed extends AbstractEntity<Feed, Long> {
         return URI.create(url);
     }
 
-    public String getAtomId() {
-        return atomId;
+    public String getFeedId() {
+        return feedId;
     }
     
     public DateTime getUpdated() {
-        return new DateTime(updated);
+        return new DateTime(updated, DateTimeZone.UTC);
     }
 
     public List<Entry> getEntries() {
         return entries;
+    }
+
+    public List<Element> getCustom() {
+        return XmlUtil.stringToXml(xml);
     }
     
     public void addEntry(Entry entry) {
@@ -176,7 +158,7 @@ public class Feed extends AbstractEntity<Feed, Long> {
      * Replace entry with same entry ID
      */
     public void addOrReplaceEntry(Entry newEntry) {
-        Entry existingEntry = findEntryByAtomId(newEntry.getAtomId());
+        Entry existingEntry = findEntryByEntryId(newEntry.getEntryId());
         
         if(existingEntry != null) {
             entries.remove(existingEntry);
@@ -195,32 +177,9 @@ public class Feed extends AbstractEntity<Feed, Long> {
         
     }
     
-    public Document createDocument(DateTime updatedSince) {
-        try {
-            // TODO cache
-            Document document = PARSER.build(new StringReader(xml));
-            for(Entry entry : entries) {
-
-                if(updatedSince == null || entry.isNewerThan(updatedSince)) {
-                    document.getRootElement().appendChild(entry.toElement().copy());
-                }
-            }
-            
-            return document;
-        } catch (Exception e) {
-            // should never happen
-            throw new RuntimeException(e);
-        }
-        
-    }
-    
-    public Document createDocument() {
-        return createDocument(null);
-    }
-    
     public void merge(Feed other) {
         this.xml = other.xml;
-        this.atomId = other.getAtomId();
+        this.feedId = other.getFeedId();
         
         List<Entry> otherEntries = other.getEntries();
 
@@ -229,9 +188,9 @@ public class Feed extends AbstractEntity<Feed, Long> {
         }
     }
     
-    private Entry findEntryByAtomId(String atomId) {
+    private Entry findEntryByEntryId(String entryId) {
         for(Entry entry : entries) {
-            if(entry.getAtomId().equals(atomId)) {
+            if(entry.getEntryId().equals(entryId)) {
                 return entry;
             }
         }

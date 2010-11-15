@@ -49,6 +49,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import se.vgregion.push.UnitTestConstants;
 import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.repository.SubscriptionRepository;
 import se.vgregion.push.types.ContentType;
@@ -96,7 +97,7 @@ public class DefaultPushServiceDistributionTest {
             }
         });
         
-        service.distribute(new DistributionRequest(new Feed(FEED_URI, ContentType.ATOM, SomeFeeds.ATOM1)));
+        service.distribute(new DistributionRequest(UnitTestConstants.atom1()));
         
         HttpRequest request = issuedRequests.poll(10000, TimeUnit.MILLISECONDS);
         Assert.assertNotNull(request);
@@ -109,7 +110,7 @@ public class DefaultPushServiceDistributionTest {
         
         Document actualAtom = new Builder().build(new ByteArrayInputStream(issuedRequestBodies.poll()));
 
-        Assert.assertEquals(1, actualAtom.getRootElement().getChildElements("entry", Feed.NS_ATOM).size());
+        Assert.assertEquals(2, actualAtom.getRootElement().getChildElements("entry", Feed.NS_ATOM).size());
     }
     
     @After

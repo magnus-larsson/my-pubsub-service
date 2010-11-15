@@ -32,6 +32,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
@@ -68,8 +69,7 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     private String topic;
     
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastUpdated;
+    private long lastUpdated;
 
     @Column
     private String verifyToken;
@@ -131,8 +131,8 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
     }
 
     public DateTime getLastUpdated() {
-        if(lastUpdated != null) {
-            return new DateTime(lastUpdated);
+        if(lastUpdated != 0) {
+            return new DateTime(lastUpdated, DateTimeZone.UTC);
         } else {
             return null;
         }
@@ -166,7 +166,7 @@ public class Subscription extends AbstractEntity<Subscription, Long> {
 
     
     public void setLastUpdated(DateTime lastUpdated) {
-        this.lastUpdated = lastUpdated.toDate();
+        this.lastUpdated = lastUpdated.getMillis();
     }
 
     @Override

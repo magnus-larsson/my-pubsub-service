@@ -30,6 +30,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
+import se.vgregion.push.UnitTestConstants;
 import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
@@ -37,8 +38,6 @@ import se.vgregion.push.types.Subscription;
 
 public class FeedDistributorTest {
 
-    private static final URI FEED_URI = URI.create("http://example.com");
-    private static final URI SUB_URI = URI.create("http://example.com/sub1");
 
     private LinkedBlockingQueue<DistributionRequest> distributionQueue = new LinkedBlockingQueue<DistributionRequest>();
     private FeedDistributor feedDistributor;
@@ -46,11 +45,11 @@ public class FeedDistributorTest {
     @Test
     public void distribute() throws Exception {
         final List<Subscription> subscriptions = new ArrayList<Subscription>();
-        Subscription sub1 = new Subscription(FEED_URI, SUB_URI);
+        Subscription sub1 = new Subscription(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK);
         subscriptions.add(sub1);
 
         
-        distributionQueue.put(new DistributionRequest(new Feed(FEED_URI, ContentType.ATOM, SomeFeeds.ATOM1)));
+        distributionQueue.put(new DistributionRequest(UnitTestConstants.atom1()));
         
         final LinkedBlockingQueue<DistributionRequest> issuedRequests = new LinkedBlockingQueue<DistributionRequest>();
         
@@ -71,7 +70,7 @@ public class FeedDistributorTest {
 
         DistributionRequest request = issuedRequests.poll(10000, TimeUnit.MILLISECONDS);
         Assert.assertNotNull(request);
-        Assert.assertEquals(FEED_URI, request.getFeed().getUrl());
+        Assert.assertEquals(UnitTestConstants.TOPIC, request.getFeed().getUrl());
     }
     
     @After

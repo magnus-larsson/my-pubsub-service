@@ -19,42 +19,61 @@
 
 package se.vgregion.push.types;
 
-import java.io.StringReader;
-import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
-import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
 public class Entry extends AbstractEntity<Entry, Long> {
 
-    private static final Builder PARSER = new Builder();
+    public static class EntryBuilder {
+        
+        private Entry entry = new Entry();
+        
+        public EntryBuilder id(String id) {
+            entry.entryId = id;
+            return this;
+        }
+
+        public EntryBuilder updated(DateTime updated) {
+            entry.updated = updated.getMillis();
+            return this;
+        }
+        
+        public EntryBuilder custom(Element elm) {
+            // TODO ugly hack, fix
+            entry.xml += new Document((Element) elm.copy()).toXML().replaceFirst("<.+>", "");
+            return this;
+        }
+        
+        public Entry build() {
+            return entry;
+        }
+    }
     
     @Id
     @GeneratedValue
     private long id;
     
     @Column(nullable=false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updated;
+    private long updated;
 
     @Column(nullable=false)
-    private String atomId;
+    private String entryId;
     
-    @Column(nullable=false)
+    @Column(nullable=true)
     @Lob
     private String xml;
 
@@ -63,39 +82,24 @@ public class Entry extends AbstractEntity<Entry, Long> {
         
     }
     
-    public Entry(Element elm) {
-        // hack to preserve namespace declarations
-        this.xml = new Document((Element)elm.copy()).toXML();
-        
-        atomId = elm.getChildElements("id", Feed.NS_ATOM).get(0).getValue();
-        
-        // TODO add exception handling
-        updated = FeedHelper.parseDateTime(elm.getChildElements("updated", Feed.NS_ATOM).get(0).getValue()).toDate();
-    }
-
     @Override
     public Long getId() {
         return id;
     }
 
-    public String getAtomId() {
-        return atomId;
+    public String getEntryId() {
+        return entryId;
     }
 
     public DateTime getUpdated() {
-        return new DateTime(updated);
+        return new DateTime(updated, DateTimeZone.UTC);
     }
     
     public boolean isNewerThan(DateTime other) {
         return this.getUpdated().isAfter(other);
     }
-
-    public Element toElement() {
-        try {
-            Document doc = PARSER.build(new StringReader(xml));
-            return doc.getRootElement();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    
+    public List<Element> getCustom() {
+        return XmlUtil.stringToXml(xml);
     }
 }
