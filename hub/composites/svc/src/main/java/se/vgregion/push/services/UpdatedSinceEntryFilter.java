@@ -15,7 +15,7 @@ public class UpdatedSinceEntryFilter implements EntryFilter {
 
     @Override
     public boolean include(Entry entry) {
-        return entry.isNewerThan(updatedSince);
+        return updatedSince == null || entry.isNewerThan(updatedSince);
     }
 
 }

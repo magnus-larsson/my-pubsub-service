@@ -29,7 +29,8 @@ public class IntegrationTest extends IntegrationTestTemplate {
 
         Feed publishedFeed = publishedFeeds.poll(5000, TimeUnit.MILLISECONDS);
 
-        System.out.println(FeedSerializer.printFeed(publishedFeed).toXML());
+        Assert.assertEquals("f1", publishedFeed.getFeedId());
+        Assert.assertEquals(2, publishedFeed.getEntries().size());
         
         Assert.assertNotNull(publishedFeed);
 
