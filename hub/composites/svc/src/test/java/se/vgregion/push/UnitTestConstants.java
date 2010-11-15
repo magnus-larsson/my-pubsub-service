@@ -17,6 +17,8 @@ public class UnitTestConstants {
     public static DateTime UPDATED1 = new DateTime(2010, 3, 1, 0, 0, 0, 0);
     public static DateTime UPDATED2 = new DateTime(2010, 2, 1, 0, 0, 0, 0);
     public static DateTime UPDATED3 = new DateTime(2010, 1, 1, 0, 0, 0, 0);
+    
+    public static DateTime FUTURE = new DateTime(2050, 1, 1, 0, 0, 0, 0);
 
     public static Feed atom1() {
         return new FeedBuilder(UnitTestConstants.TOPIC, ContentType.ATOM)

@@ -197,7 +197,7 @@ public class DefaultPushService implements PushService {
     public void distribute(DistributionRequest request) throws IOException {
         Collection<Subscription> subscribers = getAllSubscriptionsForFeed(request.getFeed().getUrl());
         
-        Feed feed = request.getFeed();
+        Feed feed = feedRepository.findByUrl(request.getFeed().getUrl());
 
         if(!subscribers.isEmpty()) {
             LOG.debug("Distributing " + request.getFeed().getUrl());
@@ -208,7 +208,7 @@ public class DefaultPushService implements PushService {
                     distribute(feed, subscription);
                     
                     // purge old feed entries based on the subscriber which is furthers behind
-                    if(subscription.getLastUpdated().isBefore(oldestUpdated)) {
+                    if(subscription.getLastUpdated() != null && subscription.getLastUpdated().isBefore(oldestUpdated)) {
                         oldestUpdated = subscription.getLastUpdated();
                     }
                     
@@ -234,6 +234,7 @@ public class DefaultPushService implements PushService {
                 return;
             }
         }
+
         if(feed.hasUpdates(subscription.getLastUpdated())) {
             LOG.info("Distributing to {}", subscription.getCallback());
             HttpPost post = new HttpPost(subscription.getCallback());
@@ -242,8 +243,6 @@ public class DefaultPushService implements PushService {
             
             Document doc = FeedSerializer.create(feed.getContentType()).print(feed, 
                     new UpdatedSinceEntryFilter(subscription.getLastUpdated()));
-System.out.println(subscription.getLastUpdated());
-System.out.println(doc.toXML());
             post.setEntity(HttpUtil.createEntity(doc));
             
             HttpResponse response = null;

@@ -54,7 +54,8 @@ public class Publisher {
             @Override
             public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException,
                     IOException {
-                response.setEntity(new StringEntity(FeedSerializer.create(feed.getContentType()).print(feed).toXML()));
+                response.setHeader("Content-type", feed.getContentType().toString());
+                response.setEntity(new StringEntity(FeedSerializer.printFeed(feed).toXML()));
             }
         });
         server.start();
