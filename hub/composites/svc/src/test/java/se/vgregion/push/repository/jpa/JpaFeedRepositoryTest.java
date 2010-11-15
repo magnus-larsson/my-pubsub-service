@@ -30,17 +30,17 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import se.vgregion.push.TestConstants;
+import se.vgregion.push.UnitTestConstants;
 import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.services.SomeFeeds;
 import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
+import se.vgregion.push.types.Entry.EntryBuilder;
+import se.vgregion.push.types.Feed.FeedBuilder;
 
 
 public class JpaFeedRepositoryTest {
 
-    private static final URI URL = URI.create("http://example.com/sub11");
-    
     private ApplicationContext ctx = new ClassPathXmlApplicationContext("services-test.xml");
     private FeedRepository repository = ctx.getBean(FeedRepository.class);
     
@@ -48,10 +48,7 @@ public class JpaFeedRepositoryTest {
     
     @Before
     public void setup() {
-        feed1 = new AtomFeedBuilder(URL).id("f1").updated(TestConstants.UPDATED1)
-            .entry("e1", TestConstants.UPDATED1)
-            .entry("e2", TestConstants.UPDATED1)
-            .build();
+        feed1 = UnitTestConstants.atom1();
         repository.persist(feed1);
     }
     
@@ -59,14 +56,14 @@ public class JpaFeedRepositoryTest {
     public void findByPk() {
         Feed feed = repository.find(feed1.getId());
         
-        XOMTestCase.assertEquals(feed1.createDocument(), feed.createDocument());
+        XOMTestCase.assertEquals(feed1.getFeedId(), feed.getFeedId());
     }
 
     @Test
     public void findByUrl() {
-        Feed feed = repository.findByUrl(URL);
+        Feed feed = repository.findByUrl(UnitTestConstants.TOPIC);
         
-        XOMTestCase.assertEquals(feed1.createDocument(), feed.createDocument());
+        XOMTestCase.assertEquals(feed1.getFeedId(), feed.getFeedId());
     }
 
     
@@ -85,22 +82,19 @@ public class JpaFeedRepositoryTest {
 
     @Test
     public void persistOrUpdateWithNonExistingFeed() {
-        URI otherUri = URI.create("http://dummy.com");
-        Feed feed2 = new Feed(otherUri, ContentType.ATOM, SomeFeeds.ATOM2);
+        repository.persistOrUpdate(UnitTestConstants.atom2());
         
-        repository.persistOrUpdate(feed2);
-        
-        Feed storedFeed = repository.findByUrl(otherUri);
-        System.out.println(storedFeed);
+        Feed storedFeed = repository.findByUrl(UnitTestConstants.TOPIC2);
         Assert.assertEquals(2, storedFeed.getEntries().size());
     }
 
     
     @Test
     public void persistOrUpdateWithExistingFeed() {
-        Feed feed2 = new AtomFeedBuilder(URL).id("f1").updated(TestConstants.UPDATED1)
-            .entry("e3", TestConstants.UPDATED1)
-            .entry("e2", TestConstants.UPDATED1) // duplicated entry
+        Feed feed2 = new FeedBuilder(UnitTestConstants.TOPIC, ContentType.ATOM)
+            .id("f1").updated(UnitTestConstants.UPDATED1)
+            .entry(new EntryBuilder().id("e3").updated(UnitTestConstants.UPDATED1).build())
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED1).build())  // duplicated entry
             .build();
             
         repository.persistOrUpdate(feed2);

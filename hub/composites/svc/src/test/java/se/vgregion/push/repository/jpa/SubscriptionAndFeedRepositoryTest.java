@@ -26,11 +26,14 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import se.vgregion.push.TestConstants;
+import se.vgregion.push.UnitTestConstants;
 import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.repository.SubscriptionRepository;
+import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
+import se.vgregion.push.types.Entry.EntryBuilder;
+import se.vgregion.push.types.Feed.FeedBuilder;
 
 
 public class SubscriptionAndFeedRepositoryTest {
@@ -41,44 +44,50 @@ public class SubscriptionAndFeedRepositoryTest {
     
     @Test
     public void findBehindSubscription() {
-        Feed feed1 = new AtomFeedBuilder(TestConstants.TOPIC)
-            .id("f1").updated(TestConstants.UPDATED1)
-            .entry("e1", TestConstants.UPDATED1).entry("e2", TestConstants.UPDATED3).build();
+        Feed feed1 = new FeedBuilder(UnitTestConstants.TOPIC, ContentType.ATOM)
+            .id("f1").updated(UnitTestConstants.UPDATED1)
+            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED3).build())
+            .build();
         feedRepository.persist(feed1);
 
-        Feed feed2 = new AtomFeedBuilder(TestConstants.TOPIC2)
-            .id("f2").updated(TestConstants.UPDATED3)
-            .entry("e3", TestConstants.UPDATED3).build();
+        Feed feed2 = new FeedBuilder(UnitTestConstants.TOPIC2, ContentType.ATOM)
+            .id("f2").updated(UnitTestConstants.UPDATED3)
+            .entry(new EntryBuilder().id("e3").updated(UnitTestConstants.UPDATED3).build())
+            .build();
         feedRepository.persist(feed2);
         
-        Subscription subscription = new Subscription(TestConstants.TOPIC, TestConstants.CALLBACK);
-        subscription.setLastUpdated(TestConstants.UPDATED2);
+        Subscription subscription = new Subscription(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK);
+        subscription.setLastUpdated(UnitTestConstants.UPDATED2);
         subscriptionRepository.persist(subscription);
         
         Collection<Feed> feeds = feedRepository.findFeedsWithBehindSubscriptions();
         
         Assert.assertEquals(1, feeds.size());
-        Assert.assertEquals(feed1.getAtomId(), feeds.iterator().next().getAtomId());
+        Assert.assertEquals(feed1.getFeedId(), feeds.iterator().next().getFeedId());
     }
 
     @Test
     public void findBehindSubscriptionMultiple() {
-        Feed feed1 = new AtomFeedBuilder(TestConstants.TOPIC)
-            .id("f1").updated(TestConstants.UPDATED1)
-            .entry("e1", TestConstants.UPDATED1).entry("e2", TestConstants.UPDATED3).build();
+        Feed feed1 = new FeedBuilder(UnitTestConstants.TOPIC, ContentType.ATOM)
+            .id("f1").updated(UnitTestConstants.UPDATED1)
+            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED3).build())
+            .build();
         feedRepository.persist(feed1);
 
-        Feed feed2 = new AtomFeedBuilder(TestConstants.TOPIC2)
-            .id("f2").updated(TestConstants.UPDATED1)
-            .entry("e3", TestConstants.UPDATED1).build();
+        Feed feed2 = new FeedBuilder(UnitTestConstants.TOPIC2, ContentType.ATOM)
+            .id("f2").updated(UnitTestConstants.UPDATED1)
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED1).build())
+            .build();
         feedRepository.persist(feed2);
         
-        Subscription subscription = new Subscription(TestConstants.TOPIC, TestConstants.CALLBACK);
-        subscription.setLastUpdated(TestConstants.UPDATED2);
+        Subscription subscription = new Subscription(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK);
+        subscription.setLastUpdated(UnitTestConstants.UPDATED2);
         subscriptionRepository.persist(subscription);
 
-        Subscription subscription2 = new Subscription(TestConstants.TOPIC2, TestConstants.CALLBACK);
-        subscription2.setLastUpdated(TestConstants.UPDATED2);
+        Subscription subscription2 = new Subscription(UnitTestConstants.TOPIC2, UnitTestConstants.CALLBACK);
+        subscription2.setLastUpdated(UnitTestConstants.UPDATED2);
         subscriptionRepository.persist(subscription2);
 
         Collection<Feed> feeds = feedRepository.findFeedsWithBehindSubscriptions();

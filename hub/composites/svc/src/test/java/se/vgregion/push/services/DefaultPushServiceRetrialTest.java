@@ -25,12 +25,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import se.vgregion.push.TestConstants;
+import se.vgregion.push.UnitTestConstants;
 import se.vgregion.push.repository.FeedRepository;
 import se.vgregion.push.repository.SubscriptionRepository;
-import se.vgregion.push.repository.jpa.AtomFeedBuilder;
+import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Subscription;
+import se.vgregion.push.types.Entry.EntryBuilder;
+import se.vgregion.push.types.Feed.FeedBuilder;
 
 public class DefaultPushServiceRetrialTest {
 
@@ -39,18 +41,20 @@ public class DefaultPushServiceRetrialTest {
 
     @Before
     public void before() {
-        Feed feed1 = new AtomFeedBuilder(TestConstants.TOPIC).id("f1").updated(TestConstants.UPDATED1)
-                .entry("e1", TestConstants.UPDATED1).build();
-        Feed feed2 = new AtomFeedBuilder(TestConstants.TOPIC2).id("f2").updated(TestConstants.UPDATED3)
-                .entry("e3", TestConstants.UPDATED3).build();
+        Feed feed1 = new FeedBuilder(UnitTestConstants.TOPIC, ContentType.ATOM).id("f1").updated(UnitTestConstants.UPDATED1)
+                .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
+                .build();
+        Feed feed2 = new FeedBuilder(UnitTestConstants.TOPIC2, ContentType.ATOM).id("f2").updated(UnitTestConstants.UPDATED3)
+            .entry(new EntryBuilder().id("e3").updated(UnitTestConstants.UPDATED3).build())        
+                .build();
 
-        Subscription subscription = new Subscription(TestConstants.TOPIC, TestConstants.CALLBACK);
+        Subscription subscription = new Subscription(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK);
 
         subscriptionRepository = Mockito.mock(SubscriptionRepository.class);
         feedRepository = Mockito.mock(FeedRepository.class);
         Mockito.when(feedRepository.findFeedsWithBehindSubscriptions()).thenReturn(Arrays.asList(feed1, feed2));
 
-        Mockito.when(subscriptionRepository.findByTopic(TestConstants.TOPIC)).thenReturn(Arrays.asList(subscription));
+        Mockito.when(subscriptionRepository.findByTopic(UnitTestConstants.TOPIC)).thenReturn(Arrays.asList(subscription));
     }
     
     @Test

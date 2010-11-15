@@ -33,14 +33,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import se.vgregion.push.UnitTestConstants;
+import se.vgregion.push.types.AbstractSerializer;
 import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 
 public class FeedRetrieverTest {
 
-    private static final URI TEST_URI = URI.create("http://example.com");
-    private static final HttpEntity TEST_ENTITY = HttpUtil.createEntity(SomeFeeds.ATOM1.toXML());
-    
     private LinkedBlockingQueue<RetrievalRequest> retrievalQueue = new LinkedBlockingQueue<RetrievalRequest>();
     private LinkedBlockingQueue<DistributionRequest> distributionQueue = new LinkedBlockingQueue<DistributionRequest>();
     
@@ -49,7 +48,7 @@ public class FeedRetrieverTest {
     @Before
     public void before() throws Exception {
         PushService service = mock(PushService.class);
-        when(service.retrieve(any(URI.class))).thenReturn(new Feed(TEST_URI, ContentType.ATOM, TEST_ENTITY.getContent()));
+        when(service.retrieve(any(URI.class))).thenReturn(UnitTestConstants.atom1());
 
         feedRetriever = new FeedRetriever(retrievalQueue, distributionQueue, service);
         feedRetriever.start();
@@ -57,13 +56,13 @@ public class FeedRetrieverTest {
     
     @Test
     public void test() throws Exception {
-        retrievalQueue.put(new RetrievalRequest(TEST_URI));
+        retrievalQueue.put(new RetrievalRequest(UnitTestConstants.TOPIC));
         
         DistributionRequest distributionRequest = distributionQueue.poll(1000, TimeUnit.MILLISECONDS);
         
         Assert.assertNotNull(distributionRequest);
-        Assert.assertEquals(TEST_URI, distributionRequest.getFeed().getUrl());
-        Assert.assertNotNull(distributionRequest.getFeed().createDocument());
+        Assert.assertEquals(UnitTestConstants.TOPIC, distributionRequest.getFeed().getUrl());
+        Assert.assertNotNull(distributionRequest.getFeed().getFeedId());
     }
     
     @After

@@ -22,13 +22,15 @@ package se.vgregion.push.types;
 import org.junit.Assert;
 import org.junit.Test;
 
+import se.vgregion.push.types.Entry.EntryBuilder;
+
 
 public class EntryTest {
 
     @Test
-    public void atomId() throws Exception {
-        Entry entry = new Entry(SomeFeeds.ATOM1.getRootElement().getFirstChildElement("entry", Feed.NS_ATOM));
+    public void entryId() throws Exception {
+        Entry entry = new EntryBuilder().id("e1").build();
         
-        Assert.assertEquals("urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a", entry.getAtomId());
+        Assert.assertEquals("e1", entry.getEntryId());
     }
 }

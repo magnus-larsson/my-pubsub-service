@@ -1,0 +1,21 @@
+<rss version="2.0">
+	<channel>
+		<title>foobar</title>
+		<link>http://www.example.com/</link>
+		<pubDate>2010-01-02T03:04:05Z</pubDate>
+		<item>
+			<title>foobar</title>
+			<link>http://example.com/item/123</link>
+			<guid>i1</guid>
+			<pubDate>2010-01-02T03:04:06Z</pubDate>
+			<description>[CDATA[ This is the description. ]]</description>
+		</item>
+		<item>
+			<title>foobar</title>
+			<link>http://example.com/item/123</link>
+			<guid>i2</guid>
+			<pubDate>2010-01-02T03:04:07Z</pubDate>
+			<description>[CDATA[ This is the description. ]]</description>
+		</item>
+	</channel>
+</rss>

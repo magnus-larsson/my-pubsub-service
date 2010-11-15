@@ -37,14 +37,17 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import se.vgregion.push.UnitTestConstants;
 import se.vgregion.push.repository.FeedRepository;
+import se.vgregion.push.types.AbstractSerializer;
+import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 
 public class DefaultPushServiceRetrievalTest {
 
     private DefaultPushService service = new DefaultPushService(null, mock(FeedRepository.class));
     private LocalTestServer server = new LocalTestServer(null, null);
-    private HttpEntity testEntity = HttpUtil.createEntity(SomeFeeds.ATOM1.toXML());
+    private HttpEntity testEntity = HttpUtil.createEntity(AbstractSerializer.create(ContentType.ATOM).print(UnitTestConstants.atom1()));
     
     @Before
     public void before() throws Exception {
@@ -67,7 +70,7 @@ public class DefaultPushServiceRetrievalTest {
         
         Feed downloaded = service.retrieve(buildTestUrl("/test"));
         
-        Assert.assertNotNull(downloaded.createDocument());
+        Assert.assertEquals("f1", downloaded.getFeedId());
     }
 
     @Test(expected=IOException.class)
