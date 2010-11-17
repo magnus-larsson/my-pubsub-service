@@ -24,7 +24,7 @@ public class IntegrationTestTemplate {
     
     @Before
     public void setUpComponents() throws Exception {
-        server = new Server(8080);
+        server = new Server(0);
         
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
@@ -41,7 +41,7 @@ public class IntegrationTestTemplate {
         context.addServlet(new ServletHolder(servlet),"/*");
         server.start();
         
-        hubUrl = URI.create("http://localhost:8080");
+        hubUrl = URI.create("http://localhost:" + server.getConnectors()[0].getLocalPort());
         
         publisher = new Publisher();
         

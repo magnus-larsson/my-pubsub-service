@@ -200,7 +200,6 @@ public class DefaultPushService implements PushService {
         Collection<Subscription> subscribers = getAllSubscriptionsForFeed(request.getFeed().getUrl());
         
         Feed feed = feedRepository.findByUrl(request.getFeed().getUrl());
-System.out.println(feed);
         if(!subscribers.isEmpty()) {
             LOG.debug("Distributing " + request.getFeed().getUrl());
             DateTime oldestUpdated = new DateTime(1970, 1, 1, 0, 0, 0, 0);
