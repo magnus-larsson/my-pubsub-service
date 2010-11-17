@@ -48,6 +48,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.push.repository.FeedRepository;
@@ -95,6 +96,7 @@ public class DefaultPushService implements PushService {
         return subscriptionRepository.findByTopic(feed);
     }
     
+    @Transactional(propagation=Propagation.REQUIRED)
     @Override
     public void verify(SubscriptionRequest request) throws FailedSubscriberVerificationException, IOException {
         String challenge = UUID.randomUUID().toString();
@@ -121,7 +123,7 @@ public class DefaultPushService implements PushService {
         }
     }
     
-    
+    @Transactional(propagation=Propagation.REQUIRED)
     @Override
     public Subscription subscribe(Subscription subscription) {
         // if subscription already exist, replace it
@@ -130,20 +132,19 @@ public class DefaultPushService implements PushService {
         return subscriptionRepository.persist(subscription);
     }
 
+    @Transactional(propagation=Propagation.REQUIRED)
     @Override
     public Subscription unsubscribe(Subscription subscription) {
         Subscription existing = subscriptionRepository.findByTopicAndCallback(subscription.getTopic(), subscription.getCallback());
         
         if(existing != null) {
-            subscriptionRepository.removeByPrimaryKey(existing.getId());
+            subscriptionRepository.remove(existing);
+            subscriptionRepository.flush();
         }
         return existing;
     }
     
-    /* (non-Javadoc)
-     * @see se.vgregion.push.services.impl.FeedRetrievalService#retrieve(se.vgregion.push.services.RetrievalRequest)
-     */
-    @Transactional
+    @Transactional(propagation=Propagation.REQUIRED)
     public Feed retrieve(URI url) throws IOException {
         LOG.debug("Downloading feed {}", url);
 
@@ -193,12 +194,13 @@ public class DefaultPushService implements PushService {
         return feed;
     }
 
+    @Transactional(propagation=Propagation.REQUIRED)
     @Override
     public void distribute(DistributionRequest request) throws IOException {
         Collection<Subscription> subscribers = getAllSubscriptionsForFeed(request.getFeed().getUrl());
         
         Feed feed = feedRepository.findByUrl(request.getFeed().getUrl());
-
+System.out.println(feed);
         if(!subscribers.isEmpty()) {
             LOG.debug("Distributing " + request.getFeed().getUrl());
             DateTime oldestUpdated = new DateTime(1970, 1, 1, 0, 0, 0, 0);
@@ -272,6 +274,7 @@ public class DefaultPushService implements PushService {
         }
     }
 
+    @Transactional(propagation=Propagation.REQUIRED)
     public boolean renewSubcription(Subscription subscription) {
         LOG.info("Renewing subscription {}", subscription);
         
@@ -302,7 +305,7 @@ public class DefaultPushService implements PushService {
 
         if(subscription.isFailed()) {
             LOG.info("Subscription reached renewal limit, removed {}", subscription);
-            subscriptionRepository.removeByPrimaryKey(subscription.getId());
+            subscriptionRepository.remove(subscription);
         } else {
             subscriptionRepository.store(subscription);
         }
@@ -310,6 +313,7 @@ public class DefaultPushService implements PushService {
         return result;
     }
 
+    @Transactional(propagation=Propagation.REQUIRED)
     @Override
     public void retryDistributions() {
         

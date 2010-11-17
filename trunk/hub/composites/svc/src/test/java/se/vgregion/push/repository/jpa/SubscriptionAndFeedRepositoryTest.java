@@ -22,9 +22,12 @@ package se.vgregion.push.repository.jpa;
 import java.util.Collection;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.push.UnitTestConstants;
 import se.vgregion.push.repository.FeedRepository;
@@ -35,14 +38,21 @@ import se.vgregion.push.types.Subscription;
 import se.vgregion.push.types.Entry.EntryBuilder;
 import se.vgregion.push.types.Feed.FeedBuilder;
 
+@ContextConfiguration("classpath:services-test.xml")
+public class SubscriptionAndFeedRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
-public class SubscriptionAndFeedRepositoryTest {
-
-    private ApplicationContext ctx = new ClassPathXmlApplicationContext("services-test.xml");
-    private SubscriptionRepository subscriptionRepository = ctx.getBean(SubscriptionRepository.class);
-    private FeedRepository feedRepository = ctx.getBean(FeedRepository.class);
+    private SubscriptionRepository subscriptionRepository;
+    private FeedRepository feedRepository;
+    
+    @Before
+    public void before() {
+        subscriptionRepository = applicationContext.getBean(SubscriptionRepository.class);
+        feedRepository = applicationContext.getBean(FeedRepository.class);
+    }
     
     @Test
+    @Transactional
+    @Rollback
     public void findBehindSubscription() {
         Feed feed1 = new FeedBuilder(UnitTestConstants.TOPIC, ContentType.ATOM)
             .id("f1").updated(UnitTestConstants.UPDATED1)
@@ -68,6 +78,8 @@ public class SubscriptionAndFeedRepositoryTest {
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void findBehindSubscriptionMultiple() {
         Feed feed1 = new FeedBuilder(UnitTestConstants.TOPIC, ContentType.ATOM)
             .id("f1").updated(UnitTestConstants.UPDATED1)

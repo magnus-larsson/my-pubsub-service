@@ -58,8 +58,6 @@ import se.vgregion.push.types.Subscription;
 
 public class DefaultPushServiceDistributionTest {
 
-    private static final URI FEED_URI = URI.create("http://example.com");
-    
     private DefaultPushService service;
     private LocalTestServer server = new LocalTestServer(null, null);
     
@@ -76,11 +74,14 @@ public class DefaultPushServiceDistributionTest {
     public void test() throws Exception {
         SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);
 
-        Subscription sub = new Subscription(FEED_URI, buildTestUrl("/sub"));
+        Subscription sub = new Subscription(UnitTestConstants.TOPIC, buildTestUrl("/sub"));
         sub.setLastUpdated(new DateTime(2010, 1, 1, 0, 0, 0, 0));
         when(subscriptionRepository.findByTopic(any(URI.class))).thenReturn(Arrays.asList(sub));
         
-        service = new DefaultPushService(subscriptionRepository, mock(FeedRepository.class));
+        FeedRepository feedRepository = mock(FeedRepository.class);
+        when(feedRepository.findByUrl(UnitTestConstants.TOPIC)).thenReturn(UnitTestConstants.atom1());
+        
+        service = new DefaultPushService(subscriptionRepository, feedRepository);
         
         final LinkedBlockingQueue<HttpRequest> issuedRequests = new LinkedBlockingQueue<HttpRequest>();
         final LinkedBlockingQueue<byte[]> issuedRequestBodies = new LinkedBlockingQueue<byte[]>();

@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.Test;
 
-import se.vgregion.push.UnitTestConstants;
 import se.vgregion.push.types.ContentType;
 import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Entry.EntryBuilder;

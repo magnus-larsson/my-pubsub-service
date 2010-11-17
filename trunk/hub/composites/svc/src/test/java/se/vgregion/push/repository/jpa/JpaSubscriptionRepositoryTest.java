@@ -27,64 +27,76 @@ import javax.persistence.PersistenceException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 
+import se.vgregion.push.UnitTestConstants;
 import se.vgregion.push.repository.SubscriptionRepository;
 import se.vgregion.push.types.Subscription;
 
+@ContextConfiguration("classpath:services-test.xml")
+public class JpaSubscriptionRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
-public class JpaSubscriptionRepositoryTest {
-
-    private static final URI CALLBACK = URI.create("http://example.com/sub11");
-    private static final URI TOPIC = URI.create("http://example.com/feed");
-    
-    private ApplicationContext ctx = new ClassPathXmlApplicationContext("services-test.xml");
-    private SubscriptionRepository repository = ctx.getBean(SubscriptionRepository.class);
+    private SubscriptionRepository repository;
     
     private Subscription sub1;
     
     @Before
     public void setup() {
-        sub1 = repository.persist(new Subscription(TOPIC, CALLBACK));
+        repository = applicationContext.getBean(SubscriptionRepository.class);
+        sub1 = repository.persist(new Subscription(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK));
     }
     
     @Test
+    @Transactional
+    @Rollback
     public void findByPk() {
         Subscription loaded = repository.find(sub1.getId());
         
-        Assert.assertEquals(CALLBACK, loaded.getCallback());
+        Assert.assertEquals(UnitTestConstants.CALLBACK, loaded.getCallback());
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void findByTopic() {
-        Collection<Subscription> loaded = repository.findByTopic(TOPIC);
+        Collection<Subscription> loaded = repository.findByTopic(UnitTestConstants.TOPIC);
         
         Assert.assertEquals(1, loaded.size());
-        Assert.assertEquals(CALLBACK, loaded.iterator().next().getCallback());
+        Assert.assertEquals(UnitTestConstants.CALLBACK, loaded.iterator().next().getCallback());
     }
     
     @Test
+    @Transactional
+    @Rollback
     public void findByTopicNoneExisting() {
         Assert.assertEquals(0, repository.findByTopic(URI.create("http://dummy")).size());
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void findByTopicAndCallback() {
-        Subscription subscription = repository.findByTopicAndCallback(TOPIC, CALLBACK);
+        Subscription subscription = repository.findByTopicAndCallback(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK);
         
         Assert.assertNotNull(subscription);
-        Assert.assertEquals(CALLBACK, subscription.getCallback());
+        Assert.assertEquals(UnitTestConstants.CALLBACK, subscription.getCallback());
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void findByTopicAndCallbackNoneExisting() {
-        Assert.assertNull(repository.findByTopicAndCallback(TOPIC, URI.create("http://dummy")));
+        Assert.assertNull(repository.findByTopicAndCallback(UnitTestConstants.TOPIC, URI.create("http://dummy")));
     }
     
     @Test(expected=PersistenceException.class)
+    @Transactional
+    @Rollback
     public void persistDuplicates() {
-        repository.persist(new Subscription(TOPIC, CALLBACK));
-        repository.persist(new Subscription(TOPIC, CALLBACK));
+        repository.persist(new Subscription(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK));
+        repository.persist(new Subscription(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK));
     }
 }

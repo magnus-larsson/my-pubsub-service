@@ -78,7 +78,7 @@ public class DefaultPushServiceRenewalTest {
             service.renewSubcription(subscription);
         }   
         
-        Mockito.verify(subscriptionRepository).removeByPrimaryKey(0L);
+        Mockito.verify(subscriptionRepository).remove(subscription);
         Assert.assertTrue(subscription.isFailed());
     }
 }
