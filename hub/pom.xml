@@ -113,7 +113,7 @@
 		<dependency>
 			<groupId>se.vgregion.daoframework</groupId>
 			<artifactId>dao-framework-jpa</artifactId>
-			<version>3.3-SNAPSHOT</version>
+			<version>3.3</version>
 		</dependency>
 		
 		<dependency>

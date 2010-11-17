@@ -36,22 +36,23 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.push.repository.SubscriptionRepository;
 import se.vgregion.push.types.Subscription;
 
-
-public class DefaultPushServiceTest {
+@ContextConfiguration("classpath:services-test.xml")
+public class DefaultPushServiceTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private static final URI CALLBACK = URI.create("http://example.com/callback");
     private static final URI TOPIC = URI.create("http://example.com/topic");
     
-    private ApplicationContext ctx = new ClassPathXmlApplicationContext("services-test.xml");
     
-    private SubscriptionRepository repository = ctx.getBean(SubscriptionRepository.class);
-    private PushService service = ctx.getBean(PushService.class);
+    private SubscriptionRepository repository;
+    private PushService service;
 
     private LocalTestServer server = new LocalTestServer(null, null);
     
@@ -59,6 +60,9 @@ public class DefaultPushServiceTest {
     
     @Before
     public void before() throws Exception {
+        repository = applicationContext.getBean(SubscriptionRepository.class);
+        service = applicationContext.getBean(PushService.class);
+        
         server.start();
         
         URI callback = buildTestUrl("/callback");
@@ -75,6 +79,8 @@ public class DefaultPushServiceTest {
     }
     
     @Test
+    @Transactional
+    @Rollback
     public void verify() throws Exception {
         final LinkedBlockingQueue<HttpRequest> requests = new LinkedBlockingQueue<HttpRequest>();
         
@@ -101,6 +107,8 @@ public class DefaultPushServiceTest {
     }
 
     @Test(expected=FailedSubscriberVerificationException.class)
+    @Transactional
+    @Rollback
     public void verifyWithMissingChallenge() throws Exception {
         server.register("/*", new HttpRequestHandler() {
             @Override
@@ -113,6 +121,8 @@ public class DefaultPushServiceTest {
     }
 
     @Test(expected=FailedSubscriberVerificationException.class)
+    @Transactional
+    @Rollback
     public void verifyWithInvalidChallenge() throws Exception {
         server.register("/*", new HttpRequestHandler() {
             @Override
@@ -125,6 +135,8 @@ public class DefaultPushServiceTest {
     }
 
     @Test(expected=FailedSubscriberVerificationException.class)
+    @Transactional
+    @Rollback
     public void verifyWithError() throws Exception {
         server.register("/*", new HttpRequestHandler() {
             @Override
@@ -137,6 +149,8 @@ public class DefaultPushServiceTest {
     }
     
     @Test
+    @Transactional
+    @Rollback
     public void subscribe() {
         service.subscribe(new Subscription(TOPIC, CALLBACK));
         
@@ -144,6 +158,8 @@ public class DefaultPushServiceTest {
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void subscribeWithExisting() {
         repository.persist(new Subscription(TOPIC, CALLBACK));
         
@@ -154,6 +170,8 @@ public class DefaultPushServiceTest {
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void unsubscribe() {
         repository.persist(new Subscription(TOPIC, CALLBACK));
         
@@ -165,6 +183,8 @@ public class DefaultPushServiceTest {
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void unsubscribeNonExisting() {
         Assert.assertEquals(0, repository.findAll().size());
 

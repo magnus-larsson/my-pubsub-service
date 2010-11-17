@@ -25,8 +25,10 @@ import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.push.UnitTestConstants;
 import se.vgregion.push.repository.FeedRepository;
@@ -35,21 +37,23 @@ import se.vgregion.push.types.Feed;
 import se.vgregion.push.types.Entry.EntryBuilder;
 import se.vgregion.push.types.Feed.FeedBuilder;
 
+@ContextConfiguration("classpath:services-test.xml")
+public class JpaFeedRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
-public class JpaFeedRepositoryTest {
-
-    private ApplicationContext ctx = new ClassPathXmlApplicationContext("services-test.xml");
-    private FeedRepository repository = ctx.getBean(FeedRepository.class);
+    private FeedRepository repository;
     
     private Feed feed1;
     
     @Before
     public void setup() {
+        repository = applicationContext.getBean(FeedRepository.class);
         feed1 = UnitTestConstants.atom1();
         repository.persist(feed1);
     }
     
     @Test
+    @Transactional
+    @Rollback
     public void findByPk() {
         Feed feed = repository.find(feed1.getId());
         
@@ -57,6 +61,8 @@ public class JpaFeedRepositoryTest {
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void findByUrl() {
         Feed feed = repository.findByUrl(UnitTestConstants.TOPIC);
         
@@ -65,10 +71,13 @@ public class JpaFeedRepositoryTest {
 
     
     @Test
+    @Transactional
+    @Rollback
     public void testDeleteOldEntries() {
         Feed feed = repository.find(feed1.getId());
         
         repository.deleteOutdatedEntries(feed, new DateTime(2110, 1, 1, 0, 0, 0, 0));
+        
         
         repository.store(feed);
         
@@ -78,6 +87,8 @@ public class JpaFeedRepositoryTest {
     }
 
     @Test
+    @Transactional
+    @Rollback
     public void persistOrUpdateWithNonExistingFeed() {
         repository.persistOrUpdate(UnitTestConstants.atom2());
         
@@ -87,6 +98,8 @@ public class JpaFeedRepositoryTest {
 
     
     @Test
+    @Transactional
+    @Rollback
     public void persistOrUpdateWithExistingFeed() {
         Feed feed2 = new FeedBuilder(UnitTestConstants.TOPIC, ContentType.ATOM)
             .id("f1").updated(UnitTestConstants.UPDATED1)
