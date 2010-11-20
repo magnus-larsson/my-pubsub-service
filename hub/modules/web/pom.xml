@@ -43,7 +43,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>pubsubhubbub-hub-composite-webcomp</artifactId>
+			<artifactId>pubsubhubbub-hub-composite-push</artifactId>
 		</dependency>
 
 		<dependency>
