@@ -27,10 +27,43 @@ import nu.xom.Document;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.params.ConnManagerParams;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
 public class HttpUtil {
 
+    private static HttpClient httpclient;
+    static {
+        SchemeRegistry schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+        
+        // configure timeouts
+        HttpParams params = new BasicHttpParams();
+        ConnManagerParams.setMaxTotalConnections(params, 100);
+        HttpConnectionParams.setConnectionTimeout(params, 10000);
+        HttpConnectionParams.setSoTimeout(params, 10000);
+
+        ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
+
+        httpclient = new DefaultHttpClient(cm, params);
+    }
+    
+    public static HttpClient getClient() {
+        return httpclient;
+    }
+    
     public static boolean successStatus(HttpResponse response) {
         int status = response.getStatusLine().getStatusCode();
         return status >= 200 && status <300;
