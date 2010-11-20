@@ -14,9 +14,8 @@
   <name>${project.artifactId}</name>
 
   <modules>
-    <module>composites/types</module>
-    <module>composites/svc</module>
-    <module>composites/webcomp</module>
+    <module>composites/pubsub</module>
+    <module>composites/push</module>
     <module>modules/web</module>
   </modules>
 
@@ -24,17 +23,12 @@
 		<dependencies>
 		    <dependency>
     			<groupId>${project.groupId}</groupId>
-    			<artifactId>pubsubhubbub-hub-composite-types</artifactId>
+    			<artifactId>pubsubhubbub-hub-composite-pubsub</artifactId>
     			<version>${project.version}</version>
     		</dependency>
 		    <dependency>
     			<groupId>${project.groupId}</groupId>
-    			<artifactId>pubsubhubbub-hub-composite-svc</artifactId>
-    			<version>${project.version}</version>
-    		</dependency>
-		    <dependency>
-    			<groupId>${project.groupId}</groupId>
-    			<artifactId>pubsubhubbub-hub-composite-webcomp</artifactId>
+    			<artifactId>pubsubhubbub-hub-composite-push</artifactId>
     			<version>${project.version}</version>
     		</dependency>
 
