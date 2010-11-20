@@ -44,6 +44,8 @@ import org.apache.http.localserver.LocalTestServer;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -63,6 +65,7 @@ public class DefaultPushSubscriberTest {
     
     @Before
     public void before() throws Exception {
+        DateTimeUtils.setCurrentMillisFixed(new DateTime().getMillis());
         server.start();
     }
     
@@ -72,6 +75,7 @@ public class DefaultPushSubscriberTest {
     
     @Test
     public void test() throws Exception {
+        
         PushSubscriberRepository subscriberRepository = mock(PushSubscriberRepository.class);
 
         subscriber = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, buildTestUrl("/"), UnitTestConstants.FUTURE, UnitTestConstants.UPDATED1, 100, "verify" );
@@ -95,6 +99,9 @@ public class DefaultPushSubscriberTest {
         
         subscriber.publish(feed);
         
+        // subscriber should be updated
+        Assert.assertEquals(new DateTime(DateTimeZone.UTC), subscriber.getLastUpdated());
+
         HttpRequest request = issuedRequests.poll(10000, TimeUnit.MILLISECONDS);
         Assert.assertNotNull(request);
         Assert.assertEquals(ContentType.ATOM.toString(), request.getHeaders("Content-Type")[0].getValue());
@@ -107,10 +114,13 @@ public class DefaultPushSubscriberTest {
         Document actualAtom = new Builder().build(new ByteArrayInputStream(issuedRequestBodies.poll()));
 
         Assert.assertEquals(1, actualAtom.getRootElement().getChildElements("entry", Namespaces.NS_ATOM).size());
+        
     }
     
     @After
     public void after() {
+        DateTimeUtils.setCurrentMillisSystem();
+
         try {
             server.stop();
         } catch (Exception e) {
