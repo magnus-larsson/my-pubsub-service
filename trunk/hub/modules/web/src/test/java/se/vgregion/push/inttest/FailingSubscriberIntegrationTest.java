@@ -3,6 +3,7 @@ package se.vgregion.push.inttest;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import se.vgregion.pubsub.Feed;
@@ -12,6 +13,7 @@ import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 public class FailingSubscriberIntegrationTest extends IntegrationTestTemplate {
 
     @Test
+    @Ignore
     public void failedFirstPublication() throws Exception {
         Feed feed = new FeedBuilder().id("f1").updated(
                 UnitTestConstants.UPDATED1).entry(

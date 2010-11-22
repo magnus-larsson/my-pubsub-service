@@ -27,7 +27,7 @@ import org.junit.Test;
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.Namespaces;
-import se.vgregion.push.types.UnitTestConstants;
+import se.vgregion.pubsub.UnitTestConstants;
 
 
 public class AtomParserTest {

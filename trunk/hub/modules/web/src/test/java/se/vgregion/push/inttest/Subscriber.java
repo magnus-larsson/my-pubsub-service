@@ -70,7 +70,6 @@ public class Subscriber {
                     // subscription verification, confirm
                     response.setEntity(new StringEntity(challenge));
                 } else if(request instanceof HttpEntityEnclosingRequest) {
-System.out.println(11111111);
                     if(result != null && result.fail()) {
                         response.setStatusCode(500);
                     }

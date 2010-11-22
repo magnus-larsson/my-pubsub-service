@@ -28,9 +28,9 @@ import org.junit.Test;
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Namespaces;
+import se.vgregion.pubsub.UnitTestConstants;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
-import se.vgregion.push.types.UnitTestConstants;
 
 
 
@@ -40,9 +40,9 @@ public class Rss2SerializerTest {
     @Test
     public void print() throws Exception {
         FeedBuilder builder = new FeedBuilder();
-        builder.id("f1").updated(UnitTestConstants.UPDATED1).custom(UnitTestConstants.RSS2_TITLE)
-            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).custom(UnitTestConstants.RSS2_TITLE).build())
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).custom(UnitTestConstants.RSS2_TITLE).build());
+        builder.id("f1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.RSS2_TITLE)
+            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.RSS2_TITLE).build())
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).field(UnitTestConstants.RSS2_TITLE).build());
         
         Rss2Serializer serializer = new Rss2Serializer();
         Document doc = serializer.print(builder.build());
@@ -54,27 +54,25 @@ public class Rss2SerializerTest {
         
         Assert.assertNotNull(channel);
         
-        System.out.println(doc.toXML());
-        
         Assert.assertEquals("f1", channel.getFirstChildElement("link").getValue());
         Assert.assertEquals("foobar", channel.getFirstChildElement("title").getValue());
-        Assert.assertEquals("2010-02-28T23:00:00.000Z", channel.getFirstChildElement("pubDate").getValue());
+        Assert.assertEquals("2010-03-01T00:00:00.000Z", channel.getFirstChildElement("pubDate").getValue());
         
         Assert.assertEquals(2, channel.getChildElements("item").size());
         
         Element entry = channel.getChildElements("item").get(0);
         Assert.assertEquals("e1", entry.getFirstChildElement("guid").getValue());
         Assert.assertEquals("foobar", entry.getFirstChildElement("title").getValue());
-        Assert.assertEquals("2010-02-28T23:00:00.000Z", entry.getFirstChildElement("pubDate").getValue());
+        Assert.assertEquals("2010-03-01T00:00:00.000Z", entry.getFirstChildElement("pubDate").getValue());
 
     }
 
     @Test
     public void printWithFilter() throws Exception {
         FeedBuilder builder = new FeedBuilder();
-        builder.id("f1").updated(UnitTestConstants.UPDATED1).custom(UnitTestConstants.RSS2_TITLE)
-            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).custom(UnitTestConstants.RSS2_TITLE).build())
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).custom(UnitTestConstants.RSS2_TITLE).build());
+        builder.id("f1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.RSS2_TITLE)
+            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.RSS2_TITLE).build())
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).field(UnitTestConstants.RSS2_TITLE).build());
         
         Rss2Serializer serializer = new Rss2Serializer();
         Document doc = serializer.print(builder.build(), new EntryFilter() {

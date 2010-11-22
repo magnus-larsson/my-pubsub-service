@@ -31,11 +31,11 @@ public class IntegrationTestTemplate {
         context.setContextPath("/");
         server.setHandler(context);
  
-        context.getInitParams().put("contextConfigLocation", "classpath*:pubsub-*.xml");
+        context.getInitParams().put("contextConfigLocation", "classpath*:spring/pubsub-*.xml");
         
         DispatcherServlet servlet = new DispatcherServlet();
         
-        servlet.setContextConfigLocation("file:src/main/webapp/WEB-INF/hub-servlet.xml, classpath*:pubsub-*.xml");
+        servlet.setContextConfigLocation("file:src/main/webapp/WEB-INF/hub-servlet.xml, classpath*:spring/pubsub-*.xml");
         
         servlet.init(new MockServletConfig());
         

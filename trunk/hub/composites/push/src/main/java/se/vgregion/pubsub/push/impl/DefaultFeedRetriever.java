@@ -39,8 +39,8 @@ import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.content.AbstractParser;
 import se.vgregion.pubsub.push.FeedRetriever;
-import se.vgregion.push.services.HttpUtil;
 
+// TODO separate runner from rest
 public class DefaultFeedRetriever implements FeedRetriever {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultFeedRetriever.class);
@@ -63,7 +63,12 @@ public class DefaultFeedRetriever implements FeedRetriever {
             public void run() {
                 while (true) {
                     try {
-                        retrieve(retrieveQueue.take());
+                        URI url = retrieveQueue.take();
+                        try {
+                            retrieve(url);
+                        } catch (IOException e) {
+                            LOG.warn("Failed to download feed from " + url.toString(), e);
+                        }
                     } catch (InterruptedException e) {
                         // shutting down
                         break;
@@ -76,18 +81,14 @@ public class DefaultFeedRetriever implements FeedRetriever {
     }
 
     @Transactional
-    public void retrieve(URI topicUrl) throws InterruptedException {
-        try {
-            LOG.info("Retrieving feed: {}", topicUrl);
+    public void retrieve(URI topicUrl) throws InterruptedException, IOException {
+        LOG.info("Retrieving feed: {}", topicUrl);
 
-            Feed feed = download(topicUrl);
+        Feed feed = download(topicUrl);
 
-            LOG.info("Feed successfully retrived, putting for distribution: {}", topicUrl);
+        LOG.info("Feed successfully retrived, putting for distribution: {}", topicUrl);
 
-            pubSubEngine.publish(topicUrl, feed);
-        } catch (IOException e) {
-            LOG.error("Failed to download feed: " + topicUrl, e);
-        }
+        pubSubEngine.publish(topicUrl, feed);
     }
 
     private Feed download(URI url) throws IOException {

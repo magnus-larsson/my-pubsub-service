@@ -19,10 +19,23 @@
 
 package se.vgregion.pubsub.push;
 
-import java.io.IOException;
-import java.net.URI;
+@SuppressWarnings("serial")
+public class FailedSubscriberVerificationException extends Exception {
 
-public interface FeedRetriever {
+    public FailedSubscriberVerificationException() {
+        super();
+    }
 
-    void retrieve(URI topicUrl) throws InterruptedException, IOException;
+    public FailedSubscriberVerificationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public FailedSubscriberVerificationException(String message) {
+        super(message);
+    }
+
+    public FailedSubscriberVerificationException(Throwable cause) {
+        super(cause);
+    }
+
 }

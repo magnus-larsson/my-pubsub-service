@@ -17,43 +17,38 @@
  *
  */
 
-package se.vgregion.pubsub.content;
+package se.vgregion.pubsub.impl;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Assert;
 import org.junit.Test;
 
-import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.Namespaces;
 import se.vgregion.pubsub.UnitTestConstants;
+import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
+import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 
 
-public class Rss2ParserTest {
+
+public class FeedBuilderTest {
 
     @Test
-    public void parse() throws Exception {
-        Rss2Parser parser = new Rss2Parser();
-        Feed feed = parser.parse(UnitTestConstants.RSS1);
-        
-        Assert.assertEquals("http://www.example.com/", feed.getFeedId());
-        Assert.assertEquals(new DateTime(2010, 1, 2, 3, 4, 5, 0, DateTimeZone.UTC), feed.getUpdated());
+    public void merge() {
+        Feed feed = new FeedBuilder()
+            .id("f1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.ATOM_TITLE)
+            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build())
+            .build();
+
+        Assert.assertEquals("f1", feed.getFeedId());
+        Assert.assertEquals(UnitTestConstants.UPDATED1, feed.getUpdated());
         Assert.assertEquals(1, feed.getFields().size());
-        
-        Assert.assertEquals("", feed.getFields().get(0).getNamespace());
+        Assert.assertEquals(Namespaces.NS_ATOM, feed.getFields().get(0).getNamespace());
         Assert.assertEquals("title", feed.getFields().get(0).getName());
         Assert.assertEquals("foobar", feed.getFields().get(0).getValue());
-
+        
         Assert.assertEquals(2, feed.getEntries().size());
-        
-        Entry entry = feed.getEntries().get(0);
-        
-        Assert.assertEquals("i1", entry.getEntryId());
-        Assert.assertEquals(new DateTime(2010, 1, 2, 3, 4, 6, 0, DateTimeZone.UTC), entry.getUpdated());
-        
-        entry = feed.getEntries().get(1);
-        
-        Assert.assertEquals("i2", entry.getEntryId());
-        Assert.assertEquals(new DateTime(2010, 1, 2, 3, 4, 7, 0, DateTimeZone.UTC), entry.getUpdated());
+        Assert.assertEquals("e1", feed.getEntries().get(0).getEntryId());
+        Assert.assertEquals("e2", feed.getEntries().get(1).getEntryId());
     }
 }

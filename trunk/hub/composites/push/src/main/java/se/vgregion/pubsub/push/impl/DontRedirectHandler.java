@@ -17,12 +17,25 @@
  *
  */
 
-package se.vgregion.pubsub.push;
+package se.vgregion.pubsub.push.impl;
 
-import java.io.IOException;
 import java.net.URI;
 
-public interface FeedRetriever {
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolException;
+import org.apache.http.client.RedirectHandler;
+import org.apache.http.protocol.HttpContext;
 
-    void retrieve(URI topicUrl) throws InterruptedException, IOException;
+public class DontRedirectHandler implements RedirectHandler {
+
+    @Override
+    public URI getLocationURI(HttpResponse response, HttpContext context) throws ProtocolException {
+        return null;
+    }
+
+    @Override
+    public boolean isRedirectRequested(HttpResponse response, HttpContext context) {
+        return false;
+    }
+
 }

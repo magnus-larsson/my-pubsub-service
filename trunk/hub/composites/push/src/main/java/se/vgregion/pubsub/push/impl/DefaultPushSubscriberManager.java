@@ -34,6 +34,8 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
     @Override
     @Transactional
     public void subscribe(PushSubscriber subscriber) {
+        unsubscribe(subscriber);
+        
         Topic topic = pubSubEngine.getOrCreateTopic(subscriber.getTopic());
         
         topic.addSubscriber(subscriber);
@@ -43,8 +45,12 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
 
     @Override
     @Transactional
-    public void unsubscribe(URI url, PushSubscriber subscriber) {
-        // TODO Auto-generated method stub
+    public void unsubscribe(PushSubscriber subscriber) {
+        Topic topic = pubSubEngine.getOrCreateTopic(subscriber.getTopic());
+        
+        topic.removeSubscriber(subscriber);
+        
+        subscriptionRepository.remove(subscriber);
         
     }
     

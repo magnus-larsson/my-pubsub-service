@@ -43,11 +43,17 @@ public class DefaultEntry extends AbstractEntity<Long> implements Entry {
             return this;
         }
         
-        public EntryBuilder custom(Element elm) {
-            entry.fields.add(new DefaultField(elm.getNamespaceURI(), elm.getLocalName(), FieldType.ELEMENT, elm.getValue()));
+        public EntryBuilder field(Element elm) {
+            entry.fields.add(new DefaultField(elm.getNamespaceURI(), elm.getLocalName(), elm.getValue()));
             return this;
         }
 
+        public EntryBuilder field(String namespace, String name, String value) {
+            entry.fields.add(new DefaultField(namespace, name, value));
+            return this;
+        }
+
+        
         public Entry build() {
             return entry;
         }

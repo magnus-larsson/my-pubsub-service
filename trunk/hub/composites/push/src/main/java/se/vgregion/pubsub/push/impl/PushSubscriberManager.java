@@ -10,7 +10,7 @@ public interface PushSubscriberManager {
 
     public void subscribe(PushSubscriber subscriber);
 
-    public void unsubscribe(URI url, PushSubscriber subscriber);
+    public void unsubscribe(PushSubscriber subscriber);
     
     
     

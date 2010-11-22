@@ -48,7 +48,7 @@ public class DefaultFeed extends AbstractEntity<Long> implements Feed {
             return this;
         }
         
-        public FeedBuilder custom(Element elm) {
+        public FeedBuilder field(Element elm) {
             feed.fields.add(new DefaultField(elm.getNamespaceURI(), elm.getLocalName(), FieldType.ELEMENT, elm.getValue()));
             return this;
         }
