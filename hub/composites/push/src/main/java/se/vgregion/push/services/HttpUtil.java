@@ -45,23 +45,24 @@ public class HttpUtil {
 
     private static HttpClient httpclient;
     static {
-        SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
-        
-        // configure timeouts
-        HttpParams params = new BasicHttpParams();
-        ConnManagerParams.setMaxTotalConnections(params, 100);
-        HttpConnectionParams.setConnectionTimeout(params, 10000);
-        HttpConnectionParams.setSoTimeout(params, 10000);
+//        SchemeRegistry schemeRegistry = new SchemeRegistry();
+//        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+//        schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+//        
+//        // configure timeouts
+//        HttpParams params = new BasicHttpParams();
+//        ConnManagerParams.setMaxTotalConnections(params, 100);
+//        HttpConnectionParams.setConnectionTimeout(params, 10000);
+//        HttpConnectionParams.setSoTimeout(params, 10000);
+//
+//        ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
 
-        ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
-
-        httpclient = new DefaultHttpClient(cm, params);
+//        httpclient = new DefaultHttpClient(cm, params);
+        httpclient = new DefaultHttpClient();
     }
     
     public static HttpClient getClient() {
-        return httpclient;
+        return new DefaultHttpClient();
     }
     
     public static boolean successStatus(HttpResponse response) {

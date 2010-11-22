@@ -25,6 +25,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
@@ -40,9 +42,9 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
 
-import se.vgregion.push.types.AbstractParser;
-import se.vgregion.push.types.ContentType;
-import se.vgregion.push.types.Feed;
+import se.vgregion.pubsub.ContentType;
+import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.content.AbstractParser;
 
 
 public class Subscriber {
@@ -68,6 +70,7 @@ public class Subscriber {
                     // subscription verification, confirm
                     response.setEntity(new StringEntity(challenge));
                 } else if(request instanceof HttpEntityEnclosingRequest) {
+System.out.println(11111111);
                     if(result != null && result.fail()) {
                         response.setStatusCode(500);
                     }
@@ -85,7 +88,7 @@ public class Subscriber {
         ContentType contentType = ContentType.fromValue(entity.getContentType().getValue());
         Feed feed;
         try {
-            feed = AbstractParser.create(contentType).parse(URI.create("http://example.com"), entity.getContent());
+            feed = AbstractParser.create(contentType).parse(entity.getContent());
             for(SubscriberListener listener : listeners) {
                 listener.published(feed);
             }
@@ -112,9 +115,10 @@ public class Subscriber {
         parameters.add(new BasicNameValuePair("hub.verify", "sync"));
         
         post.setEntity(new UrlEncodedFormEntity(parameters));
-        
         DefaultHttpClient client = new DefaultHttpClient();
-        client.execute(post);
+        HttpResponse response = client.execute(post);
+        
+        Assert.assertEquals(204, response.getStatusLine().getStatusCode());
     }
     
     public void addListener(SubscriberListener listener) {

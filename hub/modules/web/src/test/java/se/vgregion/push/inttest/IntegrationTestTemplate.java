@@ -12,7 +12,8 @@ import org.junit.Before;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import se.vgregion.push.types.Feed;
+import se.vgregion.pubsub.Feed;
+
 
 public class IntegrationTestTemplate {
 
@@ -30,11 +31,11 @@ public class IntegrationTestTemplate {
         context.setContextPath("/");
         server.setHandler(context);
  
-        context.getInitParams().put("contextConfigLocation", "classpath*:services-config.xml");
+        context.getInitParams().put("contextConfigLocation", "classpath*:pubsub-*.xml");
         
         DispatcherServlet servlet = new DispatcherServlet();
         
-        servlet.setContextConfigLocation("classpath:hub-servlet.xml, classpath*:services-config.xml");
+        servlet.setContextConfigLocation("file:src/main/webapp/WEB-INF/hub-servlet.xml, classpath*:pubsub-*.xml");
         
         servlet.init(new MockServletConfig());
         

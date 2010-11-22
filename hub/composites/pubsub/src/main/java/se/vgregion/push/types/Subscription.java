@@ -41,7 +41,7 @@ import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
         uniqueConstraints=
             @UniqueConstraint(columnNames={"TOPIC", "CALLBACK"})
     )
-public class Subscription extends AbstractEntity<Subscription, Long> {
+public class Subscription extends AbstractEntity<Long> {
 
     public static final int MAX_RENEWAL_TRIES = 3;
 

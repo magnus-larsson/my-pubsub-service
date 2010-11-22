@@ -17,6 +17,9 @@ public class AtomSerializer extends AbstractSerializer {
     public Document print(Feed feed, EntryFilter entryFilter) {
         Element feedElm = new Element("feed", Namespaces.NS_ATOM);
         
+        feedElm.appendChild(print("id", feed.getFeedId()));
+        feedElm.appendChild(print("updated", feed.getUpdated()));
+        
         List<Field> customs = feed.getFields();
         
         for(Field custom : customs) {

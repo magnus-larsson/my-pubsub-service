@@ -6,7 +6,7 @@ import org.joda.time.DateTime;
 
 import se.vgregion.dao.domain.patterns.entity.Entity;
 
-public interface Entry extends Entity<Entry, Long> {
+public interface Entry extends Entity<Long> {
 
     String getEntryId();
     DateTime getUpdated();

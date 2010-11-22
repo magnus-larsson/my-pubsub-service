@@ -38,8 +38,10 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
 
-import se.vgregion.push.types.FeedSerializer;
-import se.vgregion.push.types.Feed;
+import se.vgregion.pubsub.ContentType;
+import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.content.AbstractSerializer;
+
 
 
 public class Publisher {
@@ -54,8 +56,8 @@ public class Publisher {
             @Override
             public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException,
                     IOException {
-                response.setHeader("Content-type", feed.getContentType().toString());
-                response.setEntity(new StringEntity(FeedSerializer.printFeed(feed).toXML()));
+                response.setHeader("Content-type", ContentType.ATOM.toString());
+                response.setEntity(new StringEntity(AbstractSerializer.printFeed(ContentType.ATOM, feed).toXML()));
             }
         });
         server.start();

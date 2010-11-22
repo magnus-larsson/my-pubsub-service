@@ -5,16 +5,17 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.Test;
 
-import se.vgregion.push.types.ContentType;
-import se.vgregion.push.types.Feed;
-import se.vgregion.push.types.Entry.EntryBuilder;
-import se.vgregion.push.types.Feed.FeedBuilder;
+import se.vgregion.pubsub.ContentType;
+import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.content.AbstractSerializer;
+import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
+import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 
 public class IntegrationTest extends IntegrationTestTemplate {
 
     @Test
     public void simpleAtomPublication() throws Exception {
-        Feed feed = new FeedBuilder(UnitTestConstants.TOPIC, ContentType.ATOM).id("f1").updated(
+        Feed feed = new FeedBuilder().id("f1").updated(
                 UnitTestConstants.UPDATED1).entry(
                 new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build()).entry(
                 new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED1).build()).build();
@@ -30,7 +31,7 @@ public class IntegrationTest extends IntegrationTestTemplate {
 
     @Test
     public void simpleRssPublication() throws Exception {
-        Feed feed = new FeedBuilder(UnitTestConstants.TOPIC, ContentType.RSS).id("f1").updated(
+        Feed feed = new FeedBuilder().id("f1").updated(
                 UnitTestConstants.UPDATED1).entry(
                 new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build()).entry(
                 new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED1).build()).build();
@@ -47,11 +48,11 @@ public class IntegrationTest extends IntegrationTestTemplate {
     
     @Test
     public void doublePublication() throws Exception {
-        Feed feed = new FeedBuilder(UnitTestConstants.TOPIC, ContentType.ATOM).id("f1").updated(
+        Feed feed = new FeedBuilder().id("f1").updated(
                 UnitTestConstants.UPDATED2).entry(
                 new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED2).build()).entry(
                 new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build()).build();
-        Feed feed2 = new FeedBuilder(UnitTestConstants.TOPIC, ContentType.ATOM)
+        Feed feed2 = new FeedBuilder()
             .id("f1").updated(UnitTestConstants.FUTURE)
             .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.FUTURE).build())
             .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build())
@@ -77,7 +78,7 @@ public class IntegrationTest extends IntegrationTestTemplate {
 
     @Test
     public void doublePublicationWithoutUpdate() throws Exception {
-        Feed feed = new FeedBuilder(UnitTestConstants.TOPIC, ContentType.ATOM).id("f1").updated(
+        Feed feed = new FeedBuilder().id("f1").updated(
                 UnitTestConstants.UPDATED2).entry(
                 new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED2).build()).entry(
                 new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build()).build();

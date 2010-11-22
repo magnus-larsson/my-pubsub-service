@@ -24,57 +24,20 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:task="http://www.springframework.org/schema/task"
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/context
                            http://www.springframework.org/schema/context/spring-context.xsd
-                           http://www.springframework.org/schema/task
-                           http://www.springframework.org/schema/task/spring-task.xsd
                            http://www.springframework.org/schema/tx
                            http://www.springframework.org/schema/tx/spring-tx.xsd">
 
 	<context:annotation-config />
-	<tx:annotation-driven />
 
- 	<bean id="retrieveQueue"
-		class="java.util.concurrent.LinkedBlockingQueue" >
+ 	<bean id="pubSubEngine" class="se.vgregion.pubsub.impl.DefaultPubSubEngine" >
+		<constructor-arg ref="topicRepository"></constructor-arg>
+		<constructor-arg ref="feedRepository"></constructor-arg>
 	</bean>
 
- 	<bean id="distributionQueue"
-		class="java.util.concurrent.LinkedBlockingQueue">
-	</bean>
-
-	<bean id="feedRepository" class="se.vgregion.push.repository.jpa.JpaFeedRepository"  />
-	<bean id="subscriptionRepository" class="se.vgregion.push.repository.jpa.JpaSubscriptionRepository" />
-
- 	<bean id="pushService"
-		class="se.vgregion.push.services.DefaultPushService">
-		<constructor-arg ref="subscriptionRepository" />
-		<constructor-arg ref="feedRepository" />
-	</bean>
-
- 	<bean id="feedDistributor"
-		class="se.vgregion.push.services.FeedDistributor"
-		init-method="start"
-		destroy-method="stop">
-		<constructor-arg ref="distributionQueue" />
-		<constructor-arg ref="pushService" />
-	</bean>
-
-
- 	<bean id="feedRetriver"
-		class="se.vgregion.push.services.FeedRetriever"
-		init-method="start"
-		destroy-method="stop">
-		<constructor-arg ref="retrieveQueue" />
-		<constructor-arg ref="distributionQueue" />
-		<constructor-arg ref="pushService" />
-	</bean>
-
-	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-		<property name="entityManagerFactory" ref="entityManagerFactory" />
-	</bean>
 
 </beans>

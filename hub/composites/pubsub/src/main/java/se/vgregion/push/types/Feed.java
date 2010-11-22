@@ -44,7 +44,7 @@ import org.joda.time.DateTimeZone;
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
-public class Feed extends AbstractEntity<Feed, Long> {
+public class Feed extends AbstractEntity<Long> {
 
     private static final Builder PARSER = new Builder();
     

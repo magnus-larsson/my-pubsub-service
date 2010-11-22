@@ -1,0 +1,50 @@
+package se.vgregion.pubsub.impl;
+import junit.framework.Assert;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
+
+import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.PubSubEngine;
+import se.vgregion.pubsub.PublicationFailedException;
+import se.vgregion.pubsub.Subscriber;
+import se.vgregion.pubsub.Topic;
+import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
+import se.vgregion.push.types.UnitTestConstants;
+
+
+@ContextConfiguration({"classpath:pubsub-common.xml", "classpath:pubsub-jpa.xml", "classpath:pubsub-jpa-test.xml"})
+public class DefaultPubSubEngineTest extends AbstractTransactionalJUnit4SpringContextTests {
+
+    private PubSubEngine engine;
+
+    @Before
+    public void before() {
+        engine = applicationContext.getBean(PubSubEngine.class);
+    }
+    
+    @Test
+    @Transactional
+    @Rollback
+    public void testPublication() throws PublicationFailedException {
+        Topic topic = engine.getOrCreateTopic(UnitTestConstants.TOPIC);
+        
+        Subscriber subscriber = Mockito.mock(Subscriber.class);
+        
+        topic.addSubscriber(subscriber);
+        
+        Feed feed = new FeedBuilder().id("f1").build();
+        
+        topic.publish(feed);
+        
+        ArgumentCaptor<Feed> publishedFeed = ArgumentCaptor.forClass(Feed.class);
+        Mockito.verify(subscriber).publish(publishedFeed.capture());
+        Assert.assertEquals(feed, publishedFeed.getValue());
+    }
+}

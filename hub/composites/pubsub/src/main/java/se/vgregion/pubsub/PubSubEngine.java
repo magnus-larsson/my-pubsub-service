@@ -9,7 +9,7 @@ public interface PubSubEngine {
     
     Topic getOrCreateTopic(URI url);
     
-    Collection<Topic> getTopics();
-
     Topic getTopic(URI url);
+
+    void publish(URI url, Feed feed);
 }

@@ -36,7 +36,7 @@ import org.joda.time.DateTimeZone;
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 
 @Entity
-public class Entry extends AbstractEntity<Entry, Long> {
+public class Entry extends AbstractEntity<Long> {
 
     public static class EntryBuilder {
         
