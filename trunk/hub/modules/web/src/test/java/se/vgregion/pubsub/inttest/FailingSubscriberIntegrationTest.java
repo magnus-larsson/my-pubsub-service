@@ -1,4 +1,4 @@
-package se.vgregion.push.inttest;
+package se.vgregion.pubsub.inttest;
 
 import java.util.concurrent.TimeUnit;
 

@@ -17,7 +17,7 @@
  *
  */
 
-package se.vgregion.push.inttest;
+package se.vgregion.pubsub.inttest;
 
 import java.io.IOException;
 import java.net.URI;
