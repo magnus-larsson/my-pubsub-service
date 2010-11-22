@@ -19,16 +19,13 @@
 
 package se.vgregion.pubsub.push;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -54,8 +51,10 @@ import org.junit.Test;
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.Namespaces;
-import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
+import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
+import se.vgregion.pubsub.push.impl.DefaultPushSubscriber;
+import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 import se.vgregion.push.UnitTestConstants;
 
 public class DefaultPushSubscriberTest {

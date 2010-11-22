@@ -4,8 +4,13 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
-public interface Feed {
+import se.vgregion.dao.domain.patterns.entity.Entity;
 
+public interface Feed extends Entity<Long> {
+
+    String getFeedId();
+    DateTime getUpdated();
+    
     List<Field> getFields();
     List<Entry> getEntries();
     

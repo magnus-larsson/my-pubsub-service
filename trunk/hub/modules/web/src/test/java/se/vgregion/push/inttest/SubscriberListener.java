@@ -1,6 +1,7 @@
 package se.vgregion.push.inttest;
 
-import se.vgregion.push.types.Feed;
+import se.vgregion.pubsub.Feed;
+
 
 public interface SubscriberListener {
 

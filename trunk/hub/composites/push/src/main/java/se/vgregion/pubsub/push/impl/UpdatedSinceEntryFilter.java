@@ -1,4 +1,4 @@
-package se.vgregion.pubsub.push;
+package se.vgregion.pubsub.push.impl;
 
 import org.joda.time.DateTime;
 

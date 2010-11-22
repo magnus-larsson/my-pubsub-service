@@ -17,12 +17,11 @@
  *
  */
 
-package se.vgregion.pubsub.repository;
+package se.vgregion.pubsub.push;
 
-import se.vgregion.dao.domain.patterns.repository.Repository;
-import se.vgregion.push.types.Entry;
+import java.net.URI;
 
-public interface EntryRepository extends Repository<Entry, Long> {
+public interface FeedRetriever {
 
-    
+    void retrieve(URI topicUrl) throws InterruptedException;
 }

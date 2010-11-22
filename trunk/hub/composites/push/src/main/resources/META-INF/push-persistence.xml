@@ -26,9 +26,7 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
              version="1.0">
-    <persistence-unit name="PuSH">
-        <class>se.vgregion.push.types.Subscription</class>
-        <class>se.vgregion.push.types.Feed</class>
-        <class>se.vgregion.push.types.Entry</class>
+    <persistence-unit name="pubsub">
+        <class>se.vgregion.pubsub.push.impl.DefaultPushSubscriber</class>
     </persistence-unit>
 </persistence>

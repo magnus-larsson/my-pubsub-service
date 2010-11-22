@@ -1,7 +1,15 @@
 package se.vgregion.pubsub.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import nu.xom.Element;
 
@@ -10,14 +18,12 @@ import org.joda.time.DateTimeZone;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 import se.vgregion.pubsub.Entry;
-import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.Field;
 import se.vgregion.pubsub.FieldType;
-import se.vgregion.pubsub.Namespaces;
-import se.vgregion.pubsub.content.DateTimeUtils;
-import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 
-public class DefaultEntry extends AbstractEntity<Entry, Long> implements Entry {
+@Entity
+@Table(name="ENTRIES")
+public class DefaultEntry extends AbstractEntity<Long> implements Entry {
 
     public static class EntryBuilder {
         
@@ -47,10 +53,18 @@ public class DefaultEntry extends AbstractEntity<Entry, Long> implements Entry {
         }
     }
     
+    @Id
+    @GeneratedValue
     private Long id;
+    
+    @Basic(optional=false)
     private String entryId;
+    
+    @Basic
     private long updated;
-    private List<Field> fields = Collections.emptyList();
+    
+    @Transient
+    private List<Field> fields = new ArrayList<Field>();
     
 
     @Override

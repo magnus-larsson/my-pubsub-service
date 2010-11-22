@@ -1,15 +1,33 @@
 package se.vgregion.pubsub.impl;
 
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 import se.vgregion.pubsub.Field;
 import se.vgregion.pubsub.FieldType;
 
-public class DefaultField extends AbstractEntity<Field, Long> implements Field {
+@Entity
+@Table(name="FIELDS")
+public class DefaultField extends AbstractEntity<Long> implements Field {
 
+    @Id
+    @GeneratedValue
     private Long id;
+    
+    @Basic
     private String namespace;
+    
+    @Basic(optional=false)
     private String name;
+    
+    @Basic(optional=false)
     private FieldType type;
+    
+    @Basic(optional=false)
     private String value;
 
     public DefaultField(String namespace, String name, String value) {

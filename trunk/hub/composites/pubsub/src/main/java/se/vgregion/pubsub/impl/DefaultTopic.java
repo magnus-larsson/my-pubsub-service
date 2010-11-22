@@ -4,33 +4,73 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Transient;
+
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
-import se.vgregion.pubsub.Entry;
+import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.Subscriber;
 import se.vgregion.pubsub.Topic;
+import se.vgregion.pubsub.content.AbstractSerializer;
+import se.vgregion.pubsub.repository.FeedRepository;
 
-public class DefaultTopic extends AbstractEntity<Topic, Long> implements Topic {
+@Entity
+public class DefaultTopic extends AbstractEntity<Long> implements Topic {
 
+    private final static Logger LOG = LoggerFactory.getLogger(DefaultTopic.class);
+
+    
+    @Id
+    @GeneratedValue
     private Long id;
+    
+    @Basic(optional=false)
     private String url;
+    
+    // TODO JPA map
+    @Transient
     private Feed feed;
+    
+    @Transient
     private List<Subscriber> subscribers = new ArrayList<Subscriber>();
     
-    private FeedMerger feedMerger;
-    private SubscriberTimeoutNotifier subscriberTimoutNotifier;
+    @Transient
+    private FeedMerger feedMerger = new FeedMerger() {
+        @Override
+        public Feed merge(Feed oldFeed, Feed newFeed) {
+            return newFeed;
+        }
+    };;;
+    
+    @Transient
+    private SubscriberTimeoutNotifier subscriberTimeoutNotifier;
+
+    @Transient
+    private FeedRepository feedRepository;
+
     
     // For JPA
     protected DefaultTopic() {
     }
     
-    public DefaultTopic(URI url, SubscriberTimeoutNotifier subscriberTimoutNotifier) {
+    public DefaultTopic(URI url, FeedRepository feedRepository, SubscriberTimeoutNotifier subscriberTimoutNotifier) {
+        Assert.notNull(url);
+        Assert.notNull(feedRepository);
+        Assert.notNull(subscriberTimoutNotifier);
+        
         this.url = url.toString();
-        this.subscriberTimoutNotifier = subscriberTimoutNotifier;
+        this.feedRepository = feedRepository;
+        this.subscriberTimeoutNotifier = subscriberTimoutNotifier;
     }
     
     @Override
@@ -45,20 +85,25 @@ public class DefaultTopic extends AbstractEntity<Topic, Long> implements Topic {
     }
 
     @Override
-    public void publish(List<Entry> entries) {
-        this.feed = feedMerger.merge(this.feed, feed);
+    public void publish(Feed publishedFeed) {
+        LOG.info("Publishing on topic {}", url);
         
+        this.feed = feedMerger.merge(this.feed, publishedFeed);
         // if all publications success, purge until now
         DateTime lastUpdatedSubscriber = new DateTime();
         for(Subscriber subscriber : subscribers) {
             try {
+                LOG.info("Publishing to {}", subscriber);
                 subscriber.publish(this.getFeed());
             } catch (PublicationFailedException e) {
+                LOG.warn("Subscriber failed: {}", e.getMessage());
                 lastUpdatedSubscriber = subscriber.getLastUpdated();
             }
         }
         
         // TODO purge old entries based on lastUpdatedSubscriber
+        
+        feedRepository.store(this.feed);
     }
 
     @Override
@@ -67,7 +112,7 @@ public class DefaultTopic extends AbstractEntity<Topic, Long> implements Topic {
         
         removeSubscriber(subscriber);
         
-        subscriberTimoutNotifier.addSubscriber(subscriber);
+        subscriberTimeoutNotifier.addSubscriber(subscriber);
         subscribers.add(subscriber);
     }
 
@@ -81,5 +126,20 @@ public class DefaultTopic extends AbstractEntity<Topic, Long> implements Topic {
         return feed;
     }
 
+    public SubscriberTimeoutNotifier getSubscriberTimeoutNotifier() {
+        return subscriberTimeoutNotifier;
+    }
+
+    public void setSubscriberTimeoutNotifier(SubscriberTimeoutNotifier subscriberTimoutNotifier) {
+        this.subscriberTimeoutNotifier = subscriberTimoutNotifier;
+    }
+
+    public FeedRepository getFeedRepository() {
+        return feedRepository;
+    }
+
+    public void setFeedRepository(FeedRepository feedRepository) {
+        this.feedRepository = feedRepository;
+    }
 
 }

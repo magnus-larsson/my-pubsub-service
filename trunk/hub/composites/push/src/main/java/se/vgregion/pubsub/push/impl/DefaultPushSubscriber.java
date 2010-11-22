@@ -1,8 +1,16 @@
-package se.vgregion.pubsub.push;
+package se.vgregion.pubsub.push.impl;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.UUID;
+
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import nu.xom.Document;
 
@@ -19,24 +27,44 @@ import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PublicationFailedException;
-import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.content.AbstractSerializer;
+import se.vgregion.pubsub.push.PushSubscriber;
+import se.vgregion.pubsub.push.SubscriptionMode;
+import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 import se.vgregion.push.services.FailedSubscriberVerificationException;
 import se.vgregion.push.services.HttpUtil;
 
-public class DefaultPushSubscriber extends AbstractEntity<PushSubscriber, Long> implements PushSubscriber {
+@Entity
+public class DefaultPushSubscriber extends AbstractEntity<Long> implements PushSubscriber {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultPushSubscriber.class);
     
+    @Transient
     private PushSubscriberRepository subscriberRepository;
     
+    @Id
+    @GeneratedValue
     private Long id;
-    private long timeout;
-    private long lastUpdated;
+    
+    @Basic
+    private Long timeout;
+    
+    @Basic
+    private Long lastUpdated;
+    
+    @Basic(optional=false)
     private String topic;
+    
+    @Basic(optional=false)
     private String callback;
-    private long leaseSeconds;
+    
+    @Basic(optional=false)
+    private int leaseSeconds;
+    
+    @Basic
     private String verifyToken;
+    
+    @Transient
     private int failedVerifications;
     
     // For JPA
@@ -46,16 +74,24 @@ public class DefaultPushSubscriber extends AbstractEntity<PushSubscriber, Long> 
     
     public DefaultPushSubscriber(PushSubscriberRepository subscriberRepository, URI topic, URI callback, 
             DateTime timeout, DateTime lastUpdated,
-            long leaseSeconds, String verifyToken) {
+            int leaseSeconds, String verifyToken) {
         this.subscriberRepository = subscriberRepository;
         this.timeout = timeout.getMillis();
-        this.lastUpdated = lastUpdated.getMillis();
+        if(lastUpdated != null) this.lastUpdated = lastUpdated.getMillis();
         this.topic = topic.toString();
         this.callback = callback.toString();
         this.leaseSeconds = leaseSeconds;
         this.verifyToken = verifyToken;
     }
 
+    public DefaultPushSubscriber(PushSubscriberRepository subscriberRepository, URI topic, URI callback, 
+            int leaseSeconds, String verifyToken) {
+        this(subscriberRepository, topic, callback, 
+                new DateTime().plusSeconds(leaseSeconds), null,
+                leaseSeconds, verifyToken);
+    }
+
+    
     @Override
     public Long getId() {
         return id;
@@ -100,7 +136,7 @@ public class DefaultPushSubscriber extends AbstractEntity<PushSubscriber, Long> 
                 // TODO revisit
                 //subscription.markForVerification();
                 
-                throw new PublicationFailedException("Failed distributing to subscriber: " + callback, e);
+                throw new PublicationFailedException("Failed distributing to subscriber \"" + callback + "\" with error \"" + e.getMessage() + "\"", e);
             } finally {
                 HttpUtil.closeQuitely(response);
     
@@ -116,10 +152,8 @@ public class DefaultPushSubscriber extends AbstractEntity<PushSubscriber, Long> 
     public void timedOut() {
         // TODO verify
         
-        SubscriptionRequest request = new SubscriptionRequest(SubscriptionMode.SUBSCRIBE, getCallback(), getTopic(), leaseSeconds, verifyToken);
-        
         try {
-            verify(request);
+            verify(SubscriptionMode.SUBSCRIBE);
         } catch (Exception e) {
             failedVerifications++;
             
@@ -127,10 +161,10 @@ public class DefaultPushSubscriber extends AbstractEntity<PushSubscriber, Long> 
         }
     }
     
-    public void verify(SubscriptionRequest request) throws IOException, FailedSubscriberVerificationException {
+    public void verify(SubscriptionMode mode) throws IOException, FailedSubscriberVerificationException {
         String challenge = UUID.randomUUID().toString();
         
-        HttpGet get = new HttpGet(request.getVerificationUrl(challenge));
+        HttpGet get = new HttpGet(getVerificationUrl(mode, challenge));
 
         HttpResponse response = HttpUtil.getClient().execute(get);
         try {
@@ -155,7 +189,11 @@ public class DefaultPushSubscriber extends AbstractEntity<PushSubscriber, Long> 
 
     @Override
     public DateTime getLastUpdated() {
-        return new DateTime(lastUpdated, DateTimeZone.UTC);
+        if(lastUpdated == null) {
+            return null;
+        } else {
+            return new DateTime(lastUpdated, DateTimeZone.UTC);
+        }
     }
 
     @Override
@@ -167,7 +205,7 @@ public class DefaultPushSubscriber extends AbstractEntity<PushSubscriber, Long> 
         return URI.create(callback);
     }
 
-    public long getLeaseSeconds() {
+    public int getLeaseSeconds() {
         return leaseSeconds;
     }
 
@@ -175,6 +213,38 @@ public class DefaultPushSubscriber extends AbstractEntity<PushSubscriber, Long> 
         return verifyToken;
     }
     
-    
+    public URI getVerificationUrl(SubscriptionMode mode, String challenge) {
+        try {
+            StringBuffer url = new StringBuffer();
+            url.append(callback);
+            
+            if(getCallback().getQuery() != null) {
+                url.append("&");
+            } else {
+                url.append("?");
+            }
+            
+            if(mode.equals(SubscriptionMode.SUBSCRIBE)) {
+                url.append("hub.mode=subscribe");
+            } else {
+                url.append("hub.mode=unsubscribe");
+            }
+            url.append("&hub.topic=").append(URLEncoder.encode(topic.toString(), "UTF-8"))
+                .append("&hub.challenge=").append(URLEncoder.encode(challenge, "UTF-8"));
+                
+            if(leaseSeconds > 0) {
+                url.append("&hub.lease_seconds=").append(leaseSeconds);
+            }
+            if(verifyToken != null) {
+                url.append("&hub.verify_token=").append(URLEncoder.encode(verifyToken, "UTF-8"));
+            }
+            
+            return URI.create(url.toString());
+        } catch (UnsupportedEncodingException e) {
+            // should never happen
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

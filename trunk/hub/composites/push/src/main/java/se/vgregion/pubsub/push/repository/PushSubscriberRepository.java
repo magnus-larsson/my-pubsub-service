@@ -17,9 +17,10 @@
  *
  */
 
-package se.vgregion.pubsub.push;
+package se.vgregion.pubsub.push.repository;
 
 import se.vgregion.dao.domain.patterns.repository.db.DatabaseRepository;
+import se.vgregion.pubsub.push.PushSubscriber;
     
 public interface PushSubscriberRepository extends DatabaseRepository<PushSubscriber, Long, Long> {
 
