@@ -17,22 +17,23 @@ import nu.xom.Document;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.content.AbstractSerializer;
+import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.SubscriptionMode;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
-import se.vgregion.push.services.FailedSubscriberVerificationException;
-import se.vgregion.push.services.HttpUtil;
 
 @Entity
 public class DefaultPushSubscriber extends AbstractEntity<Long> implements PushSubscriber {
@@ -75,6 +76,10 @@ public class DefaultPushSubscriber extends AbstractEntity<Long> implements PushS
     public DefaultPushSubscriber(PushSubscriberRepository subscriberRepository, URI topic, URI callback, 
             DateTime timeout, DateTime lastUpdated,
             int leaseSeconds, String verifyToken) {
+        Assert.notNull(subscriberRepository);
+        Assert.notNull(topic);
+        Assert.notNull(callback);
+        
         this.subscriberRepository = subscriberRepository;
         this.timeout = timeout.getMillis();
         if(lastUpdated != null) this.lastUpdated = lastUpdated.getMillis();
@@ -120,7 +125,11 @@ public class DefaultPushSubscriber extends AbstractEntity<Long> implements PushS
             
             HttpResponse response = null;
             try {
-                response = HttpUtil.getClient().execute(post);
+                DefaultHttpClient httpClient = HttpUtil.getClient();
+                
+                // don't redirect publications
+                httpClient.setRedirectHandler(new DontRedirectHandler());
+                response = httpClient.execute(post);
                 if(HttpUtil.successStatus(response)) {
                     LOG.debug("Succeeded distributing to subscriber {}", callback);
                     

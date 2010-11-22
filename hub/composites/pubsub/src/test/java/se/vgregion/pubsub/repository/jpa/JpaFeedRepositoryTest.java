@@ -28,12 +28,12 @@ import org.springframework.test.context.junit4.AbstractTransactionalJUnit4Spring
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.UnitTestConstants;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 import se.vgregion.pubsub.repository.FeedRepository;
-import se.vgregion.push.types.UnitTestConstants;
 
-@ContextConfiguration({"classpath:pubsub-jpa.xml", "classpath:pubsub-jpa-test.xml"})
+@ContextConfiguration({"classpath:spring/pubsub-jpa.xml", "classpath:spring/pubsub-jpa-test.xml"})
 public class JpaFeedRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private FeedRepository feedRepository;

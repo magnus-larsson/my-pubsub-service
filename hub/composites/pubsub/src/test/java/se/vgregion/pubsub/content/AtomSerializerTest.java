@@ -29,9 +29,9 @@ import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.Namespaces;
+import se.vgregion.pubsub.UnitTestConstants;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
-import se.vgregion.push.types.UnitTestConstants;
 
 
 public class AtomSerializerTest {
@@ -40,9 +40,9 @@ public class AtomSerializerTest {
     @Test
     public void print() throws Exception {
         FeedBuilder builder = new FeedBuilder();
-        builder.id("f1").updated(UnitTestConstants.UPDATED1).custom(UnitTestConstants.ATOM_TITLE)
-            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).custom(UnitTestConstants.ATOM_TITLE).build())
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).custom(UnitTestConstants.ATOM_TITLE).build());
+        builder.id("f1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.ATOM_TITLE)
+            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.ATOM_TITLE).build())
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).field(UnitTestConstants.ATOM_TITLE).build());
         
         AtomSerializer serializer = new AtomSerializer();
         Document doc = serializer.print(builder.build());
@@ -52,23 +52,23 @@ public class AtomSerializerTest {
         
         Assert.assertEquals("f1", doc.getRootElement().getFirstChildElement("id", Namespaces.NS_ATOM).getValue());
         Assert.assertEquals("foobar", doc.getRootElement().getFirstChildElement("title", Namespaces.NS_ATOM).getValue());
-        Assert.assertEquals("2010-02-28T23:00:00.000Z", doc.getRootElement().getFirstChildElement("updated", Namespaces.NS_ATOM).getValue());
+        Assert.assertEquals("2010-03-01T00:00:00.000Z", doc.getRootElement().getFirstChildElement("updated", Namespaces.NS_ATOM).getValue());
         
         Assert.assertEquals(2, doc.getRootElement().getChildElements("entry", Namespaces.NS_ATOM).size());
         
         Element entry = doc.getRootElement().getChildElements("entry", Namespaces.NS_ATOM).get(0);
         Assert.assertEquals("e1", entry.getFirstChildElement("id", Namespaces.NS_ATOM).getValue());
         Assert.assertEquals("foobar", entry.getFirstChildElement("title", Namespaces.NS_ATOM).getValue());
-        Assert.assertEquals("2010-02-28T23:00:00.000Z", entry.getFirstChildElement("updated", Namespaces.NS_ATOM).getValue());
+        Assert.assertEquals("2010-03-01T00:00:00.000Z", entry.getFirstChildElement("updated", Namespaces.NS_ATOM).getValue());
 
     }
 
     @Test
     public void printWithFilter() throws Exception {
         FeedBuilder builder = new FeedBuilder();
-        builder.id("f1").updated(UnitTestConstants.UPDATED1).custom(UnitTestConstants.ATOM_TITLE)
-            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).custom(UnitTestConstants.ATOM_TITLE).build())
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).custom(UnitTestConstants.ATOM_TITLE).build());
+        builder.id("f1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.ATOM_TITLE)
+            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.ATOM_TITLE).build())
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).field(UnitTestConstants.ATOM_TITLE).build());
         
         AtomSerializer serializer = new AtomSerializer();
         Document doc = serializer.print(builder.build(), new EntryFilter() {

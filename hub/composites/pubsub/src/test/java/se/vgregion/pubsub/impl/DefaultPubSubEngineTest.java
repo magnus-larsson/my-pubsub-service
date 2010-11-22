@@ -15,11 +15,11 @@ import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.Subscriber;
 import se.vgregion.pubsub.Topic;
+import se.vgregion.pubsub.UnitTestConstants;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
-import se.vgregion.push.types.UnitTestConstants;
 
 
-@ContextConfiguration({"classpath:pubsub-common.xml", "classpath:pubsub-jpa.xml", "classpath:pubsub-jpa-test.xml"})
+@ContextConfiguration({"classpath:spring/pubsub-common.xml", "classpath:spring/pubsub-jpa.xml", "classpath:spring/pubsub-jpa-test.xml"})
 public class DefaultPubSubEngineTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private PubSubEngine engine;

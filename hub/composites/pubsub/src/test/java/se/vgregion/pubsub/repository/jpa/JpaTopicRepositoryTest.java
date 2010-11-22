@@ -29,12 +29,12 @@ import org.springframework.test.context.junit4.AbstractTransactionalJUnit4Spring
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.pubsub.Topic;
+import se.vgregion.pubsub.UnitTestConstants;
 import se.vgregion.pubsub.impl.DefaultTopic;
 import se.vgregion.pubsub.repository.FeedRepository;
 import se.vgregion.pubsub.repository.TopicRepository;
-import se.vgregion.push.types.UnitTestConstants;
 
-@ContextConfiguration({"classpath:pubsub-jpa.xml", "classpath:pubsub-jpa-test.xml"})
+@ContextConfiguration({"classpath:spring/pubsub-jpa.xml", "classpath:spring/pubsub-jpa-test.xml"})
 public class JpaTopicRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private TopicRepository topicRepository;

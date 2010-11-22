@@ -40,7 +40,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
 
-import se.vgregion.push.services.HttpUtil;
+import se.vgregion.pubsub.push.impl.HttpUtil;
 
 
 public class SubscriberRunner {
@@ -61,7 +61,7 @@ public class SubscriberRunner {
                     response.setEntity(new StringEntity(challenge));
                 } else if(request instanceof HttpEntityEnclosingRequest) {
                     HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();
-                    System.out.println(HttpUtil.readContent(entity));
+//                    System.out.println(HttpUtil.readContent(entity));
                 } else {
                     System.err.println("Unknown request");
                 }

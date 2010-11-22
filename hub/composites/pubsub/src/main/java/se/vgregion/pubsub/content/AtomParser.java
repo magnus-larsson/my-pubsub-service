@@ -28,10 +28,10 @@ public class AtomParser extends AbstractParser {
                 } else if("entry".equals(child.getLocalName())) {
                     builder.entry(parseEntry(child));
                 } else {
-                    builder.custom(child);
+                    builder.field(child);
                 }
             } else {
-                builder.custom(child);
+                builder.field(child);
             }
         }
         
@@ -51,7 +51,7 @@ public class AtomParser extends AbstractParser {
             } else if("updated".equals(child.getLocalName()) && isAtom(child)) {
                 entryBuilder.updated(DateTimeUtils.parseDateTime(child.getValue()));
             } else {
-                entryBuilder.custom(child);
+                entryBuilder.field(child);
             }
         }
 

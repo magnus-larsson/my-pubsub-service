@@ -31,7 +31,7 @@ public class Rss2Parser extends AbstractParser {
             } else if("item".equals(child.getLocalName())) {
                 builder.entry(parseItem(child));
             } else {
-                builder.custom(child);
+                builder.field(child);
             }
         }
         
@@ -51,7 +51,7 @@ public class Rss2Parser extends AbstractParser {
             } else if("pubDate".equals(child.getLocalName())) {
                 entryBuilder.updated(DateTimeUtils.parseDateTime(child.getValue()));
             } else {
-                entryBuilder.custom(child);
+                entryBuilder.field(child);
             }
         }
 
