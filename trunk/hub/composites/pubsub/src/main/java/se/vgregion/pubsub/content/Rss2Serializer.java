@@ -21,15 +21,14 @@ public class Rss2Serializer extends AbstractSerializer {
         Element channel = new Element("channel");
         feedElm.appendChild(channel);
         
-        // TODO fix!
-////        channel.appendChild(print("link", feed.getFeedId()));
-////        channel.appendChild(print("pubDate", feed.getUpdated()));
-//        
-//        List<Element> customs = feed.getCustom();
+        channel.appendChild(print("link", feed.getFeedId()));
+        channel.appendChild(print("pubDate", feed.getUpdated()));
         
-//        for(Element custom : customs) {
-//            channel.appendChild(custom);
-//        }
+        List<Field> customs = feed.getFields();
+        
+        for(Field custom : customs) {
+            channel.appendChild(toXml(custom));
+        }
         
         for(Entry entry : feed.getEntries()) {
             if(entryFilter == null || entryFilter.include(entry)) {
