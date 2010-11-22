@@ -17,13 +17,15 @@
  *
  */
 
-package se.vgregion.push.inttest;
+package se.vgregion.pubsub.inttest;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.Assert;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -40,14 +42,22 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
 
-import se.vgregion.pubsub.push.impl.HttpUtil;
+import se.vgregion.pubsub.ContentType;
+import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.content.AbstractParser;
 
 
-public class SubscriberRunner {
+public class Subscriber {
 
-    public static void main(String[] args) throws Exception {
-        
-        LocalTestServer server = new LocalTestServer(null, null);
+    private List<SubscriberListener> listeners = new ArrayList<SubscriberListener>();
+    private LocalTestServer server;
+    
+    public Subscriber() throws Exception {
+        this(null);
+    }
+    
+    public Subscriber(final SubscriberResult result) throws Exception {
+        server = new LocalTestServer(null, null);
         
         server.register("/*", new HttpRequestHandler() {
             @Override
@@ -56,31 +66,62 @@ public class SubscriberRunner {
                 String challenge = getQueryParamValue(request.getRequestLine().getUri(), "hub.challenge");
                 
                 if(challenge != null) {
+                    doVerify();
                     // subscription verification, confirm
-                    System.out.println("Respond to challenge");
                     response.setEntity(new StringEntity(challenge));
                 } else if(request instanceof HttpEntityEnclosingRequest) {
+                    if(result != null && result.fail()) {
+                        response.setStatusCode(500);
+                    }
                     HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();
-//                    System.out.println(HttpUtil.readContent(entity));
+                    doPublish(entity);
                 } else {
                     System.err.println("Unknown request");
                 }
             }
         });
         server.start();
+    }
+    
+    private void doPublish(HttpEntity entity) {
+        ContentType contentType = ContentType.fromValue(entity.getContentType().getValue());
+        Feed feed;
+        try {
+            feed = AbstractParser.create(contentType).parse(entity.getContent());
+            for(SubscriberListener listener : listeners) {
+                listener.published(feed);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         
-        HttpPost post = new HttpPost("http://localhost:8080/");
+    }
+
+    private void doVerify() {
+        for(SubscriberListener listener : listeners) {
+            listener.verified();
+        }
+    }
+
+    
+    public void subscribe(URI hub, URI topic) throws URISyntaxException, IOException {
+        HttpPost post = new HttpPost(hub);
         
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
         parameters.add(new BasicNameValuePair("hub.callback", buildTestUrl(server, "/").toString()));
         parameters.add(new BasicNameValuePair("hub.mode", "subscribe"));
-        parameters.add(new BasicNameValuePair("hub.topic", "http://feeds.feedburner.com/protocol7/main"));
+        parameters.add(new BasicNameValuePair("hub.topic", topic.toString()));
         parameters.add(new BasicNameValuePair("hub.verify", "sync"));
         
         post.setEntity(new UrlEncodedFormEntity(parameters));
-        
         DefaultHttpClient client = new DefaultHttpClient();
-        client.execute(post);
+        HttpResponse response = client.execute(post);
+        
+        Assert.assertEquals(204, response.getStatusLine().getStatusCode());
+    }
+    
+    public void addListener(SubscriberListener listener) {
+        this.listeners.add(listener);
     }
     
     private static URI buildTestUrl(LocalTestServer server, String path) throws URISyntaxException {
