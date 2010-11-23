@@ -1,7 +1,6 @@
 package se.vgregion.pubsub;
 
 import java.net.URI;
-import java.util.Collection;
 
 public interface PubSubEngine {
 

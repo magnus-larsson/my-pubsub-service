@@ -32,7 +32,7 @@
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>
-      classpath*:/services-config.xml
+      classpath*:spring/pubsub-*.xml
     </param-value>
   </context-param>
 

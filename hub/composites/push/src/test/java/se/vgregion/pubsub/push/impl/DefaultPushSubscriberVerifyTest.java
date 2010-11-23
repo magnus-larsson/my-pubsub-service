@@ -21,20 +21,12 @@ package se.vgregion.pubsub.push.impl;
 
 import static org.mockito.Mockito.mock;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
-import nu.xom.Builder;
-import nu.xom.Document;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -44,7 +36,6 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,15 +43,9 @@ import org.junit.Test;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import se.vgregion.pubsub.ContentType;
-import se.vgregion.pubsub.Feed;
-import se.vgregion.pubsub.Namespaces;
-import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
-import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 import se.vgregion.pubsub.push.SubscriptionMode;
 import se.vgregion.pubsub.push.UnitTestConstants;
-import se.vgregion.pubsub.push.impl.DefaultPushSubscriber;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 public class DefaultPushSubscriberVerifyTest {

@@ -5,9 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.Test;
 
-import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
-import se.vgregion.pubsub.content.AbstractSerializer;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 

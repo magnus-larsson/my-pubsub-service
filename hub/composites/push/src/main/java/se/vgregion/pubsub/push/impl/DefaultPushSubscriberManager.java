@@ -1,6 +1,5 @@
 package se.vgregion.pubsub.push.impl;
 
-import java.net.URI;
 import java.util.Collection;
 
 import org.springframework.transaction.annotation.Transactional;
