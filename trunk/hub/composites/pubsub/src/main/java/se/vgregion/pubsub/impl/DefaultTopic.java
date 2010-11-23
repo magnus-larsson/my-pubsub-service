@@ -85,7 +85,7 @@ public class DefaultTopic extends AbstractEntity<Long> implements Topic {
     }
 
     @Override
-    public void publish(Feed publishedFeed) {
+    public synchronized void publish(Feed publishedFeed) {
         LOG.info("Publishing on topic {}", url);
         
         this.feed = feedMerger.merge(this.feed, publishedFeed);
@@ -107,7 +107,7 @@ public class DefaultTopic extends AbstractEntity<Long> implements Topic {
     }
 
     @Override
-    public void addSubscriber(Subscriber subscriber) {
+    public synchronized void addSubscriber(Subscriber subscriber) {
         Assert.notNull(subscriber);
         
         removeSubscriber(subscriber);
@@ -117,7 +117,7 @@ public class DefaultTopic extends AbstractEntity<Long> implements Topic {
     }
 
     @Override
-    public void removeSubscriber(Subscriber subscriber) {
+    public synchronized void removeSubscriber(Subscriber subscriber) {
         subscribers.remove(subscriber);
     }
 
@@ -126,19 +126,11 @@ public class DefaultTopic extends AbstractEntity<Long> implements Topic {
         return feed;
     }
 
-    public SubscriberTimeoutNotifier getSubscriberTimeoutNotifier() {
-        return subscriberTimeoutNotifier;
-    }
-
-    public void setSubscriberTimeoutNotifier(SubscriberTimeoutNotifier subscriberTimoutNotifier) {
+    protected void setSubscriberTimeoutNotifier(SubscriberTimeoutNotifier subscriberTimoutNotifier) {
         this.subscriberTimeoutNotifier = subscriberTimoutNotifier;
     }
 
-    public FeedRepository getFeedRepository() {
-        return feedRepository;
-    }
-
-    public void setFeedRepository(FeedRepository feedRepository) {
+    protected void setFeedRepository(FeedRepository feedRepository) {
         this.feedRepository = feedRepository;
     }
 
