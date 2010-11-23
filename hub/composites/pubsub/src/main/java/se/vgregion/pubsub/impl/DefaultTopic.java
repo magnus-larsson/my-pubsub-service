@@ -17,8 +17,10 @@ import org.springframework.util.Assert;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.FeedMerger;
 import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.Subscriber;
+import se.vgregion.pubsub.SubscriberTimeoutNotifier;
 import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.repository.FeedRepository;
 

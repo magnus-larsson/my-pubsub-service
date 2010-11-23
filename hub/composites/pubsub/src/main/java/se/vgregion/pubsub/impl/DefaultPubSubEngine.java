@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
+import se.vgregion.pubsub.SubscriberTimeoutNotifier;
 import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.repository.FeedRepository;
 import se.vgregion.pubsub.repository.TopicRepository;
