@@ -1,6 +1,5 @@
 package se.vgregion.pubsub.impl;
 
-import java.io.IOException;
 import java.io.StringReader;
 
 import javax.persistence.Basic;
@@ -12,11 +11,8 @@ import javax.persistence.Table;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
-import nu.xom.ParsingException;
-import nu.xom.ValidityException;
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 import se.vgregion.pubsub.Field;
-import se.vgregion.pubsub.FieldType;
 
 @Entity
 @Table(name="FIELDS")

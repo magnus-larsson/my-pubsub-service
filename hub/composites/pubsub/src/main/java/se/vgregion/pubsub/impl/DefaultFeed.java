@@ -23,7 +23,6 @@ import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.Field;
-import se.vgregion.pubsub.FieldType;
 
 @Entity
 @Table(name="FEEDS")
