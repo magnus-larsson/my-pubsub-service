@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -13,6 +14,7 @@ import javax.persistence.Transient;
 
 import nu.xom.Element;
 
+import org.hibernate.annotations.Cascade;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -68,7 +70,8 @@ public class DefaultEntry extends AbstractEntity<Long> implements Entry {
     @Basic
     private long updated;
     
-    @OneToMany
+    @OneToMany(cascade=CascadeType.ALL, targetEntity=DefaultField.class)
+    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
     private List<Field> fields = new ArrayList<Field>();
     
 

@@ -108,7 +108,7 @@ public class DefaultPushSubscriber extends AbstractEntity<Long> implements PushS
     }
 
     @Override
-    public void publish(Feed feed) throws PublicationFailedException {
+    public synchronized void publish(Feed feed) throws PublicationFailedException {
         //Feed feed = topic.getFeed();
         if(feed.hasUpdates(getLastUpdated())) {
             LOG.info("Distributing to {}", callback);

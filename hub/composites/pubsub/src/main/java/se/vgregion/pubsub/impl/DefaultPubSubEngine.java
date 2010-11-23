@@ -44,7 +44,7 @@ public class DefaultPubSubEngine implements PubSubEngine {
 
     @Override
     @Transactional
-    public Topic createTopic(URI url) {
+    public synchronized Topic createTopic(URI url) {
         Topic topic = new DefaultTopic(url, feedRepository, subscriberTimeoutNotifier);
         topics.put(url, topic);
         
