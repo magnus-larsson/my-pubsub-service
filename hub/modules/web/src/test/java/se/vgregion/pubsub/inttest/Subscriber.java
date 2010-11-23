@@ -45,6 +45,7 @@ import org.apache.http.protocol.HttpRequestHandler;
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.content.AbstractParser;
+import se.vgregion.pubsub.push.SubscriptionMode;
 
 
 public class Subscriber {
@@ -104,12 +105,16 @@ public class Subscriber {
     }
 
     
-    public void subscribe(URI hub, URI topic) throws URISyntaxException, IOException {
+    public void subscribe(SubscriptionMode mode, URI hub, URI topic) throws URISyntaxException, IOException {
         HttpPost post = new HttpPost(hub);
         
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
         parameters.add(new BasicNameValuePair("hub.callback", buildTestUrl(server, "/").toString()));
-        parameters.add(new BasicNameValuePair("hub.mode", "subscribe"));
+        if(mode == SubscriptionMode.SUBSCRIBE) {
+            parameters.add(new BasicNameValuePair("hub.mode", "subscribe"));
+        } else {
+            parameters.add(new BasicNameValuePair("hub.mode", "unsubscribe"));
+        }
         parameters.add(new BasicNameValuePair("hub.topic", topic.toString()));
         parameters.add(new BasicNameValuePair("hub.verify", "sync"));
         

@@ -99,9 +99,13 @@ public class PushController {
                         
                         
                         try {
-                            subscriber.verify(SubscriptionMode.SUBSCRIBE);
+                            subscriber.verify(mode);
                             
-                            pushSubscriberManager.subscribe(subscriber);
+                            if(mode == SubscriptionMode.SUBSCRIBE) {
+                                pushSubscriberManager.subscribe(subscriber);
+                            } else {
+                                pushSubscriberManager.unsubscribe(subscriber);
+                            }
                             
                             response.setStatus(204);
                         } catch(Exception e) {

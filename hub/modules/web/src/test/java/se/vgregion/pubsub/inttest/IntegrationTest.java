@@ -8,6 +8,7 @@ import org.junit.Test;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
+import se.vgregion.pubsub.push.SubscriptionMode;
 
 public class IntegrationTest extends IntegrationTestTemplate {
 
@@ -94,6 +95,22 @@ public class IntegrationTest extends IntegrationTestTemplate {
         publishedFeed = publishedFeeds.poll(5000, TimeUnit.MILLISECONDS);
 
         // nothing should be pushed to the subscriber
+        Assert.assertNull(publishedFeed);
+    }
+
+    @Test
+    public void unsubscribe() throws Exception {
+        Feed feed = new FeedBuilder().id("f1").updated(
+                UnitTestConstants.UPDATED1).entry(
+                new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build()).entry(
+                new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED1).build()).build();
+
+        subscriber.subscribe(SubscriptionMode.UNSUBSCRIBE, hubUrl, publisher.getUrl());
+        
+        publisher.publish(hubUrl, feed);
+
+        Feed publishedFeed = publishedFeeds.poll(5000, TimeUnit.MILLISECONDS);
+
         Assert.assertNull(publishedFeed);
     }
 

@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 
 import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.push.SubscriptionMode;
 
 
 public class IntegrationTestTemplate {
@@ -19,6 +20,7 @@ public class IntegrationTestTemplate {
     protected BlockingQueue<Feed> publishedFeeds = new LinkedBlockingQueue<Feed>();
     protected Publisher publisher;
     protected URI hubUrl;
+    protected Subscriber subscriber;
     
     @Before
     public void setUpComponents() throws Exception {
@@ -37,7 +39,7 @@ public class IntegrationTestTemplate {
         
         publisher = new Publisher();
         
-        Subscriber subscriber = new Subscriber(createSubscriberResult());
+        subscriber = new Subscriber(createSubscriberResult());
         subscriber.addListener(new SubscriberListener() {
             @Override
             public void published(Feed feed) {
@@ -50,7 +52,7 @@ public class IntegrationTestTemplate {
             }
         });
         
-        subscriber.subscribe(hubUrl, publisher.getUrl());
+        subscriber.subscribe(SubscriptionMode.SUBSCRIBE, hubUrl, publisher.getUrl());
         
     }
     

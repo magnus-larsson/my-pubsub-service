@@ -68,5 +68,13 @@ public class DefaultPushSubscriberTest {
                 subscriber.getVerificationUrl(SubscriptionMode.SUBSCRIBE, "ch"));
     }
 
+    @Test
+    public void testEquals() {
+        DefaultPushSubscriber subscriber1 = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 0, null);
+        DefaultPushSubscriber subscriber2 = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 0, null);
+
+        Assert.assertTrue(subscriber1.equals(subscriber2));
+        Assert.assertTrue(subscriber2.equals(subscriber1));
+    }
 
 }
