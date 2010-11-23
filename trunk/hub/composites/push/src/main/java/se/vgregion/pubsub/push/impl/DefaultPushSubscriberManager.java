@@ -46,11 +46,10 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
     @Transactional
     public void unsubscribe(PushSubscriber subscriber) {
         Topic topic = pubSubEngine.getOrCreateTopic(subscriber.getTopic());
-        
+
         topic.removeSubscriber(subscriber);
         
         subscriptionRepository.remove(subscriber);
-        
     }
     
     

@@ -255,5 +255,15 @@ public class DefaultPushSubscriber extends AbstractEntity<Long> implements PushS
         }
     }
 
+    @Override 
+    public boolean equals(Object other) {
+        boolean result = false;
+        if (other instanceof DefaultPushSubscriber) {
+            DefaultPushSubscriber that = (DefaultPushSubscriber) other;
+            result = (that.callback.equals(callback) && that.topic.equals(topic)
+                    && this.getClass().equals(that.getClass()));
+        }
+        return result;
+    }
 
 }
