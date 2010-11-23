@@ -1,7 +1,7 @@
 package se.vgregion.pubsub.repository.jpa;
 
 import se.vgregion.pubsub.Subscriber;
-import se.vgregion.pubsub.impl.SubscriberTimeoutNotifier;
+import se.vgregion.pubsub.SubscriberTimeoutNotifier;
 
 public class NoopSubscriberTimeoutNotifier implements SubscriberTimeoutNotifier {
 

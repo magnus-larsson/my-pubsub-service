@@ -6,6 +6,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import se.vgregion.pubsub.Subscriber;
+import se.vgregion.pubsub.SubscriberTimeoutNotifier;
 
 public class DefaultSubscriberTimeoutNotifier implements SubscriberTimeoutNotifier {
 

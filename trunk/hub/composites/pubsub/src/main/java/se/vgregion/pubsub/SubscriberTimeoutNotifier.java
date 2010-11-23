@@ -1,6 +1,5 @@
-package se.vgregion.pubsub.impl;
+package se.vgregion.pubsub;
 
-import se.vgregion.pubsub.Subscriber;
 
 public interface SubscriberTimeoutNotifier {
 
