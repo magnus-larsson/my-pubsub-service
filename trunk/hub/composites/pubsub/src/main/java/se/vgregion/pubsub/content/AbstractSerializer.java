@@ -41,15 +41,12 @@ public abstract class AbstractSerializer {
     }
 
     protected Element print(String name, String ns, DateTime value) {
-        Element elm = new Element(name, ns);
-        elm.appendChild(DateTimeUtils.print(value));
-        return elm;
+        if(value != null) {
+            Element elm = new Element(name, ns);
+            elm.appendChild(DateTimeUtils.print(value));
+            return elm;
+        } else {
+            return null;
+        }
     }
-
-    protected Element toXml(Field field) {
-        Element elm = new Element(field.getName(), field.getNamespace());
-        elm.appendChild(field.getValue());
-        return elm;
-    }
-
 }

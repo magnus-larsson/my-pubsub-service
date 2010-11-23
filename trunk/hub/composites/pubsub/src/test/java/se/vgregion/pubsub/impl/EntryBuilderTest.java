@@ -19,6 +19,9 @@
 
 package se.vgregion.pubsub.impl;
 
+import nu.xom.Element;
+import nu.xom.tests.XOMTestCase;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,14 +34,16 @@ public class EntryBuilderTest {
 
     @Test
     public void entryId() throws Exception {
-        Entry entry = new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).field("ns", "n", "v").build();
+        String ns = "http://example.com";
+        Entry entry = new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).field(ns, "n", "v").build();
         
         Assert.assertEquals("e1", entry.getEntryId());
         Assert.assertEquals(UnitTestConstants.UPDATED1, entry.getUpdated());
 
         Assert.assertEquals(1, entry.getFields().size());
-        Assert.assertEquals("ns", entry.getFields().get(0).getNamespace());
-        Assert.assertEquals("n", entry.getFields().get(0).getName());
-        Assert.assertEquals("v", entry.getFields().get(0).getValue());
+        Element expected = new Element("n", ns);
+        expected.appendChild("v");
+        
+        XOMTestCase.assertEquals(expected, entry.getFields().get(0).toXml());
     }
 }

@@ -18,12 +18,15 @@ public class AtomSerializer extends AbstractSerializer {
         Element feedElm = new Element("feed", Namespaces.NS_ATOM);
         
         feedElm.appendChild(print("id", feed.getFeedId()));
-        feedElm.appendChild(print("updated", feed.getUpdated()));
+        Element updated = print("updated", feed.getUpdated());
+        if(updated != null) {
+            feedElm.appendChild(updated);
+        }
         
         List<Field> customs = feed.getFields();
         
         for(Field custom : customs) {
-            feedElm.appendChild(toXml(custom));
+            feedElm.appendChild(custom.toXml());
         }
         
         for(Entry entry : feed.getEntries()) {
@@ -40,12 +43,15 @@ public class AtomSerializer extends AbstractSerializer {
         Element entryElm = new Element("entry", Namespaces.NS_ATOM);
         
         entryElm.appendChild(print("id", entry.getEntryId()));
-        entryElm.appendChild(print("updated", entry.getUpdated()));
+        Element updated = print("updated", entry.getUpdated());
+        if(updated != null) {
+            entryElm.appendChild(updated);
+        }
         
         List<Field> customs = entry.getFields();
         
         for(Field custom : customs) {
-            entryElm.appendChild(toXml(custom));
+            entryElm.appendChild(custom.toXml());
         }
         
         return entryElm;

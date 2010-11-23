@@ -1,11 +1,19 @@
 package se.vgregion.pubsub.impl;
 
+import java.io.IOException;
+import java.io.StringReader;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.ParsingException;
+import nu.xom.ValidityException;
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 import se.vgregion.pubsub.Field;
 import se.vgregion.pubsub.FieldType;
@@ -14,31 +22,29 @@ import se.vgregion.pubsub.FieldType;
 @Table(name="FIELDS")
 public class DefaultField extends AbstractEntity<Long> implements Field {
 
+    private static final Builder PARSER = new Builder();;
+
     @Id
     @GeneratedValue
     private Long id;
     
-    @Basic
-    private String namespace;
-    
     @Basic(optional=false)
-    private String name;
-    
-    @Basic(optional=false)
-    private FieldType type;
-    
-    @Basic(optional=false)
-    private String value;
+    private String xml;
 
+    
+    private static Element createElement(String namespace, String name, String value) {
+        Element elm = new Element(name, namespace);
+        elm.appendChild(value);
+        return elm;
+    }
+    
     public DefaultField(String namespace, String name, String value) {
-        this(namespace, name, FieldType.ELEMENT, value);
+        this(createElement(namespace, name, value));
     }
 
-    public DefaultField(String namespace, String name, FieldType type, String value) {
-        this.namespace = namespace;
-        this.name = name;
-        this.type = type;
-        this.value = value;
+    public DefaultField(Element elm) {
+        // TODO ugly hack to retain namespaces
+        this.xml = new Document((Element) elm.copy()).toXML().replaceFirst("<.+>", "");
     }
 
     @Override
@@ -47,22 +53,15 @@ public class DefaultField extends AbstractEntity<Long> implements Field {
     }
 
     @Override
-    public String getNamespace() {
-        return namespace;
+    public Element toXml() {
+        try {
+            Document doc = PARSER.build(new StringReader(xml));
+            Element elm = doc.getRootElement();
+            return (Element) elm.copy();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public FieldType getType() {
-        return type;
-    }
-
-    @Override
-    public String getValue() {
-        return value;
-    }
 }

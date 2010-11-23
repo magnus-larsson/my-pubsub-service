@@ -19,11 +19,12 @@
 
 package se.vgregion.pubsub.impl;
 
+import nu.xom.tests.XOMTestCase;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import se.vgregion.pubsub.Feed;
-import se.vgregion.pubsub.Namespaces;
 import se.vgregion.pubsub.UnitTestConstants;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
@@ -43,9 +44,7 @@ public class FeedBuilderTest {
         Assert.assertEquals("f1", feed.getFeedId());
         Assert.assertEquals(UnitTestConstants.UPDATED1, feed.getUpdated());
         Assert.assertEquals(1, feed.getFields().size());
-        Assert.assertEquals(Namespaces.NS_ATOM, feed.getFields().get(0).getNamespace());
-        Assert.assertEquals("title", feed.getFields().get(0).getName());
-        Assert.assertEquals("foobar", feed.getFields().get(0).getValue());
+        XOMTestCase.assertEquals(UnitTestConstants.ATOM_TITLE, feed.getFields().get(0).toXml());
         
         Assert.assertEquals(2, feed.getEntries().size());
         Assert.assertEquals("e1", feed.getEntries().get(0).getEntryId());
