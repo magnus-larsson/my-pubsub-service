@@ -10,7 +10,6 @@ import org.mockito.Mockito;
 
 import se.vgregion.pubsub.push.SubscriptionMode;
 import se.vgregion.pubsub.push.UnitTestConstants;
-import se.vgregion.pubsub.push.impl.DefaultPushSubscriber;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 

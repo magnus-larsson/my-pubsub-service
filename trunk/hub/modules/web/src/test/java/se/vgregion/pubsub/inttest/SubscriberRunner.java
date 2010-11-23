@@ -40,8 +40,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
 
-import se.vgregion.pubsub.push.impl.HttpUtil;
-
 
 public class SubscriberRunner {
 

@@ -25,9 +25,7 @@ import nu.xom.Element;
 import org.junit.Assert;
 import org.junit.Test;
 
-import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Entry;
-import se.vgregion.pubsub.Namespaces;
 import se.vgregion.pubsub.UnitTestConstants;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;

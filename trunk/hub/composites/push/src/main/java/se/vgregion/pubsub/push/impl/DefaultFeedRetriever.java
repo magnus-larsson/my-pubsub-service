@@ -36,7 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
-import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.content.AbstractParser;
 import se.vgregion.pubsub.push.FeedRetriever;
 

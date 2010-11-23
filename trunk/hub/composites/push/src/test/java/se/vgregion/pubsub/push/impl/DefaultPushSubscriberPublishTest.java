@@ -54,7 +54,6 @@ import se.vgregion.pubsub.Namespaces;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 import se.vgregion.pubsub.push.UnitTestConstants;
-import se.vgregion.pubsub.push.impl.DefaultPushSubscriber;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 public class DefaultPushSubscriberPublishTest {
