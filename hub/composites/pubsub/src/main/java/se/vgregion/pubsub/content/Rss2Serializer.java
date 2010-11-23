@@ -27,7 +27,7 @@ public class Rss2Serializer extends AbstractSerializer {
         List<Field> customs = feed.getFields();
         
         for(Field custom : customs) {
-            channel.appendChild(toXml(custom));
+            channel.appendChild(custom.toXml());
         }
         
         for(Entry entry : feed.getEntries()) {
@@ -49,7 +49,7 @@ public class Rss2Serializer extends AbstractSerializer {
         List<Field> customs = entry.getFields();
         
         for(Field custom : customs) {
-            entryElm.appendChild(toXml(custom));
+            entryElm.appendChild(custom.toXml());
         }
         
         return entryElm;

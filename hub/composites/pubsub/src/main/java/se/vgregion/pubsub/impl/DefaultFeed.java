@@ -48,12 +48,12 @@ public class DefaultFeed extends AbstractEntity<Long> implements Feed {
         }
         
         public FeedBuilder field(Element elm) {
-            feed.fields.add(new DefaultField(elm.getNamespaceURI(), elm.getLocalName(), FieldType.ELEMENT, elm.getValue()));
+            feed.fields.add(new DefaultField(elm));
             return this;
         }
 
         public FeedBuilder field(String namespace, String name, String value) {
-            feed.fields.add(new DefaultField(namespace, name, FieldType.ELEMENT, value));
+            feed.fields.add(new DefaultField(namespace, name, value));
             return this;
         }
         
@@ -119,7 +119,11 @@ public class DefaultFeed extends AbstractEntity<Long> implements Feed {
 
     @Override
     public DateTime getUpdated() {
-        return new DateTime(updated, DateTimeZone.UTC);
+        if(updated > 0) {
+            return new DateTime(updated, DateTimeZone.UTC);
+        } else {
+            return null;
+        }
     }
 
 }

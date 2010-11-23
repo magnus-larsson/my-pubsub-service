@@ -19,6 +19,9 @@
 
 package se.vgregion.pubsub.content;
 
+import nu.xom.Element;
+import nu.xom.tests.XOMTestCase;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Assert;
@@ -40,10 +43,10 @@ public class Rss2ParserTest {
         Assert.assertEquals(new DateTime(2010, 1, 2, 3, 4, 5, 0, DateTimeZone.UTC), feed.getUpdated());
         Assert.assertEquals(1, feed.getFields().size());
         
-        Assert.assertEquals("", feed.getFields().get(0).getNamespace());
-        Assert.assertEquals("title", feed.getFields().get(0).getName());
-        Assert.assertEquals("foobar", feed.getFields().get(0).getValue());
-
+        Element expected = new Element("title");
+        expected.appendChild("foobar");
+        XOMTestCase.assertEquals(expected, feed.getFields().get(0).toXml());
+        
         Assert.assertEquals(2, feed.getEntries().size());
         
         Entry entry = feed.getEntries().get(0);

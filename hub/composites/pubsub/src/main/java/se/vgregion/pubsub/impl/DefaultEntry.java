@@ -7,6 +7,7 @@ import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -42,7 +43,7 @@ public class DefaultEntry extends AbstractEntity<Long> implements Entry {
         }
         
         public EntryBuilder field(Element elm) {
-            entry.fields.add(new DefaultField(elm.getNamespaceURI(), elm.getLocalName(), elm.getValue()));
+            entry.fields.add(new DefaultField(elm));
             return this;
         }
 
@@ -67,7 +68,7 @@ public class DefaultEntry extends AbstractEntity<Long> implements Entry {
     @Basic
     private long updated;
     
-    @Transient
+    @OneToMany
     private List<Field> fields = new ArrayList<Field>();
     
 
@@ -83,7 +84,11 @@ public class DefaultEntry extends AbstractEntity<Long> implements Entry {
 
     @Override
     public DateTime getUpdated() {
-        return new DateTime(updated, DateTimeZone.UTC);
+        if(updated > 0) {
+            return new DateTime(updated, DateTimeZone.UTC);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -93,7 +98,12 @@ public class DefaultEntry extends AbstractEntity<Long> implements Entry {
 
     @Override
     public boolean isNewerThan(DateTime since) {
-        return getUpdated().isAfter(since);
+        DateTime thisUpdated = getUpdated();
+        if(thisUpdated == null) {
+            return true;
+        } else {
+            return thisUpdated.isAfter(since);
+        }
     }
 
 }

@@ -19,11 +19,16 @@
 
 package se.vgregion.pubsub.content;
 
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.tests.XOMTestCase;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Assert;
 import org.junit.Test;
 
+import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.Namespaces;
@@ -41,9 +46,9 @@ public class AtomParserTest {
         Assert.assertEquals(new DateTime(2010, 1, 2, 3, 4, 5, 0, DateTimeZone.UTC), feed.getUpdated());
         Assert.assertEquals(2, feed.getFields().size());
         
-        Assert.assertEquals(Namespaces.NS_ATOM, feed.getFields().get(0).getNamespace());
-        Assert.assertEquals("title", feed.getFields().get(0).getName());
-        Assert.assertEquals("foobar", feed.getFields().get(0).getValue());
+        Element expected = new Element("title", Namespaces.NS_ATOM);
+        expected.appendChild("foobar");
+        XOMTestCase.assertEquals(expected, feed.getFields().get(0).toXml());
 
         Assert.assertEquals(2, feed.getEntries().size());
         
@@ -56,5 +61,40 @@ public class AtomParserTest {
         
         Assert.assertEquals("urn:e2", entry.getEntryId());
         Assert.assertEquals(new DateTime(2010, 1, 2, 3, 4, 7, 0, DateTimeZone.UTC), entry.getUpdated());
+    }
+
+    private Element newAtomElement(String name, String value) {
+        Element elm = new Element(name, Namespaces.NS_ATOM);
+        elm.appendChild(value);
+        return elm;
+    }
+    
+    @Test
+    public void parseRecursive() throws Exception {
+        AtomParser parser = new AtomParser();
+
+        Element feedElm = new Element("feed", Namespaces.NS_ATOM);
+        feedElm.appendChild(newAtomElement("id", "f1"));
+        
+        Element entry = new Element("entry", Namespaces.NS_ATOM);
+        entry.appendChild(newAtomElement("id", "e1"));
+        
+        Element content = new Element("content", Namespaces.NS_ATOM);
+        Element div = new Element("div");
+        Element span = new Element("span");
+        span.appendChild("Hello");
+        div.appendChild(span);
+        content.appendChild(div);
+        entry.appendChild(content);
+        feedElm.appendChild(entry);
+        
+        Document expected = new Document(feedElm);
+        
+        Feed feed = parser.parse(expected);
+        Document actual = AbstractSerializer.printFeed(ContentType.ATOM, feed);
+        
+        System.out.println(expected.toXML());
+        System.out.println(actual.toXML());
+        XOMTestCase.assertEquals(expected, actual);
     }
 }
