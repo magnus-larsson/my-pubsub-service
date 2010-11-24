@@ -36,7 +36,7 @@ import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.Subscriber;
 
-@ContextConfiguration({"classpath:spring/pubsub-common.xml", "classpath:spring/pubsub-jpa.xml", "classpath:spring/pubsub-push.xml", "classpath:spring/pubsub-push-jpa.xml", "classpath:spring/pubsub-jpa-test.xml"})
+@ContextConfiguration({"classpath:spring/pubsub-common.xml", "classpath:spring/pubsub-jpa.xml", "classpath:spring/pubsub-push.xml", "classpath:spring/pubsub-push-jpa.xml", "classpath:spring/test-jpa.xml"})
 public class PushTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     @Before

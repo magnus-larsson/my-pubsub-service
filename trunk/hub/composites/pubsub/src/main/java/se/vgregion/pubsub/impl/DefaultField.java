@@ -33,6 +33,11 @@ public class DefaultField extends AbstractEntity<Long> implements Field {
         elm.appendChild(value);
         return elm;
     }
+
+    // For JPA
+    protected DefaultField() {
+    }
+
     
     public DefaultField(String namespace, String name, String value) {
         this(createElement(namespace, name, value));

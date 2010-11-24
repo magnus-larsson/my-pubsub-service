@@ -19,7 +19,7 @@ import se.vgregion.pubsub.UnitTestConstants;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 
 
-@ContextConfiguration({"classpath:spring/pubsub-common.xml", "classpath:spring/pubsub-jpa.xml", "classpath:spring/pubsub-jpa-test.xml"})
+@ContextConfiguration({"classpath:spring/pubsub-common.xml", "classpath:spring/pubsub-jpa.xml", "classpath:spring/test-jpa.xml"})
 public class DefaultPubSubEngineTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private PubSubEngine engine;

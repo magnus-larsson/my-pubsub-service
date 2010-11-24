@@ -24,6 +24,8 @@ public class IntegrationTestTemplate {
     
     @Before
     public void setUpComponents() throws Exception {
+        System.setProperty("testproperties", "classpath:integrationtest.properties");
+        
         server = new Server(0);
         
         WebAppContext context = new WebAppContext();

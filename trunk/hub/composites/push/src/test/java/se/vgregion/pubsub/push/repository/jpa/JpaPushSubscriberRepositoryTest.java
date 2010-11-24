@@ -32,7 +32,7 @@ import se.vgregion.pubsub.push.UnitTestConstants;
 import se.vgregion.pubsub.push.impl.DefaultPushSubscriber;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
-@ContextConfiguration({"classpath:spring/pubsub-push-jpa.xml", "classpath:spring/pubsub-jpa-test.xml"})
+@ContextConfiguration({"classpath:spring/pubsub-push-jpa.xml", "classpath:spring/test-jpa.xml"})
 public class JpaPushSubscriberRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private PushSubscriberRepository subscriberRepository;

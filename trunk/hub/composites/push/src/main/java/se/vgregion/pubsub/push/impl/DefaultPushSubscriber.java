@@ -10,6 +10,7 @@ import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import nu.xom.Document;
@@ -36,6 +37,7 @@ import se.vgregion.pubsub.push.SubscriptionMode;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 @Entity
+@Table(name="PUSH_SUBSCRIBERS")
 public class DefaultPushSubscriber extends AbstractEntity<Long> implements PushSubscriber {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultPushSubscriber.class);
