@@ -34,7 +34,7 @@ import se.vgregion.pubsub.impl.DefaultTopic;
 import se.vgregion.pubsub.repository.FeedRepository;
 import se.vgregion.pubsub.repository.TopicRepository;
 
-@ContextConfiguration({"classpath:spring/pubsub-jpa.xml", "classpath:spring/pubsub-jpa-test.xml"})
+@ContextConfiguration({"classpath:spring/pubsub-jpa.xml", "classpath:spring/test-jpa.xml"})
 public class JpaTopicRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private TopicRepository topicRepository;

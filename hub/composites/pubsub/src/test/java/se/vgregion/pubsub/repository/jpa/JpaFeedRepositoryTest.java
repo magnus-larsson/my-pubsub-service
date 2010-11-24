@@ -33,7 +33,7 @@ import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 import se.vgregion.pubsub.repository.FeedRepository;
 
-@ContextConfiguration({"classpath:spring/pubsub-jpa.xml", "classpath:spring/pubsub-jpa-test.xml"})
+@ContextConfiguration({"classpath:spring/pubsub-jpa.xml", "classpath:spring/test-jpa.xml"})
 public class JpaFeedRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private FeedRepository feedRepository;
@@ -45,7 +45,7 @@ public class JpaFeedRepositoryTest extends AbstractTransactionalJUnit4SpringCont
     @Rollback(false)
     public void setup() {
         feedRepository = applicationContext.getBean(FeedRepository.class);
-        expected = new FeedBuilder().id("f1").field("ns", "n", "v")
+        expected = new FeedBuilder().id("f1").field("http://namespace.org", "n", "v")
             .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
             .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build())
             .build();

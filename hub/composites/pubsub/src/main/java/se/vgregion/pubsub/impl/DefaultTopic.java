@@ -8,6 +8,7 @@ import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.joda.time.DateTime;
@@ -25,6 +26,7 @@ import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.repository.FeedRepository;
 
 @Entity
+@Table(name="TOPICS")
 public class DefaultTopic extends AbstractEntity<Long> implements Topic {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultTopic.class);
