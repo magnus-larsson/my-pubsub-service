@@ -19,9 +19,12 @@
 
 package se.vgregion.pubsub.push.repository;
 
-import se.vgregion.dao.domain.patterns.repository.db.DatabaseRepository;
+import java.net.URI;
+
+import se.vgregion.dao.domain.patterns.repository.Repository;
 import se.vgregion.pubsub.push.PushSubscriber;
+import se.vgregion.pubsub.push.Tuple;
     
-public interface PushSubscriberRepository extends DatabaseRepository<PushSubscriber, Long, Long> {
+public interface PushSubscriberRepository extends Repository<PushSubscriber, Tuple<URI, URI>> {
 
 }

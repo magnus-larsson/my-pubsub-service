@@ -4,7 +4,7 @@ import java.net.URI;
 
 import se.vgregion.dao.domain.patterns.entity.Entity;
 
-public interface Topic extends Entity<Long> {
+public interface Topic extends Entity<URI> {
 
     URI getUrl();
     

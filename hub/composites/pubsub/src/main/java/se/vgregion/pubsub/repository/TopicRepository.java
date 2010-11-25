@@ -24,7 +24,6 @@ import java.net.URI;
 import se.vgregion.dao.domain.patterns.repository.Repository;
 import se.vgregion.pubsub.Topic;
 
-public interface TopicRepository extends Repository<Topic, Long> {
+public interface TopicRepository extends Repository<Topic, URI> {
 
-    Topic findByUrl(URI url);
 }

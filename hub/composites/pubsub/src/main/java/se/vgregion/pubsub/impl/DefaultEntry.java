@@ -2,9 +2,11 @@ package se.vgregion.pubsub.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -24,7 +26,7 @@ import se.vgregion.pubsub.Field;
 
 @Entity
 @Table(name="ENTRIES")
-public class DefaultEntry extends AbstractEntity<Long> implements Entry {
+public class DefaultEntry extends AbstractEntity<String> implements Entry {
 
     public static class EntryBuilder {
         
@@ -62,10 +64,11 @@ public class DefaultEntry extends AbstractEntity<Long> implements Entry {
     
     @Id
     @GeneratedValue
-    private Long id;
+    @SuppressWarnings("unused")
+    private Long pk;
     
-    @Basic(optional=false)
-    private String entryId;
+    @Column(nullable=false, unique=true)
+    private String entryId = UUID.randomUUID().toString();
     
     @Basic
     private long updated;
@@ -76,8 +79,8 @@ public class DefaultEntry extends AbstractEntity<Long> implements Entry {
     
 
     @Override
-    public Long getId() {
-        return id;
+    public String getId() {
+        return entryId;
     }
 
     @Override
