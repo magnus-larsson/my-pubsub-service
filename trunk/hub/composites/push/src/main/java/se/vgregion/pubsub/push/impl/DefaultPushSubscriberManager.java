@@ -39,7 +39,8 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
         
         topic.addSubscriber(subscriber);
         
-        subscriptionRepository.store(subscriber);
+        // TODO handle resubscriptions
+        subscriptionRepository.persist(subscriber);
     }
 
     @Override

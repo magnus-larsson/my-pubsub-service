@@ -3,9 +3,11 @@ package se.vgregion.pubsub.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -26,7 +28,7 @@ import se.vgregion.pubsub.Field;
 
 @Entity
 @Table(name="FEEDS")
-public class DefaultFeed extends AbstractEntity<Long> implements Feed {
+public class DefaultFeed extends AbstractEntity<String> implements Feed {
 
     public static class FeedBuilder {
         
@@ -68,10 +70,11 @@ public class DefaultFeed extends AbstractEntity<Long> implements Feed {
 
     @Id
     @GeneratedValue
-    private Long id;
+    @SuppressWarnings("unused")
+    private Long pk;
     
-    @Basic
-    private String feedId;
+    @Column(nullable=false, unique=true)
+    private String feedId = UUID.randomUUID().toString();
 
     @Basic
     private long updated;
@@ -86,8 +89,8 @@ public class DefaultFeed extends AbstractEntity<Long> implements Feed {
     private List<Entry> entries = new ArrayList<Entry>();
     
     @Override
-    public Long getId() {
-        return id;
+    public String getId() {
+        return feedId;
     }
     
     @Override

@@ -52,17 +52,8 @@ public class JpaTopicRepositoryTest extends AbstractTransactionalJUnit4SpringCon
     @Test
     @Transactional
     @Rollback
-    public void findByPk() {
-        Topic topic = topicRepository.find(topic1.getId());
-        
-        Assert.assertEquals(UnitTestConstants.TOPIC, topic.getUrl());
-    }
-
-    @Test
-    @Transactional
-    @Rollback
-    public void findByUrl() {
-        Topic topic = topicRepository.findByUrl(UnitTestConstants.TOPIC);
+    public void find() {
+        Topic topic = topicRepository.find(UnitTestConstants.TOPIC);
         
         Assert.assertEquals(UnitTestConstants.TOPIC, topic.getUrl());
     }

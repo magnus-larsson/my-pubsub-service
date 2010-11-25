@@ -1,8 +1,10 @@
 package se.vgregion.pubsub.impl;
 
 import java.io.StringReader;
+import java.util.UUID;
 
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -16,13 +18,17 @@ import se.vgregion.pubsub.Field;
 
 @Entity
 @Table(name="FIELDS")
-public class DefaultField extends AbstractEntity<Long> implements Field {
+public class DefaultField extends AbstractEntity<String> implements Field {
 
     private static final Builder PARSER = new Builder();;
 
     @Id
     @GeneratedValue
-    private Long id;
+    @SuppressWarnings("unused")
+    private Long pk;
+
+    @Column(nullable=false, unique=true)
+    private String id = UUID.randomUUID().toString();
     
     @Basic(optional=false)
     private String xml;
@@ -49,7 +55,7 @@ public class DefaultField extends AbstractEntity<Long> implements Field {
     }
 
     @Override
-    public Long getId() {
+    public String getId() {
         return id;
     }
 

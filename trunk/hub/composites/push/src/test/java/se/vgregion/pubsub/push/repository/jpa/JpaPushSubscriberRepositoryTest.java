@@ -19,6 +19,8 @@ package se.vgregion.pubsub.push.repository.jpa;
  */
 
 
+import java.net.URI;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +30,7 @@ import org.springframework.test.context.junit4.AbstractTransactionalJUnit4Spring
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.pubsub.push.PushSubscriber;
+import se.vgregion.pubsub.push.Tuple;
 import se.vgregion.pubsub.push.UnitTestConstants;
 import se.vgregion.pubsub.push.impl.DefaultPushSubscriber;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
@@ -51,8 +54,8 @@ public class JpaPushSubscriberRepositoryTest extends AbstractTransactionalJUnit4
     @Test
     @Transactional
     @Rollback
-    public void findByPk() {
-        PushSubscriber actual = subscriberRepository.find(expected.getId());
+    public void find() {
+        PushSubscriber actual = subscriberRepository.find(new Tuple<URI, URI>(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK));
         
         Assert.assertEquals(expected.getTopic(), actual.getTopic());
     }

@@ -22,7 +22,7 @@ package se.vgregion.pubsub.repository;
 import se.vgregion.dao.domain.patterns.repository.Repository;
 import se.vgregion.pubsub.Feed;
 
-public interface FeedRepository extends Repository<Feed, Long> {
+public interface FeedRepository extends Repository<Feed, String> {
 
     
 }

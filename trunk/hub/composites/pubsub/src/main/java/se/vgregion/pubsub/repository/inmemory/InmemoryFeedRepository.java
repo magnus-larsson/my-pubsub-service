@@ -4,7 +4,7 @@ import se.vgregion.dao.domain.patterns.repository.inmemory.AbstractInMemoryRepos
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.repository.FeedRepository;
 
-public class InmemoryFeedRepository extends AbstractInMemoryRepository<Feed, Long> implements FeedRepository {
+public class InmemoryFeedRepository extends AbstractInMemoryRepository<Feed, String> implements FeedRepository {
 
 
 }

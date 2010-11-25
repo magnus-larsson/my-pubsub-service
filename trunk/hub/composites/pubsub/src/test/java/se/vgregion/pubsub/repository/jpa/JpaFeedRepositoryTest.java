@@ -55,8 +55,8 @@ public class JpaFeedRepositoryTest extends AbstractTransactionalJUnit4SpringCont
     @Test
     @Transactional
     @Rollback
-    public void findByPk() {
-        Feed actual = feedRepository.find(expected.getId());
+    public void find() {
+        Feed actual = feedRepository.find("f1");
         
         Assert.assertEquals(expected.getFeedId(), actual.getFeedId());
         Assert.assertEquals(2, actual.getEntries().size());

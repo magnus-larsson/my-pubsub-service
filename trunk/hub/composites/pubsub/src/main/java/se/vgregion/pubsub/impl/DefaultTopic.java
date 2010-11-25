@@ -4,10 +4,12 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -27,20 +29,20 @@ import se.vgregion.pubsub.repository.FeedRepository;
 
 @Entity
 @Table(name="TOPICS")
-public class DefaultTopic extends AbstractEntity<Long> implements Topic {
+public class DefaultTopic extends AbstractEntity<URI> implements Topic {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultTopic.class);
 
     
     @Id
     @GeneratedValue
-    private Long id;
+    @SuppressWarnings("unused")
+    private Long pk;
     
-    @Basic(optional=false)
+    @Column(nullable=false, unique=true)
     private String url;
     
-    // TODO JPA map
-    @Transient
+    @OneToOne(targetEntity=DefaultFeed.class, cascade=CascadeType.ALL)
     private Feed feed;
     
     @Transient
@@ -76,8 +78,8 @@ public class DefaultTopic extends AbstractEntity<Long> implements Topic {
     }
     
     @Override
-    public Long getId() {
-        return id;
+    public URI getId() {
+        return getUrl();
     }
 
     
@@ -104,8 +106,9 @@ public class DefaultTopic extends AbstractEntity<Long> implements Topic {
         }
         
         // TODO purge old entries based on lastUpdatedSubscriber
-        
-        feedRepository.store(this.feed);
+
+        // handle new feeds
+        feedRepository.persist(this.feed);
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 import java.util.UUID;
 
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -34,11 +35,12 @@ import se.vgregion.pubsub.content.AbstractSerializer;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.SubscriptionMode;
+import se.vgregion.pubsub.push.Tuple;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 @Entity
 @Table(name="PUSH_SUBSCRIBERS")
-public class DefaultPushSubscriber extends AbstractEntity<Long> implements PushSubscriber {
+public class DefaultPushSubscriber extends AbstractEntity<Tuple<URI, URI>> implements PushSubscriber {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultPushSubscriber.class);
     
@@ -47,24 +49,24 @@ public class DefaultPushSubscriber extends AbstractEntity<Long> implements PushS
     
     @Id
     @GeneratedValue
-    private Long id;
+    private Long pk;
     
-    @Basic
+    @Column
     private Long timeout;
     
-    @Basic
+    @Column
     private Long lastUpdated;
     
-    @Basic(optional=false)
+    @Column(nullable=false, unique=true)
     private String topic;
     
-    @Basic(optional=false)
+    @Column(nullable=false, unique=true)
     private String callback;
     
-    @Basic(optional=false)
+    @Column(nullable=false)
     private int leaseSeconds;
     
-    @Basic
+    @Column
     private String verifyToken;
     
     @Transient
@@ -100,8 +102,8 @@ public class DefaultPushSubscriber extends AbstractEntity<Long> implements PushS
 
     
     @Override
-    public Long getId() {
-        return id;
+    public Tuple<URI, URI> getId() {
+        return new Tuple<URI, URI>(getTopic(), getCallback());
     }
 
     @Override
@@ -151,7 +153,7 @@ public class DefaultPushSubscriber extends AbstractEntity<Long> implements PushS
             } finally {
                 HttpUtil.closeQuitely(response);
     
-                subscriberRepository.store(this);
+                subscriberRepository.merge(this);
             }
         } else {
             LOG.info("No updates for subscriber {}", this);
