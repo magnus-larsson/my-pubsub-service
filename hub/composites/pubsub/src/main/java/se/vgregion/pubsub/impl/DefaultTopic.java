@@ -91,7 +91,6 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     @Override
     public synchronized void publish(Feed publishedFeed) {
         LOG.info("Publishing on topic {}", url);
-        
         this.feed = feedMerger.merge(this.feed, publishedFeed);
         // if all publications success, purge until now
         DateTime lastUpdatedSubscriber = new DateTime();

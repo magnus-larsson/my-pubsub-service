@@ -35,12 +35,12 @@ import se.vgregion.pubsub.content.AbstractSerializer;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.SubscriptionMode;
-import se.vgregion.pubsub.push.Tuple;
+import se.vgregion.pubsub.push.Pair;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 @Entity
 @Table(name="PUSH_SUBSCRIBERS")
-public class DefaultPushSubscriber extends AbstractEntity<Tuple<URI, URI>> implements PushSubscriber {
+public class DefaultPushSubscriber extends AbstractEntity<Pair<URI, URI>> implements PushSubscriber {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultPushSubscriber.class);
     
@@ -102,8 +102,8 @@ public class DefaultPushSubscriber extends AbstractEntity<Tuple<URI, URI>> imple
 
     
     @Override
-    public Tuple<URI, URI> getId() {
-        return new Tuple<URI, URI>(getTopic(), getCallback());
+    public Pair<URI, URI> getId() {
+        return new Pair<URI, URI>(getTopic(), getCallback());
     }
 
     @Override
