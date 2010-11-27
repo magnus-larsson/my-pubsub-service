@@ -24,7 +24,7 @@ public class DefaultField extends AbstractEntity<String> implements Field {
 
     @Id
     @GeneratedValue
-    @SuppressWarnings("unused")
+    @SuppressWarnings("unused") // only used by JPA
     private Long pk;
 
     @Column(nullable=false, unique=true)
