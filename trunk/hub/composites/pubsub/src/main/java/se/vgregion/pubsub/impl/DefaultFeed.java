@@ -70,7 +70,7 @@ public class DefaultFeed extends AbstractEntity<String> implements Feed {
 
     @Id
     @GeneratedValue
-    @SuppressWarnings("unused")
+    @SuppressWarnings("unused") // only used by JPA
     private Long pk;
     
     @Column(nullable=false, unique=true)

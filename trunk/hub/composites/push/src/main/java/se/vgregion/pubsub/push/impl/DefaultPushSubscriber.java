@@ -6,7 +6,6 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.util.UUID;
 
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -33,9 +32,9 @@ import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.content.AbstractSerializer;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
+import se.vgregion.pubsub.push.Pair;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.SubscriptionMode;
-import se.vgregion.pubsub.push.Pair;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 @Entity
@@ -47,6 +46,7 @@ public class DefaultPushSubscriber extends AbstractEntity<Pair<URI, URI>> implem
     @Transient
     private PushSubscriberRepository subscriberRepository;
     
+    @SuppressWarnings("unused") // only used by JPA
     @Id
     @GeneratedValue
     private Long pk;
@@ -258,16 +258,4 @@ public class DefaultPushSubscriber extends AbstractEntity<Pair<URI, URI>> implem
             throw new RuntimeException(e);
         }
     }
-
-    @Override 
-    public boolean equals(Object other) {
-        boolean result = false;
-        if (other instanceof DefaultPushSubscriber) {
-            DefaultPushSubscriber that = (DefaultPushSubscriber) other;
-            result = (that.callback.equals(callback) && that.topic.equals(topic)
-                    && this.getClass().equals(that.getClass()));
-        }
-        return result;
-    }
-
 }

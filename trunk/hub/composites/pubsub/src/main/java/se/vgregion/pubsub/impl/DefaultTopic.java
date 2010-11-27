@@ -36,7 +36,7 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     
     @Id
     @GeneratedValue
-    @SuppressWarnings("unused")
+    @SuppressWarnings("unused") // only used by JPA
     private Long pk;
     
     @Column(nullable=false, unique=true)

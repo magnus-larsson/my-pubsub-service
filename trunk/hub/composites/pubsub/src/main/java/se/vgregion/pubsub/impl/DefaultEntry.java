@@ -64,7 +64,7 @@ public class DefaultEntry extends AbstractEntity<String> implements Entry {
     
     @Id
     @GeneratedValue
-    @SuppressWarnings("unused")
+    @SuppressWarnings("unused") // only used by JPA
     private Long pk;
     
     @Column(nullable=false, unique=true)
