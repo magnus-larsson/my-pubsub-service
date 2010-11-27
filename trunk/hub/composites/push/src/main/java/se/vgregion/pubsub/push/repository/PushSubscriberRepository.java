@@ -23,8 +23,8 @@ import java.net.URI;
 
 import se.vgregion.dao.domain.patterns.repository.Repository;
 import se.vgregion.pubsub.push.PushSubscriber;
-import se.vgregion.pubsub.push.Tuple;
+import se.vgregion.pubsub.push.Pair;
     
-public interface PushSubscriberRepository extends Repository<PushSubscriber, Tuple<URI, URI>> {
+public interface PushSubscriberRepository extends Repository<PushSubscriber, Pair<URI, URI>> {
 
 }
