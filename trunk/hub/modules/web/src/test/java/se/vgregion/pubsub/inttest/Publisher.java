@@ -46,12 +46,13 @@ import se.vgregion.pubsub.content.AbstractSerializer;
 
 public class Publisher {
 
+    private String localServerName;
     private LocalTestServer server;
     private Feed feed;
     
-    public Publisher() throws Exception {
+    public Publisher(String host) throws Exception {
+        this.localServerName = host;
         server = new LocalTestServer(null, null);
-        
         server.register("/*", new HttpRequestHandler() {
             @Override
             public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException,
@@ -64,7 +65,7 @@ public class Publisher {
     }
     
     public URI getUrl() {
-        return buildTestUrl(server, "/");
+        return buildTestUrl(localServerName, server, "/");
     }
     
     public void publish(URI hub, Feed feed) throws URISyntaxException, IOException {
@@ -74,7 +75,7 @@ public class Publisher {
         
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
         parameters.add(new BasicNameValuePair("hub.mode", "publish"));
-        parameters.add(new BasicNameValuePair("hub.url", buildTestUrl(server, "/").toString()));
+        parameters.add(new BasicNameValuePair("hub.url", getUrl().toString()));
         
         post.setEntity(new UrlEncodedFormEntity(parameters));
         
@@ -82,9 +83,9 @@ public class Publisher {
         client.execute(post);
     }
     
-    private static URI buildTestUrl(LocalTestServer server, String path) {
+    private static URI buildTestUrl(String host, LocalTestServer server, String path) {
         try {
-            return new URI("http://" + server.getServiceHostName() + ":" + server.getServicePort() + path);
+            return new URI("http://" + host + ":" + server.getServicePort() + path);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }

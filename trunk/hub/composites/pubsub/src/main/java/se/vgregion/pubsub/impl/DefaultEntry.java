@@ -71,7 +71,7 @@ public class DefaultEntry extends AbstractEntity<String> implements Entry {
     private String entryId = UUID.randomUUID().toString();
     
     @Basic
-    private long updated;
+    private Long updated;
     
     @OneToMany(cascade=CascadeType.ALL, targetEntity=DefaultField.class)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
@@ -101,6 +101,18 @@ public class DefaultEntry extends AbstractEntity<String> implements Entry {
     public List<Field> getFields() {
         return fields;
     }
+    
+    private Field getField(String namespace, String name) {
+        // TODO handle multiple fields with same ns and name
+        for(Field field : fields) {
+            Element elm = field.toXml();
+            if(elm.getNamespaceURI().equals(namespace) && elm.getLocalName().equals(name)) {
+                return field;
+            }
+        }
+        
+        return null;
+    }
 
     @Override
     public boolean isNewerThan(DateTime since) {
@@ -110,6 +122,23 @@ public class DefaultEntry extends AbstractEntity<String> implements Entry {
         } else {
             return thisUpdated.isAfter(since);
         }
+    }
+
+    @Override
+    public void merge(Entry entry) {
+        this.entryId = entry.getEntryId();
+        if(entry.getUpdated() != null) {
+            this.updated = entry.getUpdated().getMillis();
+        } else {
+            this.updated = null;
+        }
+        
+        fields.clear();
+        
+        for(Field otherField : entry.getFields()) {
+            fields.add(otherField);
+        }
+        
     }
 
 }
