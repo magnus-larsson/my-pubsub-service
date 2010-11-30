@@ -53,6 +53,7 @@ public class IntegrationTest extends IntegrationTestTemplate {
                 new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build()).build();
         Feed feed2 = new FeedBuilder()
             .id("f1").updated(UnitTestConstants.FUTURE)
+            .entry(new EntryBuilder().id("e3").updated(UnitTestConstants.FUTURE).build())
             .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.FUTURE).build())
             .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build())
             .build();
@@ -71,8 +72,9 @@ public class IntegrationTest extends IntegrationTestTemplate {
 
         Assert.assertNotNull(publishedFeed);
         Assert.assertEquals("f1", publishedFeed.getFeedId());
-        Assert.assertEquals(1, publishedFeed.getEntries().size());
-        Assert.assertEquals("e1", publishedFeed.getEntries().get(0).getEntryId());
+        Assert.assertEquals(2, publishedFeed.getEntries().size());
+        Assert.assertEquals("e3", publishedFeed.getEntries().get(0).getEntryId());
+        Assert.assertEquals("e1", publishedFeed.getEntries().get(1).getEntryId());
     }
 
     @Test

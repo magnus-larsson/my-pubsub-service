@@ -50,14 +50,16 @@ import se.vgregion.pubsub.push.SubscriptionMode;
 
 public class Subscriber {
 
+    private String localServerName;
     private List<SubscriberListener> listeners = new ArrayList<SubscriberListener>();
     private LocalTestServer server;
     
-    public Subscriber() throws Exception {
-        this(null);
+    public Subscriber(String localServerName) throws Exception {
+        this(localServerName, null);
     }
     
-    public Subscriber(final SubscriberResult result) throws Exception {
+    public Subscriber(String localServerName, final SubscriberResult result) throws Exception {
+        this.localServerName = localServerName;
         server = new LocalTestServer(null, null);
         
         server.register("/*", new HttpRequestHandler() {
@@ -109,7 +111,7 @@ public class Subscriber {
         HttpPost post = new HttpPost(hub);
         
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
-        parameters.add(new BasicNameValuePair("hub.callback", buildTestUrl(server, "/").toString()));
+        parameters.add(new BasicNameValuePair("hub.callback", buildTestUrl(localServerName, server, "/").toString()));
         if(mode == SubscriptionMode.SUBSCRIBE) {
             parameters.add(new BasicNameValuePair("hub.mode", "subscribe"));
         } else {
@@ -129,8 +131,8 @@ public class Subscriber {
         this.listeners.add(listener);
     }
     
-    private static URI buildTestUrl(LocalTestServer server, String path) throws URISyntaxException {
-        return new URI("http://" + server.getServiceHostName() + ":" + server.getServicePort() + path);
+    private static URI buildTestUrl(String localServerName, LocalTestServer server, String path) throws URISyntaxException {
+        return new URI("http://" + localServerName + ":" + server.getServicePort() + path);
     }
 
 

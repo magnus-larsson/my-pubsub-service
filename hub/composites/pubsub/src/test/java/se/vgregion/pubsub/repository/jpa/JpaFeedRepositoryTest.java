@@ -46,8 +46,8 @@ public class JpaFeedRepositoryTest extends AbstractTransactionalJUnit4SpringCont
     public void setup() {
         feedRepository = applicationContext.getBean(FeedRepository.class);
         expected = new FeedBuilder().id("f1").field("http://namespace.org", "n", "v")
-            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build())
+            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED2).build())
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED3).build())
             .build();
         feedRepository.persist(expected);
     }
@@ -62,6 +62,18 @@ public class JpaFeedRepositoryTest extends AbstractTransactionalJUnit4SpringCont
         Assert.assertEquals(2, actual.getEntries().size());
         
         Assert.assertEquals(expected.getEntries().get(0).getEntryId(), actual.getEntries().get(0).getEntryId());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void merge() {
+        Feed updated = new FeedBuilder().id("f1").field("http://namespace.org", "n", "v")
+            .entry(new EntryBuilder().id("e3").updated(UnitTestConstants.UPDATED1).build())
+            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED3).build())
+            .build();
+
     }
 
 }

@@ -15,4 +15,6 @@ public interface Feed extends Entity<String> {
     List<Entry> getEntries();
     
     boolean hasUpdates(DateTime since);
+    
+    void merge(Feed feed);
 }

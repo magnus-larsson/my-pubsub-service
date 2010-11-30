@@ -49,14 +49,6 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     private List<Subscriber> subscribers = new ArrayList<Subscriber>();
     
     @Transient
-    private FeedMerger feedMerger = new FeedMerger() {
-        @Override
-        public Feed merge(Feed oldFeed, Feed newFeed) {
-            return newFeed;
-        }
-    };;;
-    
-    @Transient
     private SubscriberTimeoutNotifier subscriberTimeoutNotifier;
 
     @Transient
@@ -91,7 +83,12 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     @Override
     public synchronized void publish(Feed publishedFeed) {
         LOG.info("Publishing on topic {}", url);
-        this.feed = feedMerger.merge(this.feed, publishedFeed);
+        if(this.feed != null) {
+            this.feed.merge(publishedFeed);
+        } else {
+            this.feed = publishedFeed;
+        }
+        
         // if all publications success, purge until now
         DateTime lastUpdatedSubscriber = new DateTime();
         for(Subscriber subscriber : subscribers) {
@@ -106,8 +103,15 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
         
         // TODO purge old entries based on lastUpdatedSubscriber
 
-        // handle new feeds
-        feedRepository.persist(this.feed);
+        //feedRepository.store(this.feed);
+        if (feed.getId() == null || feedRepository.find(feed.getId()) == null) {
+            System.out.println("persist");
+            feedRepository.persist(feed);
+        } else {
+            System.out.println("merge");
+            feedRepository.merge(feed);
+        }
+
     }
 
     @Override

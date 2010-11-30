@@ -19,12 +19,13 @@ public class JpaFeedRepository extends AbstractJpaRepository<Feed, String, Long>
     @Transactional(propagation=Propagation.MANDATORY, readOnly=true)
     public Feed find(String id) {
         try {
-            return (Feed) entityManager.createQuery("select l from DefaultFeed l where l.feedId = :id")
+            Feed feed = (Feed) entityManager.createQuery("select l from DefaultFeed l where l.feedId = :id")
                 .setParameter("id", id)
                 .getSingleResult();
-            
+            return feed;
         } catch(NoResultException e) {
             return null;
+        } finally {
         }
     }
 }

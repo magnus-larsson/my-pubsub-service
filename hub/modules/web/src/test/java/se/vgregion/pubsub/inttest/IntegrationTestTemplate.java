@@ -26,6 +26,8 @@ public class IntegrationTestTemplate {
     public void setUpComponents() throws Exception {
         System.setProperty("testproperties", "classpath:integrationtest.properties");
         
+        String localServerName = "localhost";
+        
         server = new Server(0);
         
         WebAppContext context = new WebAppContext();
@@ -39,9 +41,9 @@ public class IntegrationTestTemplate {
         
         hubUrl = URI.create("http://localhost:" + server.getConnectors()[0].getLocalPort());
         
-        publisher = new Publisher();
+        publisher = new Publisher(localServerName);
         
-        subscriber = new Subscriber(createSubscriberResult());
+        subscriber = new Subscriber(localServerName, createSubscriberResult());
         subscriber.addListener(new SubscriberListener() {
             @Override
             public void published(Feed feed) {

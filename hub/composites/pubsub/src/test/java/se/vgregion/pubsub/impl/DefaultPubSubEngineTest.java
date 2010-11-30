@@ -16,6 +16,7 @@ import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.Subscriber;
 import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.UnitTestConstants;
+import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 
 
@@ -47,4 +48,35 @@ public class DefaultPubSubEngineTest extends AbstractTransactionalJUnit4SpringCo
         Mockito.verify(subscriber).publish(publishedFeed.capture());
         Assert.assertEquals(feed, publishedFeed.getValue());
     }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void testDoublePublication() throws PublicationFailedException {
+        Topic topic = engine.getOrCreateTopic(UnitTestConstants.TOPIC);
+        
+        Subscriber subscriber = Mockito.mock(Subscriber.class);
+        
+        topic.addSubscriber(subscriber);
+        
+        Feed feed = new FeedBuilder().id("f1").updated(
+                UnitTestConstants.UPDATED2).entry(
+                new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED2).build()).entry(
+                new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build()).build();
+        Feed feed2 = new FeedBuilder()
+            .id("f1").updated(UnitTestConstants.UPDATED1)
+            .entry(new EntryBuilder().id("e3").updated(UnitTestConstants.UPDATED1).build())
+            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build())
+            .build();
+
+//        Feed feed = new FeedBuilder().id("f1").updated(UnitTestConstants.UPDATED2).build();
+//        Feed feed2 = new FeedBuilder().id("f1").updated(UnitTestConstants.UPDATED1)
+//            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
+//            .build();
+        
+        topic.publish(feed);
+        topic.publish(feed2);
+    }
+
 }

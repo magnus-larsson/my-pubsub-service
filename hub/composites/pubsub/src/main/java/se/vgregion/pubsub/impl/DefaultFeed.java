@@ -71,13 +71,13 @@ public class DefaultFeed extends AbstractEntity<String> implements Feed {
     @Id
     @GeneratedValue
     @SuppressWarnings("unused") // only used by JPA
-    private Long pk;
+    protected Long pk;
     
     @Column(nullable=false, unique=true)
-    private String feedId = UUID.randomUUID().toString();
+    protected String feedId = UUID.randomUUID().toString();
 
     @Basic
-    private long updated;
+    private Long updated;
     
     @OneToMany(cascade=CascadeType.ALL, targetEntity=DefaultField.class)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
@@ -97,12 +97,26 @@ public class DefaultFeed extends AbstractEntity<String> implements Feed {
     public List<Field> getFields() {
         return Collections.unmodifiableList(fields);
     }
-
+    
     @Override
     public List<Entry> getEntries() {
         return Collections.unmodifiableList(entries);
     }
+    
+    private Entry getEntry(String entryId) {
+        return getEntry(this.entries, entryId);
+    }
 
+    private Entry getEntry(List<Entry> entries, String entryId) {
+        for(Entry entry : entries) {
+            if(entry.getEntryId() != null && entry.getEntryId().equals(entryId)) {
+                return entry;
+            }
+        }
+        return null;
+    }
+
+    
     @Override
     public boolean hasUpdates(DateTime since) {
         if(since == null) return true;
@@ -121,11 +135,52 @@ public class DefaultFeed extends AbstractEntity<String> implements Feed {
 
     @Override
     public DateTime getUpdated() {
-        if(updated > 0) {
+        if(updated != null) {
             return new DateTime(updated, DateTimeZone.UTC);
         } else {
             return null;
         }
+    }
+
+    @Override
+    public void merge(Feed feed) {
+        this.feedId = feed.getFeedId();
+        if(feed.getUpdated() != null) {
+            this.updated = feed.getUpdated().getMillis();
+        } else {
+            this.updated = null;
+        }
+        
+        fields.clear();
+        
+        for(Field otherField : feed.getFields()) {
+            fields.add(otherField);
+        }
+        
+        List<Entry> newEntries = new ArrayList<Entry>();
+        
+        
+        // check for updated entries
+        for(Entry otherEntry : feed.getEntries()) {
+            Entry existingEntry = getEntry(otherEntry.getEntryId());
+            
+            if(existingEntry != null) {
+                existingEntry.merge(otherEntry);
+                newEntries.add(existingEntry);
+            } else {
+                newEntries.add(otherEntry);
+            }
+        }
+        
+        // check if any of the existing entries do not exist in the new feed
+        for(Entry entry : entries) {
+            Entry otherEntry = getEntry(feed.getEntries(), entry.getEntryId());
+            if(otherEntry == null) {
+                newEntries.add(entry);
+            }
+        }
+
+        this.entries = newEntries;
     }
 
 }
