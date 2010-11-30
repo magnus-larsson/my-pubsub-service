@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.dao.domain.patterns.repository.db.jpa.AbstractJpaRepository;
-import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.Pair;
+import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.impl.DefaultPushSubscriber;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
