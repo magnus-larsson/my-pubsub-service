@@ -29,8 +29,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
 
-import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.Pair;
+import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.UnitTestConstants;
 import se.vgregion.pubsub.push.impl.DefaultPushSubscriber;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;

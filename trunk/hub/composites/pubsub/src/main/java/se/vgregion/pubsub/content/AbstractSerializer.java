@@ -7,7 +7,6 @@ import org.joda.time.DateTime;
 
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
-import se.vgregion.pubsub.Field;
 
 public abstract class AbstractSerializer {
 
