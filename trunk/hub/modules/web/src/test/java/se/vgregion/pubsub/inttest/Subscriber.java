@@ -150,4 +150,8 @@ public class Subscriber {
         }
     }
 
+    public void stop() throws Exception {
+        server.stop();
+    }
+
 }

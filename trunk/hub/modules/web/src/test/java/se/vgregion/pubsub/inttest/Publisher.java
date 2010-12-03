@@ -90,4 +90,8 @@ public class Publisher {
             throw new RuntimeException(e);
         }
     }
+    
+    public void stop() throws Exception {
+        server.stop();
+    }
 }

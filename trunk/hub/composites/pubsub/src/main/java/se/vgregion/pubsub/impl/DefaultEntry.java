@@ -89,7 +89,7 @@ public class DefaultEntry extends AbstractEntity<String> implements Entry {
 
     @Override
     public DateTime getUpdated() {
-        if(updated > 0) {
+        if(updated != null && updated > 0) {
             return new DateTime(updated, DateTimeZone.UTC);
         } else {
             return null;

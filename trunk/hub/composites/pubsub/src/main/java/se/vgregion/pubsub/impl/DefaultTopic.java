@@ -87,13 +87,13 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
         } else {
             this.feed = publishedFeed;
         }
-        
+
         // if all publications success, purge until now
         DateTime lastUpdatedSubscriber = new DateTime();
         for(Subscriber subscriber : subscribers) {
             try {
                 LOG.info("Publishing to {}", subscriber);
-                subscriber.publish(this.getFeed());
+                subscriber.publish(this.feed);
             } catch (PublicationFailedException e) {
                 LOG.warn("Subscriber failed: {}", e.getMessage());
                 lastUpdatedSubscriber = subscriber.getLastUpdated();
@@ -101,16 +101,6 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
         }
         
         // TODO purge old entries based on lastUpdatedSubscriber
-
-        //feedRepository.store(this.feed);
-        if (feed.getId() == null || feedRepository.find(feed.getId()) == null) {
-            System.out.println("persist");
-            feedRepository.persist(feed);
-        } else {
-            System.out.println("merge");
-            feedRepository.merge(feed);
-        }
-
     }
 
     @Override
