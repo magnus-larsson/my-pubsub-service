@@ -37,25 +37,7 @@
 
 	<context:annotation-config />
 	<tx:annotation-driven />
-
- 	<bean id="retrieveQueue"
-		class="java.util.concurrent.LinkedBlockingQueue" >
-	</bean>
-
- 	<bean id="pushManager"
-		class="se.vgregion.pubsub.push.impl.DefaultPushSubscriberManager"
-		init-method="loadSubscribers"
-		>
-		<constructor-arg ref="pubSubEngine" />
-		<constructor-arg ref="pushSubscriberRepository" />
-	</bean>
-
- 	<bean id="feedRetriver"
-		class="se.vgregion.pubsub.push.impl.DefaultFeedRetriever"
-		init-method="start"
-		destroy-method="stop">
-		<constructor-arg ref="retrieveQueue" />
-		<constructor-arg ref="pubSubEngine" />
-	</bean>
+	
+	<context:component-scan base-package="se.vgregion.pubsub.admin" />
 
 </beans>

@@ -16,6 +16,7 @@
   <modules>
     <module>composites/pubsub</module>
     <module>composites/push</module>
+    <module>composites/admin-gui</module>
     <module>modules/web</module>
   </modules>
 
@@ -29,6 +30,11 @@
 		    <dependency>
     			<groupId>${project.groupId}</groupId>
     			<artifactId>pubsubhubbub-hub-composite-push</artifactId>
+    			<version>${project.version}</version>
+    		</dependency>
+		    <dependency>
+    			<groupId>${project.groupId}</groupId>
+    			<artifactId>pubsubhubbub-hub-composite-admin-gui</artifactId>
     			<version>${project.version}</version>
     		</dependency>
 
