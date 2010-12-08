@@ -8,10 +8,10 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import nu.xom.Document;
 
@@ -32,35 +32,36 @@ import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.content.AbstractSerializer;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
-import se.vgregion.pubsub.push.Pair;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.SubscriptionMode;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 @Entity
-@Table(name="PUSH_SUBSCRIBERS")
-public class DefaultPushSubscriber extends AbstractEntity<Pair<URI, URI>> implements PushSubscriber {
+@Table(name="PUSH_SUBSCRIBERS",
+    uniqueConstraints={
+        @UniqueConstraint(columnNames={"topic", "callback"})
+    }
+)
+public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushSubscriber {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultPushSubscriber.class);
     
     @Transient
     private PushSubscriberRepository subscriberRepository;
     
-    @SuppressWarnings("unused") // only used by JPA
     @Id
-    @GeneratedValue
-    private Long pk;
-    
+    private UUID id;
+
     @Column
     private Long timeout;
     
     @Column
     private Long lastUpdated;
     
-    @Column(nullable=false, unique=true)
+    @Column(nullable=false)
     private String topic;
     
-    @Column(nullable=false, unique=true)
+    @Column(nullable=false)
     private String callback;
     
     @Column(nullable=false)
@@ -80,6 +81,8 @@ public class DefaultPushSubscriber extends AbstractEntity<Pair<URI, URI>> implem
     public DefaultPushSubscriber(PushSubscriberRepository subscriberRepository, URI topic, URI callback, 
             DateTime timeout, DateTime lastUpdated,
             int leaseSeconds, String verifyToken) {
+        id = UUID.randomUUID();
+        
         Assert.notNull(subscriberRepository);
         Assert.notNull(topic);
         Assert.notNull(callback);
@@ -102,8 +105,8 @@ public class DefaultPushSubscriber extends AbstractEntity<Pair<URI, URI>> implem
 
     
     @Override
-    public Pair<URI, URI> getId() {
-        return new Pair<URI, URI>(getTopic(), getCallback());
+    public UUID getId() {
+        return id;
     }
 
     @Override

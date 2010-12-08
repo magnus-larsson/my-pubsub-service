@@ -11,7 +11,7 @@
 		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/reset.css" type="text/css" />
 		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/typography.css" type="text/css" />
 		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/forms.css" type="text/css" />
-		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/urlservice.css" type="text/css" />
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/pubsub.css" type="text/css" />
 
 	</head>
 	<body>
@@ -27,7 +27,7 @@
 				<tr>
 					<td>${pushSubscriber.topic}</td>
 					<td>${pushSubscriber.callback}</td>
-					<td><input type="submit" value="Ta bort" name="delete-${rule.id}">
+					<td><input type="submit" value="Ta bort" name="delete-${pushSubscriber.id}">
 				</tr>
 			</c:forEach>
 		</table>

@@ -37,8 +37,10 @@
         http://www.springframework.org/schema/tx
         http://www.springframework.org/schema/tx/spring-tx.xsd">
 
+    <mvc:resources location="classpath:/META-INF/" mapping="/resources/**" /> 
 
-	<context:annotation-config />
+	<mvc:annotation-driven/>
+<!--	<context:annotation-config />-->
 	<tx:annotation-driven />
 
     <context:component-scan base-package="se.vgregion.pubsub.push.web"/>
@@ -52,5 +54,6 @@
 		<property name="prefix" value="/WEB-INF/jsp/" />
 		<property name="suffix" value=".jsp" />
 	</bean>
+    
     
 </beans>
