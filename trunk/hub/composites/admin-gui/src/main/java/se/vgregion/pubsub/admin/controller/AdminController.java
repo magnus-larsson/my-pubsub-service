@@ -18,7 +18,6 @@ public class AdminController {
     @Resource
     private AdminService adminService;
     
-    
     @RequestMapping("/admin")
     public ModelAndView index() {
         ModelAndView mav = new ModelAndView("admin/index");
@@ -39,12 +38,15 @@ public class AdminController {
     public ModelAndView creataPushSubscriber(
         @RequestParam("topic") URI topic,    
         @RequestParam("callback") URI callback,    
-        @RequestParam(value="leaseSeconds", required=false) int leaseSeconds,    
+        @RequestParam(value="leaseSeconds", required=false) Integer leaseSeconds,    
         @RequestParam(value="verifyToken", required=false) String verifyToken) {
 
+        if(leaseSeconds == null) {
+            leaseSeconds = 0;
+        }
         adminService.createPushSubscriber(topic, callback, leaseSeconds, verifyToken);
         
-        return new ModelAndView("redirect:..");
+        return new ModelAndView("redirect:");
     }
 
 }
