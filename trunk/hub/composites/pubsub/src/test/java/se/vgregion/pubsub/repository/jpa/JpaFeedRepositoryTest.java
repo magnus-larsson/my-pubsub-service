@@ -45,9 +45,9 @@ public class JpaFeedRepositoryTest extends AbstractTransactionalJUnit4SpringCont
     @Rollback(false)
     public void setup() {
         feedRepository = applicationContext.getBean(FeedRepository.class);
-        expected = new FeedBuilder().id("f1").field("http://namespace.org", "n", "v")
-            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED2).build())
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED3).build())
+        expected = new FeedBuilder().id("f11").field("http://namespace.org", "n", "v")
+            .entry(new EntryBuilder().id("e11").updated(UnitTestConstants.UPDATED2).build())
+            .entry(new EntryBuilder().id("e12").updated(UnitTestConstants.UPDATED3).build())
             .build();
         feedRepository.persist(expected);
     }
@@ -56,7 +56,7 @@ public class JpaFeedRepositoryTest extends AbstractTransactionalJUnit4SpringCont
     @Transactional
     @Rollback
     public void find() {
-        Feed actual = feedRepository.find("f1");
+        Feed actual = feedRepository.find("f11");
         
         Assert.assertEquals(expected.getFeedId(), actual.getFeedId());
         Assert.assertEquals(2, actual.getEntries().size());
@@ -68,10 +68,10 @@ public class JpaFeedRepositoryTest extends AbstractTransactionalJUnit4SpringCont
     @Transactional
     @Rollback
     public void merge() {
-        Feed updated = new FeedBuilder().id("f1").field("http://namespace.org", "n", "v")
-            .entry(new EntryBuilder().id("e3").updated(UnitTestConstants.UPDATED1).build())
-            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED3).build())
+        Feed updated = new FeedBuilder().id("f11").field("http://namespace.org", "n", "v")
+            .entry(new EntryBuilder().id("e13").updated(UnitTestConstants.UPDATED1).build())
+            .entry(new EntryBuilder().id("e11").updated(UnitTestConstants.UPDATED1).build())
+            .entry(new EntryBuilder().id("e12").updated(UnitTestConstants.UPDATED3).build())
             .build();
 
     }

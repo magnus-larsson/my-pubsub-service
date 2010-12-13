@@ -79,7 +79,6 @@ public class DefaultFeedRetriever implements FeedRetriever {
         });
     }
 
-    @Transactional
     public void retrieve(URI topicUrl) throws InterruptedException, IOException {
         LOG.info("Retrieving feed: {}", topicUrl);
 

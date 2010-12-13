@@ -15,4 +15,5 @@ public interface Topic extends Entity<URI> {
     void addSubscriber(Subscriber subscriber);
 
     void removeSubscriber(Subscriber subscriber);
+
 }

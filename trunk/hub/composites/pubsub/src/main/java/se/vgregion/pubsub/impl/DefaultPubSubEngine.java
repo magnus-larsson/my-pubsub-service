@@ -19,12 +19,16 @@ public class DefaultPubSubEngine implements PubSubEngine {
     private TopicRepository topicRepository;
     private FeedRepository feedRepository;
     private SubscriberTimeoutNotifier subscriberTimeoutNotifier = new DefaultSubscriberTimeoutNotifier();
+    private PublicationRetryer publicationRetryer;
+
     
     private Map<URI, Topic> topics = new ConcurrentHashMap<URI, Topic>();
     
-    public DefaultPubSubEngine(TopicRepository topicRepository, FeedRepository feedRepository) {
+    public DefaultPubSubEngine(TopicRepository topicRepository, FeedRepository feedRepository,
+            PublicationRetryer publicationRetryer) {
         this.topicRepository = topicRepository;
         this.feedRepository = feedRepository;
+        this.publicationRetryer = publicationRetryer;
         
         Collection<Topic> storedTopics = topicRepository.findAll();
         
@@ -45,7 +49,7 @@ public class DefaultPubSubEngine implements PubSubEngine {
     @Override
     @Transactional
     public synchronized Topic createTopic(URI url) {
-        Topic topic = new DefaultTopic(url, feedRepository, subscriberTimeoutNotifier);
+        Topic topic = new DefaultTopic(url, feedRepository, subscriberTimeoutNotifier, publicationRetryer);
         topics.put(url, topic);
         
         topicRepository.persist(topic);

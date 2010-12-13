@@ -30,6 +30,15 @@ public class DefaultPushSubscriberTest {
     public void cstrNullCallback() {
         new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, null, 123, "token");
     }    
+
+    @Test
+    public void getTimeout() {
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 0, "token");
+        
+        Assert.assertNull(subscriber.getTimeout());
+        
+    }    
+
     
     @Test
     public void verificationUrl() throws UnsupportedEncodingException {
@@ -67,14 +76,4 @@ public class DefaultPushSubscriberTest {
                 URI.create(UnitTestConstants.CALLBACK + "?abc=def&hub.mode=subscribe&hub.topic=" + URLEncoder.encode(UnitTestConstants.TOPIC.toString(), "UTF-8") + "&hub.challenge=ch"), 
                 subscriber.getVerificationUrl(SubscriptionMode.SUBSCRIBE, "ch"));
     }
-
-    @Test
-    public void testEquals() {
-        DefaultPushSubscriber subscriber1 = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 0, null);
-        DefaultPushSubscriber subscriber2 = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 0, null);
-
-        Assert.assertTrue(subscriber1.equals(subscriber2));
-        Assert.assertTrue(subscriber2.equals(subscriber1));
-    }
-
 }
