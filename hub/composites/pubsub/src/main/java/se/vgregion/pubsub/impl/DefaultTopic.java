@@ -51,6 +51,9 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     private SubscriberTimeoutNotifier subscriberTimeoutNotifier;
 
     @Transient
+    private PublicationRetryer publicationRetryer;
+
+    @Transient
     private FeedRepository feedRepository;
 
     
@@ -58,7 +61,8 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     protected DefaultTopic() {
     }
     
-    public DefaultTopic(URI url, FeedRepository feedRepository, SubscriberTimeoutNotifier subscriberTimoutNotifier) {
+    public DefaultTopic(URI url, FeedRepository feedRepository, SubscriberTimeoutNotifier subscriberTimoutNotifier, 
+            PublicationRetryer publicationRetryer) {
         Assert.notNull(url);
         Assert.notNull(feedRepository);
         Assert.notNull(subscriberTimoutNotifier);
@@ -66,6 +70,7 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
         this.url = url.toString();
         this.feedRepository = feedRepository;
         this.subscriberTimeoutNotifier = subscriberTimoutNotifier;
+        this.publicationRetryer = publicationRetryer;
     }
     
     @Override
@@ -82,6 +87,7 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     @Override
     public synchronized void publish(Feed publishedFeed) {
         LOG.info("Publishing on topic {}", url);
+
         if(this.feed != null) {
             this.feed.merge(publishedFeed);
         } else {
@@ -92,15 +98,23 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
         DateTime lastUpdatedSubscriber = new DateTime();
         for(Subscriber subscriber : subscribers) {
             try {
-                LOG.info("Publishing to {}", subscriber);
-                subscriber.publish(this.feed);
+                publish(subscriber);
             } catch (PublicationFailedException e) {
                 LOG.warn("Subscriber failed: {}", e.getMessage());
+                
+                if(publicationRetryer != null) {
+                    publicationRetryer.addRetry(this, subscriber);
+                }
                 lastUpdatedSubscriber = subscriber.getLastUpdated();
             }
         }
         
         // TODO purge old entries based on lastUpdatedSubscriber
+    }
+    
+    protected synchronized void publish(Subscriber subscriber) throws PublicationFailedException {
+        LOG.info("Publishing to {}", subscriber);
+        subscriber.publish(this.feed);
     }
 
     @Override

@@ -144,8 +144,6 @@ public class PushController {
             URI uri = new URI(url);
             
             if(allowScheme(uri)) {
-                Topic topic = pubSubEngine.getOrCreateTopic(uri);
-                
                 boolean wasAdded = false;
                 try {
                     wasAdded = retrieverQueue.offer(uri, 2000, TimeUnit.MILLISECONDS);

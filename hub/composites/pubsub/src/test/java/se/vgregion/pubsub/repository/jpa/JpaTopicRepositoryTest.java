@@ -45,7 +45,7 @@ public class JpaTopicRepositoryTest extends AbstractTransactionalJUnit4SpringCon
     @Before
     public void setup() {
         topicRepository = applicationContext.getBean(TopicRepository.class);
-        topic1 = new DefaultTopic(UnitTestConstants.TOPIC, feedRepository, new NoopSubscriberTimeoutNotifier());
+        topic1 = new DefaultTopic(UnitTestConstants.TOPIC, feedRepository, new NoopSubscriberTimeoutNotifier(), null);
         topicRepository.persist(topic1);
     }
     

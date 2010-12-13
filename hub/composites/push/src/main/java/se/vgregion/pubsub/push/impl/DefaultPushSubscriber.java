@@ -15,6 +15,7 @@ import javax.persistence.UniqueConstraint;
 
 import nu.xom.Document;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -88,7 +89,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         Assert.notNull(callback);
         
         this.subscriberRepository = subscriberRepository;
-        this.timeout = timeout.getMillis();
+        if(timeout != null) this.timeout = timeout.getMillis();
         if(lastUpdated != null) this.lastUpdated = lastUpdated.getMillis();
         this.topic = topic.toString();
         this.callback = callback.toString();
@@ -99,7 +100,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     public DefaultPushSubscriber(PushSubscriberRepository subscriberRepository, URI topic, URI callback, 
             int leaseSeconds, String verifyToken) {
         this(subscriberRepository, topic, callback, 
-                new DateTime().plusSeconds(leaseSeconds), null,
+                (leaseSeconds > 0) ? new DateTime().plusSeconds(leaseSeconds) : null, null,
                 leaseSeconds, verifyToken);
     }
 
@@ -111,7 +112,11 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
 
     @Override
     public DateTime getTimeout() {
-        return new DateTime(timeout, DateTimeZone.UTC);
+        if(timeout != null && timeout > 0) {
+            return new DateTime(timeout, DateTimeZone.UTC);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -261,4 +266,11 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public String toString() {
+        return "[topic=" + topic + ", callback=" + callback + "]";
+    }
+    
+    
 }
