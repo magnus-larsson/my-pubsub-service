@@ -38,14 +38,13 @@ import se.vgregion.pubsub.repository.TopicRepository;
 public class JpaTopicRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     private TopicRepository topicRepository;
-    private FeedRepository feedRepository = Mockito.mock(FeedRepository.class);
     
     private DefaultTopic topic1;
     
     @Before
     public void setup() {
         topicRepository = applicationContext.getBean(TopicRepository.class);
-        topic1 = new DefaultTopic(UnitTestConstants.TOPIC, feedRepository, new NoopSubscriberTimeoutNotifier(), null);
+        topic1 = new DefaultTopic(UnitTestConstants.TOPIC, new NoopSubscriberTimeoutNotifier(), null);
         topicRepository.persist(topic1);
     }
     

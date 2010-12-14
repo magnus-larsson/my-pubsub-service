@@ -57,4 +57,13 @@ public class JpaPushSubscriberRepositoryTest extends AbstractTransactionalJUnit4
         Assert.assertEquals(expected.getTopic(), actual.getTopic());
     }
 
+    @Test
+    @Transactional
+    @Rollback
+    public void findByTopicAndCallback() {
+        PushSubscriber actual = subscriberRepository.findByTopicAndCallback(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK);
+        
+        Assert.assertEquals(expected.getTopic(), actual.getTopic());
+    }
+
 }

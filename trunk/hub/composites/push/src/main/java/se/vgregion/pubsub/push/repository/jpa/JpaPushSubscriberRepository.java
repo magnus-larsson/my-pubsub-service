@@ -1,5 +1,6 @@
 package se.vgregion.pubsub.push.repository.jpa;
 
+import java.net.URI;
 import java.util.UUID;
 
 import javax.persistence.NoResultException;
@@ -24,6 +25,21 @@ public class JpaPushSubscriberRepository extends AbstractJpaRepository<PushSubsc
             return (PushSubscriber) entityManager.createQuery("select l from DefaultPushSubscriber l " +
             		"where l.id = :id ")
                 .setParameter("id", id)
+                .getSingleResult();
+            
+        } catch(NoResultException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public PushSubscriber findByTopicAndCallback(URI topic, URI callback) {
+        try {
+            return (PushSubscriber) entityManager.createQuery("select l from DefaultPushSubscriber l " +
+                        "where l.topic = :topic " +
+                        "and l.callback = :callback ")
+                .setParameter("topic", topic.toString())
+                .setParameter("callback", callback.toString())
                 .getSingleResult();
             
         } catch(NoResultException e) {

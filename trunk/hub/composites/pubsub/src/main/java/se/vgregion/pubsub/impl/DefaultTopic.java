@@ -24,7 +24,6 @@ import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.Subscriber;
 import se.vgregion.pubsub.SubscriberTimeoutNotifier;
 import se.vgregion.pubsub.Topic;
-import se.vgregion.pubsub.repository.FeedRepository;
 
 @Entity
 @Table(name="TOPICS")
@@ -53,22 +52,16 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     @Transient
     private PublicationRetryer publicationRetryer;
 
-    @Transient
-    private FeedRepository feedRepository;
-
-    
     // For JPA
     protected DefaultTopic() {
     }
     
-    public DefaultTopic(URI url, FeedRepository feedRepository, SubscriberTimeoutNotifier subscriberTimoutNotifier, 
+    public DefaultTopic(URI url, SubscriberTimeoutNotifier subscriberTimoutNotifier, 
             PublicationRetryer publicationRetryer) {
         Assert.notNull(url);
-        Assert.notNull(feedRepository);
         Assert.notNull(subscriberTimoutNotifier);
         
         this.url = url.toString();
-        this.feedRepository = feedRepository;
         this.subscriberTimeoutNotifier = subscriberTimoutNotifier;
         this.publicationRetryer = publicationRetryer;
     }
@@ -140,9 +133,4 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     protected void setSubscriberTimeoutNotifier(SubscriberTimeoutNotifier subscriberTimoutNotifier) {
         this.subscriberTimeoutNotifier = subscriberTimoutNotifier;
     }
-
-    protected void setFeedRepository(FeedRepository feedRepository) {
-        this.feedRepository = feedRepository;
-    }
-
 }

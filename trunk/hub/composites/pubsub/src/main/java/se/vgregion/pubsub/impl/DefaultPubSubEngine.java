@@ -11,23 +11,19 @@ import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.SubscriberTimeoutNotifier;
 import se.vgregion.pubsub.Topic;
-import se.vgregion.pubsub.repository.FeedRepository;
 import se.vgregion.pubsub.repository.TopicRepository;
 
 public class DefaultPubSubEngine implements PubSubEngine {
 
     private TopicRepository topicRepository;
-    private FeedRepository feedRepository;
     private SubscriberTimeoutNotifier subscriberTimeoutNotifier = new DefaultSubscriberTimeoutNotifier();
     private PublicationRetryer publicationRetryer;
 
     
     private Map<URI, Topic> topics = new ConcurrentHashMap<URI, Topic>();
     
-    public DefaultPubSubEngine(TopicRepository topicRepository, FeedRepository feedRepository,
-            PublicationRetryer publicationRetryer) {
+    public DefaultPubSubEngine(TopicRepository topicRepository, PublicationRetryer publicationRetryer) {
         this.topicRepository = topicRepository;
-        this.feedRepository = feedRepository;
         this.publicationRetryer = publicationRetryer;
         
         Collection<Topic> storedTopics = topicRepository.findAll();
@@ -35,7 +31,6 @@ public class DefaultPubSubEngine implements PubSubEngine {
         for(Topic storedTopic : storedTopics) {
             DefaultTopic defaultTopic = (DefaultTopic) storedTopic;
             
-            defaultTopic.setFeedRepository(feedRepository);
             defaultTopic.setSubscriberTimeoutNotifier(subscriberTimeoutNotifier);
             topics.put(defaultTopic.getUrl(), defaultTopic);
         }
@@ -49,7 +44,7 @@ public class DefaultPubSubEngine implements PubSubEngine {
     @Override
     @Transactional
     public synchronized Topic createTopic(URI url) {
-        Topic topic = new DefaultTopic(url, feedRepository, subscriberTimeoutNotifier, publicationRetryer);
+        Topic topic = new DefaultTopic(url, subscriberTimeoutNotifier, publicationRetryer);
         topics.put(url, topic);
         
         topicRepository.persist(topic);

@@ -19,6 +19,7 @@
 
 package se.vgregion.pubsub.push.repository;
 
+import java.net.URI;
 import java.util.UUID;
 
 import se.vgregion.dao.domain.patterns.repository.Repository;
@@ -26,4 +27,5 @@ import se.vgregion.pubsub.push.PushSubscriber;
     
 public interface PushSubscriberRepository extends Repository<PushSubscriber, UUID> {
 
+    PushSubscriber findByTopicAndCallback(URI topic, URI callback);
 }

@@ -1,16 +1,12 @@
 package se.vgregion.pubsub.push.impl;
 
-import se.vgregion.pubsub.push.PushSubscriber;
+import java.net.URI;
 
 public interface PushSubscriberManager {
 
     public void loadSubscribers();
 
-    public void subscribe(PushSubscriber subscriber);
+    public void subscribe(URI topicUrl, URI callback, int leaseSeconds, String verifyToken);
 
-    public void unsubscribe(PushSubscriber subscriber);
-    
-    
-    
-    
+    public void unsubscribe(URI topic, URI callback);
 }
