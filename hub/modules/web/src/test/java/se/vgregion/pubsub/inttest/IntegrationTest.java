@@ -106,7 +106,6 @@ public class IntegrationTest extends IntegrationTestTemplate {
                 UnitTestConstants.UPDATED1).entry(
                 new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build()).entry(
                 new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED1).build()).build();
-
         subscriber.subscribe(SubscriptionMode.UNSUBSCRIBE, hubUrl, publisher.getUrl());
         
         publisher.publish(hubUrl, feed);

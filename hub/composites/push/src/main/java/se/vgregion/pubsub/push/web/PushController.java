@@ -95,16 +95,13 @@ public class PushController {
                         String secret = request.getParameter("hub.secret");
                         String verifyToken = request.getParameter("hub.verify_token");
                         
-                        PushSubscriber subscriber = new DefaultPushSubscriber(subscriberRepository, topicUrl, callback, leaseSeconds, verifyToken);
-                        
-                        
                         try {
-                            subscriber.verify(mode);
-                            
                             if(mode == SubscriptionMode.SUBSCRIBE) {
-                                pushSubscriberManager.subscribe(subscriber);
+                                PushSubscriber subscriber = new DefaultPushSubscriber(subscriberRepository, topicUrl, callback, leaseSeconds, verifyToken);
+                                subscriber.verify(mode);
+                                pushSubscriberManager.subscribe(topicUrl, callback, leaseSeconds, verifyToken);
                             } else {
-                                pushSubscriberManager.unsubscribe(subscriber);
+                                pushSubscriberManager.unsubscribe(topicUrl, callback);
                             }
                             
                             response.setStatus(204);

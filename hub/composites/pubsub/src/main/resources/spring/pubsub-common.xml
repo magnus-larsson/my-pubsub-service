@@ -34,7 +34,7 @@
 
 	<context:annotation-config />
 
- 	<bean id="publicationRetryer" class="se.vgregion.pubsub.impl.PublicationRetryer" >
+ 	<bean id="publicationRetryer" class="se.vgregion.pubsub.impl.DefaultPublicationRetryer" >
 		<constructor-arg>
 			<bean id="sharedTransactionTemplate"
 	      		class="org.springframework.transaction.support.TransactionTemplate">
@@ -47,7 +47,6 @@
 
  	<bean id="pubSubEngine" class="se.vgregion.pubsub.impl.DefaultPubSubEngine" >
 		<constructor-arg ref="topicRepository"></constructor-arg>
-		<constructor-arg ref="feedRepository"></constructor-arg>
 		<constructor-arg ref="publicationRetryer"></constructor-arg>
 	</bean>
 

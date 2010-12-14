@@ -267,10 +267,10 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         }
     }
 
-    @Override
-    public String toString() {
-        return "[topic=" + topic + ", callback=" + callback + "]";
-    }
+//    @Override
+//    public String toString() {
+//        return "[topic=" + topic + ", callback=" + callback + "]";
+//    }
     
     
 }
