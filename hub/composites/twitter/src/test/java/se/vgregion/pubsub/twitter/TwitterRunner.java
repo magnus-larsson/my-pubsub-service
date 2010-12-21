@@ -12,9 +12,12 @@ import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.twitter.impl.TwitterPublisher;
 
 
-public class TwitterTest {
+public class TwitterRunner {
 
     public static void main(String[] args) throws InterruptedException {
+        String username = args[0];
+        String password = args[1];
+        
         PubSubEngine engine = new PubSubEngine() {
             @Override
             public void publish(URI url, Feed feed) {
@@ -47,7 +50,7 @@ public class TwitterTest {
             }
         };
         
-        TwitterPublisher consumer = new TwitterPublisher(engine, "", "");
+        TwitterPublisher consumer = new TwitterPublisher(engine, username, username);
         Subscriber subscriber = Mockito.mock(Subscriber.class);
         Mockito.when(subscriber.getTopic()).thenReturn(URI.create(TwitterPublisher.FILTER_URL + "#" + "foo"));
         consumer.onSubscribe(subscriber);
