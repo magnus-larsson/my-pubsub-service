@@ -35,10 +35,16 @@
                            http://www.springframework.org/schema/tx
                            http://www.springframework.org/schema/tx/spring-tx.xsd">
 
+	<context:property-placeholder
+		location="classpath:default.properties,file:${user.home}/.pubsub/pubsub.properties,${testproperties}"
+		ignore-resource-not-found="true"
+		ignore-unresolvable="true"
+	/>
+
  	<bean id="twitterPublisher"
 		class="se.vgregion.pubsub.twitter.impl.TwitterPublisher">
 		<constructor-arg ref="pubSubEngine" />
-		<constructor-arg value="protocol7" />
-		<constructor-arg value="PUkcqKHN8J2OvU" />
+		<constructor-arg value="${twitter.username}" />
+		<constructor-arg value="${twitter.password}" />
 	</bean>
 </beans>
