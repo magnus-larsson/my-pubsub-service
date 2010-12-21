@@ -50,7 +50,7 @@ public class TwitterRunner {
             }
         };
         
-        TwitterPublisher consumer = new TwitterPublisher(engine, username, username);
+        TwitterPublisher consumer = new TwitterPublisher(engine, username, password);
         Subscriber subscriber = Mockito.mock(Subscriber.class);
         Mockito.when(subscriber.getTopic()).thenReturn(URI.create(TwitterPublisher.FILTER_URL + "#" + "foo"));
         consumer.onSubscribe(subscriber);
