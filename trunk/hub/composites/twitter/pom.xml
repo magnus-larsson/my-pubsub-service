@@ -17,10 +17,6 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>pubsubhubbub-hub-composite-pubsub</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>se.vgregion.daoframework</groupId>
-			<artifactId>dao-framework-jpa-spring</artifactId>
-		</dependency>
 		
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
