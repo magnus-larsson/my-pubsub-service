@@ -1,7 +1,9 @@
 package se.vgregion.pubsub.impl;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -9,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
+import se.vgregion.pubsub.PubSubEventListener;
+import se.vgregion.pubsub.Subscriber;
 import se.vgregion.pubsub.SubscriberTimeoutNotifier;
 import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.repository.TopicRepository;
@@ -19,8 +23,9 @@ public class DefaultPubSubEngine implements PubSubEngine {
     private SubscriberTimeoutNotifier subscriberTimeoutNotifier = new DefaultSubscriberTimeoutNotifier();
     private PublicationRetryer publicationRetryer;
 
-    
     private Map<URI, Topic> topics = new ConcurrentHashMap<URI, Topic>();
+    
+    private List<PubSubEventListener> eventListeners = new ArrayList<PubSubEventListener>();
     
     public DefaultPubSubEngine(TopicRepository topicRepository, PublicationRetryer publicationRetryer) {
         this.topicRepository = topicRepository;
@@ -66,5 +71,38 @@ public class DefaultPubSubEngine implements PubSubEngine {
     public void publish(URI url, Feed feed) {
         Topic topic = getOrCreateTopic(url);
         topic.publish(feed);
+    }
+
+    @Override
+    public void subscribe(Subscriber subscriber) {
+        Topic topic = getOrCreateTopic(subscriber.getTopic());
+        topic.addSubscriber(subscriber);
+        
+        for(PubSubEventListener listener : eventListeners) {
+            listener.onSubscribe(subscriber);
+        }
+    }
+
+    @Override
+    public void unsubscribe(Subscriber subscriber) {
+        Topic topic = getTopic(subscriber.getTopic());
+        
+        if(topic != null) {
+            topic.removeSubscriber(subscriber);
+        }
+
+        for(PubSubEventListener listener : eventListeners) {
+            listener.onUnsubscribe(subscriber);
+        }
+    }
+
+    @Override
+    public void addPubSubEventListener(PubSubEventListener eventListener) {
+        eventListeners.add(eventListener);        
+    }
+
+    @Override
+    public void removePubSubEventListener(PubSubEventListener eventListener) {
+        eventListeners.remove(eventListener);
     }
 }

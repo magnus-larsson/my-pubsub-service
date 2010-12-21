@@ -52,6 +52,15 @@ public class Rss2Serializer extends AbstractSerializer {
             entryElm.appendChild(custom.toXml());
         }
         
+        Element content = entry.getContent();
+        if(content != null) {
+            // in Atom NS, needs be be changed
+            Element rssContent = new Element("description");
+            for(int i = 0; i<content.getChildCount(); i++) {
+                rssContent.appendChild(content.getChild(i).copy());
+            }
+        }
+        
         return entryElm;
 
     }

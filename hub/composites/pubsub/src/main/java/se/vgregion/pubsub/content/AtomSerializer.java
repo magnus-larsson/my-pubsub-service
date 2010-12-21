@@ -54,6 +54,11 @@ public class AtomSerializer extends AbstractSerializer {
             entryElm.appendChild(custom.toXml());
         }
         
+        Element content = entry.getContent();
+        if(content != null) {
+            entryElm.appendChild(content);
+        }
+        
         return entryElm;
 
     }

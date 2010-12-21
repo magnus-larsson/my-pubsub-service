@@ -9,6 +9,6 @@ public interface AdminService {
 
     Collection<PushSubscriber> getAllPushSubscribers();
     
-    PushSubscriber createPushSubscriber(URI topic, URI callback, int leaseSeconds, String verifyToken);
+    void createPushSubscriber(URI topic, URI callback, int leaseSeconds, String verifyToken);
     
 }

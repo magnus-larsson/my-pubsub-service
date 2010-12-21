@@ -22,6 +22,7 @@ import org.joda.time.DateTimeZone;
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Field;
+import se.vgregion.pubsub.Namespaces;
 
 @Entity
 @Table(name="ENTRIES")
@@ -42,6 +43,18 @@ public class DefaultEntry extends AbstractEntity<String> implements Entry {
 
         public EntryBuilder updated(DateTime updated) {
             entry.updated = updated.getMillis();
+            return this;
+        }
+
+        public EntryBuilder content(Element elm) {
+            entry.content = XmlUtil.xmlToString(elm);
+            return this;
+        }
+
+        public EntryBuilder content(String content) {
+            Element elm = new Element("content", Namespaces.NS_ATOM);
+            elm.appendChild(content);
+            entry.content = XmlUtil.xmlToString(elm);
             return this;
         }
         
@@ -71,6 +84,9 @@ public class DefaultEntry extends AbstractEntity<String> implements Entry {
     
     @Basic
     private Long updated;
+
+    @Basic
+    private String content;
     
     @OneToMany(cascade=CascadeType.ALL, targetEntity=DefaultField.class)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
@@ -97,22 +113,17 @@ public class DefaultEntry extends AbstractEntity<String> implements Entry {
     }
 
     @Override
+    public Element getContent() {
+        if(content == null) return null;
+        
+        return XmlUtil.stringToXml(content);
+    }
+    
+    @Override
     public List<Field> getFields() {
         return fields;
     }
     
-    private Field getField(String namespace, String name) {
-        // TODO handle multiple fields with same ns and name
-        for(Field field : fields) {
-            Element elm = field.toXml();
-            if(elm.getNamespaceURI().equals(namespace) && elm.getLocalName().equals(name)) {
-                return field;
-            }
-        }
-        
-        return null;
-    }
-
     @Override
     public boolean isNewerThan(DateTime since) {
         DateTime thisUpdated = getUpdated();
@@ -126,6 +137,11 @@ public class DefaultEntry extends AbstractEntity<String> implements Entry {
     @Override
     public void merge(Entry entry) {
         this.entryId = entry.getEntryId();
+        if(entry.getContent() != null) {
+            this.content = XmlUtil.xmlToString(entry.getContent());
+        } else {
+            this.content = null;
+        }
         if(entry.getUpdated() != null) {
             this.updated = entry.getUpdated().getMillis();
         } else {

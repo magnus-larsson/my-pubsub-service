@@ -29,8 +29,7 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
         Collection<PushSubscriber> subscribers = subscriptionRepository.findAll();
         
         for(PushSubscriber subscriber : subscribers) {
-            Topic topic = pubSubEngine.getOrCreateTopic(subscriber.getTopic());
-            topic.addSubscriber(subscriber);
+            pubSubEngine.subscribe(subscriber);
         }
     }
 
@@ -39,11 +38,9 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
     public void subscribe(URI topicUrl, URI callback, int leaseSeconds, String verifyToken) {
         unsubscribe(topicUrl, callback);
         
-        Topic topic = pubSubEngine.getOrCreateTopic(topicUrl);
-        
         DefaultPushSubscriber subscriber = new DefaultPushSubscriber(subscriptionRepository, topicUrl, callback, leaseSeconds, verifyToken);
         
-        topic.addSubscriber(subscriber);
+        pubSubEngine.subscribe(subscriber);
         
         subscriptionRepository.persist(subscriber);
     }
@@ -55,8 +52,8 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
         if(subscriber != null) {
             try {
                 subscriber.verify(SubscriptionMode.UNSUBSCRIBE);
-                Topic topic = pubSubEngine.getOrCreateTopic(subscriber.getTopic());
-                topic.removeSubscriber(subscriber);
+
+                pubSubEngine.unsubscribe(subscriber);
                 subscriptionRepository.remove(subscriber);
             } catch (IOException e) {
                 // ignore
