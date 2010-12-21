@@ -50,6 +50,8 @@ public class AtomParser extends AbstractParser {
                 entryBuilder.id(child.getValue());
             } else if("updated".equals(child.getLocalName()) && isAtom(child)) {
                 entryBuilder.updated(DateTimeUtils.parseDateTime(child.getValue()));
+            } else if("content".equals(child.getLocalName()) && isAtom(child)) {
+                entryBuilder.content(child);
             } else {
                 entryBuilder.field(child);
             }

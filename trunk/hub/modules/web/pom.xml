@@ -14,7 +14,7 @@
 	<name>${project.artifactId}</name>
 
 	<build>
-		<finalName>pubsub</finalName>
+		<finalName>pubsub-${project.version}</finalName>
 		<plugins>
 			<plugin>
 				<!--
@@ -47,6 +47,10 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>pubsubhubbub-hub-composite-twitter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>pubsubhubbub-hub-composite-admin-gui</artifactId>
 		</dependency>
 
@@ -73,6 +77,13 @@
 			-->
 			<scope>compile</scope>
 		</dependency>
+		
+		<dependency>
+		    <groupId>jstl</groupId>
+		    <artifactId>jstl</artifactId>
+		    <version>1.2</version>
+		</dependency>
+		
 		
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>

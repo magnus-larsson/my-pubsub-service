@@ -20,9 +20,6 @@ import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 public class DefaultAdminService implements AdminService {
 
     @Resource
-    private PubSubEngine pubSubEngine;
-
-    @Resource
     private PushSubscriberRepository subscriberRepository;
     
     @Resource
@@ -30,12 +27,8 @@ public class DefaultAdminService implements AdminService {
     
     @Override
     @Transactional
-    public PushSubscriber createPushSubscriber(URI topic, URI callback, int leaseSeconds, String verifyToken) {
-        PushSubscriber subscriber = new DefaultPushSubscriber(subscriberRepository, topic, callback, leaseSeconds, verifyToken);
-        
-        pushSubscriberManager.subscribe(subscriber);
-        
-        return subscriber;
+    public void createPushSubscriber(URI topic, URI callback, int leaseSeconds, String verifyToken) {
+        pushSubscriberManager.subscribe(topic, callback, leaseSeconds, verifyToken);
     }
 
     @Override

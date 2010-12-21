@@ -34,8 +34,9 @@ public class DefaultPubSubEngineTest extends AbstractTransactionalJUnit4SpringCo
         PubSubEngine engine = applicationContext.getBean(PubSubEngine.class);
         Topic topic = engine.getOrCreateTopic(UnitTestConstants.TOPIC);
         Subscriber subscriber = Mockito.mock(Subscriber.class);
+        Mockito.when(subscriber.getTopic()).thenReturn(UnitTestConstants.TOPIC);
         
-        topic.addSubscriber(subscriber);
+        engine.subscribe(subscriber);
         
         Feed feed = new FeedBuilder().id("f1").build();
         
@@ -54,8 +55,9 @@ public class DefaultPubSubEngineTest extends AbstractTransactionalJUnit4SpringCo
         Topic topic = engine.getOrCreateTopic(UnitTestConstants.TOPIC2);
         
         Subscriber subscriber = Mockito.mock(Subscriber.class);
+        Mockito.when(subscriber.getTopic()).thenReturn(UnitTestConstants.TOPIC);
         
-        topic.addSubscriber(subscriber);
+        engine.subscribe(subscriber);
         
         Feed feed = new FeedBuilder().id("f2").updated(
                 UnitTestConstants.UPDATED2).entry(

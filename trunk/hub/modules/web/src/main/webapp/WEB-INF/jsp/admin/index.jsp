@@ -17,20 +17,22 @@
 	<body>
 		<h2>PubSubHubbub prenumeranter</h2>
 		
-		<table>
-			<tr>
-				<th>Topic</th>
-				<th>Callback</th>
-				<th></th>
-			</tr>
-			<c:forEach var="pushSubscriber" items="${pushSubscribers}">
+		<form action='' method="post">
+			<table>
 				<tr>
-					<td>${pushSubscriber.topic}</td>
-					<td>${pushSubscriber.callback}</td>
-					<td><input type="submit" value="Ta bort" name="delete-${pushSubscriber.id}">
+					<th>Topic</th>
+					<th>Callback</th>
+					<th></th>
 				</tr>
-			</c:forEach>
-		</table>
+				<c:forEach var="pushSubscriber" items="${pushSubscribers}">
+					<tr>
+						<td>${pushSubscriber.topic}</td>
+						<td>${pushSubscriber.callback}</td>
+						<td><!--<input type="submit" value="Ta bort" name="delete-${pushSubscriber.id}">--></td>
+					</tr>
+				</c:forEach>
+			</table>
+		</form>
 		<div><a href="${pageContext.request.contextPath}/admin/new"><img src="${pageContext.request.contextPath}/resources/img/page_add.png" /> Skapa ny prenumerant</a></div>
 	</body>
 </html>
