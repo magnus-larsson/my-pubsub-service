@@ -53,6 +53,10 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>pubsubhubbub-hub-composite-admin-gui</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>pubsubhubbub-hub-composite-websocket</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>hibernate</groupId>

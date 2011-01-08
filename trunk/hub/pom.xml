@@ -17,6 +17,7 @@
     <module>composites/pubsub</module>
     <module>composites/push</module>
     <module>composites/twitter</module>
+    <module>composites/websocket</module>
     <module>composites/admin-gui</module>
     <module>modules/web</module>
   </modules>
@@ -41,6 +42,11 @@
 		    <dependency>
     			<groupId>${project.groupId}</groupId>
     			<artifactId>pubsubhubbub-hub-composite-admin-gui</artifactId>
+    			<version>${project.version}</version>
+    		</dependency>
+		    <dependency>
+    			<groupId>${project.groupId}</groupId>
+    			<artifactId>pubsubhubbub-hub-composite-websocket</artifactId>
     			<version>${project.version}</version>
     		</dependency>
 
@@ -143,6 +149,12 @@
 			<version>3.4.0.GA</version>
 		</dependency>
 		
+		<dependency>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-websocket</artifactId>
+          <version>7.2.1.v20101111</version>
+        </dependency>
+        
 		
 		<dependency>
 			<groupId>org.slf4j</groupId>

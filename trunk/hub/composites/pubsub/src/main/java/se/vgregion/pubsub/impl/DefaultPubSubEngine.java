@@ -74,6 +74,7 @@ public class DefaultPubSubEngine implements PubSubEngine {
     }
 
     @Override
+    @Transactional
     public void subscribe(Subscriber subscriber) {
         Topic topic = getOrCreateTopic(subscriber.getTopic());
         topic.addSubscriber(subscriber);
@@ -84,6 +85,7 @@ public class DefaultPubSubEngine implements PubSubEngine {
     }
 
     @Override
+    @Transactional
     public void unsubscribe(Subscriber subscriber) {
         Topic topic = getTopic(subscriber.getTopic());
         
