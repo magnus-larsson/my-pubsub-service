@@ -143,6 +143,7 @@ public class PushController {
             if(allowScheme(uri)) {
                 boolean wasAdded = false;
                 try {
+                    LOG.info("Published feed queued for retrieval");
                     wasAdded = retrieverQueue.offer(uri, 2000, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
                     wasAdded = false;

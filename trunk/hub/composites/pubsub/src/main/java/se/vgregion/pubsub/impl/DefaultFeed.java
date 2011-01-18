@@ -143,17 +143,17 @@ public class DefaultFeed extends AbstractEntity<String> implements Feed {
     }
 
     @Override
-    public void merge(Feed feed) {
-        this.feedId = feed.getFeedId();
-        if(feed.getUpdated() != null) {
-            this.updated = feed.getUpdated().getMillis();
+    public void merge(Feed other) {
+        this.feedId = other.getFeedId();
+        if(other.getUpdated() != null) {
+            this.updated = other.getUpdated().getMillis();
         } else {
             this.updated = null;
         }
         
         fields.clear();
         
-        for(Field otherField : feed.getFields()) {
+        for(Field otherField : other.getFields()) {
             fields.add(otherField);
         }
         
@@ -161,9 +161,8 @@ public class DefaultFeed extends AbstractEntity<String> implements Feed {
         
         
         // check for updated entries
-        for(Entry otherEntry : feed.getEntries()) {
+        for(Entry otherEntry : other.getEntries()) {
             Entry existingEntry = getEntry(otherEntry.getEntryId());
-            
             if(existingEntry != null) {
                 existingEntry.merge(otherEntry);
                 newEntries.add(existingEntry);
@@ -174,7 +173,7 @@ public class DefaultFeed extends AbstractEntity<String> implements Feed {
         
         // check if any of the existing entries do not exist in the new feed
         for(Entry entry : entries) {
-            Entry otherEntry = getEntry(feed.getEntries(), entry.getEntryId());
+            Entry otherEntry = getEntry(other.getEntries(), entry.getEntryId());
             if(otherEntry == null) {
                 newEntries.add(entry);
             }

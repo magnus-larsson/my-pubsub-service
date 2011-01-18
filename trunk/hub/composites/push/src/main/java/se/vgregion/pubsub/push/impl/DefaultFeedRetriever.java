@@ -25,13 +25,13 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
@@ -105,6 +105,8 @@ public class DefaultFeedRetriever implements FeedRetriever {
 
             Header[] contentTypes = response.getHeaders("Content-Type");
 
+            String content = IOUtils.toString(entity.getContent());
+            
             // TODO is this a reasonable default?
             ContentType contentType = ContentType.ATOM;
             if (contentTypes.length > 0) {
@@ -112,12 +114,19 @@ public class DefaultFeedRetriever implements FeedRetriever {
                     contentType = ContentType.fromValue(contentTypes[0].getValue());
                 } catch (IllegalArgumentException e) {
                     // TODO How to handle this, sniff the entity?
-                    contentType = ContentType.ATOM;
+                    
+                    if(content.contains("<rss")) {
+                        contentType = ContentType.RSS;
+                    } else {
+                        contentType = ContentType.ATOM;
+                    }
                 }
             }
 
             try {
-                Feed feed = AbstractParser.create(contentType).parse(entity.getContent());
+                System.out.println(contentType);
+                Feed feed = AbstractParser.create(contentType).parse(content);
+                System.out.println(feed.getEntries().size());
                 LOG.debug("Feed downloaded: {}", url);
                 return feed;
             } catch (Exception e) {
