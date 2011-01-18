@@ -81,7 +81,9 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     public synchronized void publish(Feed publishedFeed) {
         LOG.info("Publishing on topic {}", url);
 
+System.out.println(this.feed);
         if(this.feed != null) {
+            
             this.feed.merge(publishedFeed);
         } else {
             this.feed = publishedFeed;

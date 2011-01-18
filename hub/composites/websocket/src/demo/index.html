@@ -6,9 +6,9 @@
 		<script>
 		function subscribe(e) {
 		    var topic = $("#topic").val()
-		    console.log(encodeURIComponent(topic))
 		    var ws = new WebSocket("ws://localhost:8080/pubsub-1.0-SNAPSHOT/ws?topic=" + encodeURIComponent(topic))
 		    ws.onmessage = function(data) {
+		        console.log(data.data)
 		        var content = $.parseJSON(data.data)
 		        var p = $("<p>" + content.entries[0].content + "</p>")
 		        $("#dump").append(p)
@@ -21,7 +21,7 @@
 	<body>
 	    
 	    <form onsubmit="subscribe();return false">
-	        Topic <input id="topic" name="topic" value="http://stream.twitter.com/1/statuses/filter.json#gaga" />
+	        Topic <input id="topic" name="topic" value="http://stream.twitter.com/1/statuses/filter.json#bieber" />
 	        <input type="submit" value="Subscribe" />
 	    </form>
 	    <div id="dump"></div>

@@ -52,10 +52,10 @@ public class TwitterRunner {
         
         TwitterPublisher consumer = new TwitterPublisher(engine, username, password);
         Subscriber subscriber = Mockito.mock(Subscriber.class);
-        Mockito.when(subscriber.getTopic()).thenReturn(URI.create(TwitterPublisher.FILTER_URL + "#" + "foo"));
+        Mockito.when(subscriber.getTopic()).thenReturn(URI.create(TwitterPublisher.FILTER_URL + "#" + "bieber"));
         consumer.onSubscribe(subscriber);
         
-        Thread.sleep(5000);
+        Thread.sleep(50000);
         consumer.stop();
     }
     

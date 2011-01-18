@@ -43,6 +43,7 @@ public class TwitterPublisher implements PubSubEventListener {
                 topic.toString().startsWith(FILTER_URL)) {
             if(!consumers.containsKey(topic)) {
                 // no consumer running, start one
+                
                 TwitterStreamConsumer consumer = new TwitterStreamConsumer(topic, pubSubEngine, username, password, executor);
                 consumer.start();
                 consumers.put(topic, consumer);

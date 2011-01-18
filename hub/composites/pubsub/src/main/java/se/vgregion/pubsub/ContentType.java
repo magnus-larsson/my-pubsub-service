@@ -20,7 +20,7 @@
 package se.vgregion.pubsub;
 
 public enum ContentType {
-    ATOM("application/atom+xm"),
+    ATOM("application/atom+xml"),
     RSS("application/rss+xml");
     
     private String value;
@@ -30,7 +30,7 @@ public enum ContentType {
     }
 
     public static ContentType fromValue(String value) {
-        if("application/atom+xm".equals(value)) return ATOM;
+        if("application/atom+xml".equals(value)) return ATOM;
         else if("application/rss+xml".equals(value)) return RSS;
         else throw new IllegalArgumentException("Unknown content type: " + value);
     }
