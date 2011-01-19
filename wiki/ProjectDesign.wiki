@@ -1,9 +1,15 @@
-#summary Overal system design
+#summary System design overview
 #labels Featured,Phase-Design
 
-This project aims to implement PubSubHubbub in a Java application, targeted for deployment on typical Servlet engines like Apache Tomcat.
+This project aims to implement PubSubHubbub? in a Java application, targeted for deployment on typical Servlet engines like Apache Tomcat. It also supports additional protocols, such as streaming APIs through a pluggable interface.
 
-The overall design of this project is based on a number of processors with queues on which they listen for jobs. An example of a processor is FeedRetriever which, given a URL on it's queue will retrieve a feed and store a locally. It will then publish the URL on the queue for the FeedDistributor, another processor. You can think of processors as actors in Scala. The purpose of this design is to decouple processing a publication (or polling) event from for example the retrieval, distribution. Processors run on a thread pool and we can thus add additional processing threads for scaling the application. Also, it allows publications to be very quick, as the full content distribution is done asynchronously.
+The core of the project is a publish-subscribe engine. In many ways, it is similar to other similar engine, e.g. JMS publish-subscribe brokers. It does have some differences, the primary one being that published events are collections and subscribers can opt to only use parts of this collection. For example, in the case of PubSubHubbub, a subscriber will only receive updated entries. Events are published on topics, described as an URI for the source data. In the case of PubSubHubbub, the URI is the location of the Atom or RSS2 feed.
 
-The following picture shows an overview of the design:
-http://oppna-program-pubsub-service.googlecode.com/svn/wiki/images/push-publish.png
+In addition to the publish-subscribe engine, there are two other major types of components:
+* Publishers: implements the publishing end of a protocol, e.g. PubSubHubbub or the Twitter Streaming API and publishes events on the pubsub-engine. 
+* Subscribers: implements a subscriber for a specific protocol, e.g. PubSubHubbub or Websockets. Will notify the publish-subscribe engine of topics it will subscribe to, and will then receive published events. 
+
+Components can listen for subscriber changes, e.g. when a subscriber subscribes to a topic. This can typically be used to enable dynamic publishers which only acts when a subscriber is active.
+
+The following picture shows an a high level overview.
+http://oppna-program-pubsub-service.googlecode.com/svn/wiki/images/pubsub-overview.png
