@@ -19,56 +19,8 @@
 
 package se.vgregion.pubsub.impl;
 
-import nu.xom.tests.XOMTestCase;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import se.vgregion.pubsub.Entry;
-import se.vgregion.pubsub.Feed;
-import se.vgregion.pubsub.UnitTestConstants;
-import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
-import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 
 
 public class DefaultFeedTest {
 
-    @Test
-    public void merge() throws Exception {
-        Feed feed = new FeedBuilder()
-            .id("f1").updated(UnitTestConstants.UPDATED2).field(UnitTestConstants.ATOM_TITLE)
-            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build())
-            .build();
-
-        Feed feed2 = new FeedBuilder()
-            .id("f1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.ATOM_TITLE)
-            .entry(new EntryBuilder().id("e3").updated(UnitTestConstants.UPDATED1).build())
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED1).build())
-            .build();
-
-        
-        feed.merge(feed2);
-        
-        Assert.assertEquals("f1", feed.getFeedId());
-        Assert.assertEquals(UnitTestConstants.UPDATED1, feed.getUpdated());
-        Assert.assertEquals(1, feed.getFields().size());
-        XOMTestCase.assertEquals(UnitTestConstants.ATOM_TITLE, feed.getFields().get(0).toXml());
-        
-        Assert.assertEquals(3, feed.getEntries().size());
-        
-        Entry entry = feed.getEntries().get(0);
-        Assert.assertEquals("e3", entry.getEntryId());
-        Assert.assertEquals(UnitTestConstants.UPDATED1, entry.getUpdated());
-
-        entry = feed.getEntries().get(1);
-        Assert.assertEquals("e2", entry.getEntryId());
-        Assert.assertEquals(UnitTestConstants.UPDATED1, entry.getUpdated());
-        
-        entry = feed.getEntries().get(2);
-        Assert.assertEquals("e1", entry.getEntryId());
-        Assert.assertEquals(UnitTestConstants.UPDATED1, entry.getUpdated());
-        
-
-    }
 }

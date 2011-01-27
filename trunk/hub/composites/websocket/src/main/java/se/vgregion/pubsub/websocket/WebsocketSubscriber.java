@@ -14,9 +14,11 @@ import org.joda.time.DateTime;
 
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.Field;
 import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.Subscriber;
+import se.vgregion.pubsub.impl.XmlUtil;
 
 public class WebsocketSubscriber implements Subscriber, WebSocket  {
 
@@ -62,12 +64,19 @@ public class WebsocketSubscriber implements Subscriber, WebSocket  {
                 for(Entry entry : feed.getEntries()) {
                     Map<String, Object> entryMap = new HashMap<String, Object>();
                     entryMap.put("id", entry.getId());
-                    entryMap.put("content", entry.getContent().toXML());
+                    
+                    for(Field field : entry.getFields()) {
+                        entryMap.put(field.getName(), field.getContent());
+                    }
+                    
+                    entryMap.put("title", XmlUtil.innerToString(entry.getContent()));
+                    
                     entries.add(entryMap);
                 }
                 map.put("entries", entries);
                 
                 mapper.writeValue(writer, map);
+
                 outbound.sendMessage(writer.toString());
                 lastUpdate = new DateTime();
             } catch (IOException e) {

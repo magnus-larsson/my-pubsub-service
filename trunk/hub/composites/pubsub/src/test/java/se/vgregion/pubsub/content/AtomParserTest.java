@@ -33,6 +33,7 @@ import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.Namespaces;
 import se.vgregion.pubsub.UnitTestConstants;
+import se.vgregion.pubsub.impl.XmlUtil;
 
 
 public class AtomParserTest {
@@ -40,7 +41,7 @@ public class AtomParserTest {
     @Test
     public void parse() throws Exception {
         AtomParser parser = new AtomParser();
-        Feed feed = parser.parse(UnitTestConstants.ATOM1);
+        Feed feed = parser.parse(UnitTestConstants.ATOM1, ContentType.ATOM);
         
         Assert.assertEquals("urn:f1", feed.getFeedId());
         Assert.assertEquals(new DateTime(2010, 1, 2, 3, 4, 5, 0, DateTimeZone.UTC), feed.getUpdated());
@@ -48,7 +49,7 @@ public class AtomParserTest {
         
         Element expected = new Element("title", Namespaces.NS_ATOM);
         expected.appendChild("foobar");
-        XOMTestCase.assertEquals(expected, feed.getFields().get(0).toXml());
+        XOMTestCase.assertEquals(expected, XmlUtil.fieldToXml(feed.getFields().get(0)));
 
         Assert.assertEquals(2, feed.getEntries().size());
         
@@ -90,7 +91,7 @@ public class AtomParserTest {
         
         Document expected = new Document(feedElm);
         
-        Feed feed = parser.parse(expected);
+        Feed feed = parser.parse(expected, ContentType.ATOM);
         Document actual = AbstractSerializer.printFeed(ContentType.ATOM, feed);
         
         System.out.println(expected.toXML());

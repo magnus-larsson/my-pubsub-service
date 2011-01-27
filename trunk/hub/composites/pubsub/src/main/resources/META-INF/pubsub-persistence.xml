@@ -28,8 +28,5 @@
              version="1.0">
     <persistence-unit name="pubsub">
         <class>se.vgregion.pubsub.impl.DefaultTopic</class>
-        <class>se.vgregion.pubsub.impl.DefaultFeed</class>
-        <class>se.vgregion.pubsub.impl.DefaultEntry</class>
-        <class>se.vgregion.pubsub.impl.DefaultField</class>
     </persistence-unit>
 </persistence>

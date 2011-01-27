@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.joda.time.DateTime;
 
+import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
@@ -20,7 +21,7 @@ public class UnitTestConstants {
     public static DateTime FUTURE = new DateTime(2050, 1, 1, 0, 0, 0, 0);
 
     public static Feed atom1() {
-        return new FeedBuilder()
+        return new FeedBuilder(ContentType.ATOM)
             .id("f1").updated(UnitTestConstants.UPDATED1)
             .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
             .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED1).build())
@@ -28,7 +29,7 @@ public class UnitTestConstants {
     }
 
     public static Feed atom2() {
-        return new FeedBuilder()
+        return new FeedBuilder(ContentType.ATOM)
         .id("f2").updated(UnitTestConstants.UPDATED1)
         .entry(new EntryBuilder().id("e3").updated(UnitTestConstants.UPDATED1).build())
         .entry(new EntryBuilder().id("e4").updated(UnitTestConstants.UPDATED1).build())

@@ -9,6 +9,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.Subscriber;
 import se.vgregion.pubsub.Topic;
@@ -26,22 +27,24 @@ public class DefaultPublicationRetryer implements PublicationRetryer {
         this.transactionTemplate = transactionTemplate;
     }
     
-    public void addRetry(Topic topic, Subscriber subscriber) {
+    public void addRetry(Topic topic, Subscriber subscriber, Feed feed) {
         LOG.info("Registring publication retry on {} to {}", topic.getUrl(), subscriber);
-        timer.schedule(new PublicationRetryTask(transactionTemplate, (DefaultTopic) topic, subscriber), DELAY, DELAY);
+        timer.schedule(new PublicationRetryTask(transactionTemplate, (DefaultTopic) topic, subscriber, feed), DELAY, DELAY);
     }
     
     public static class PublicationRetryTask extends TimerTask {
         private TransactionTemplate transactionTemplate;
         private DefaultTopic topic;
         private Subscriber subscriber;
+        private Feed feed;
         
         private int attempts = 0;
 
-        public PublicationRetryTask(TransactionTemplate transactionTemplate, DefaultTopic topic, Subscriber subscriber) {
+        public PublicationRetryTask(TransactionTemplate transactionTemplate, DefaultTopic topic, Subscriber subscriber, Feed feed) {
             this.transactionTemplate = transactionTemplate;
             this.topic = topic;
             this.subscriber = subscriber;
+            this.feed = feed;
         }
 
         @Override
@@ -51,7 +54,7 @@ public class DefaultPublicationRetryer implements PublicationRetryer {
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
                     try {
                         LOG.info("Retrying publication on {} to {}", topic.getUrl(), subscriber);
-                        topic.publish(subscriber);
+                        topic.publish(subscriber, feed);
                         
                         // success! don't attempt retrying again
                         cancel();

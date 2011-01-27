@@ -36,7 +36,6 @@
 	<tx:annotation-driven />
 
  	<bean id="topicRepository" class="se.vgregion.pubsub.repository.jpa.JpaTopicRepository" />
- 	<bean id="feedRepository" class="se.vgregion.pubsub.repository.jpa.JpaFeedRepository" />
 
 
 </beans>

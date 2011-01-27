@@ -8,8 +8,6 @@ public interface Topic extends Entity<URI> {
 
     URI getUrl();
     
-    Feed getFeed();
-    
     void publish(Feed feed);
     
     void addSubscriber(Subscriber subscriber);

@@ -4,18 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
 import nu.xom.Element;
 
-import org.hibernate.annotations.Cascade;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -24,8 +14,6 @@ import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Field;
 import se.vgregion.pubsub.Namespaces;
 
-@Entity
-@Table(name="ENTRIES")
 public class DefaultEntry extends AbstractEntity<String> implements Entry {
 
     public static class EntryBuilder {
@@ -74,25 +62,16 @@ public class DefaultEntry extends AbstractEntity<String> implements Entry {
         }
     }
     
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused") // only used by JPA
     private Long pk;
     
-    @Column(nullable=false, unique=true)
     private String entryId = UUID.randomUUID().toString();
     
-    @Basic
     private Long updated;
 
-    @Basic
     private String content;
     
-    @OneToMany(cascade=CascadeType.ALL, targetEntity=DefaultField.class)
-    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
     private List<Field> fields = new ArrayList<Field>();
     
-
     @Override
     public String getId() {
         return entryId;

@@ -44,6 +44,6 @@ public class EntryBuilderTest {
         Element expected = new Element("n", ns);
         expected.appendChild("v");
         
-        XOMTestCase.assertEquals(expected, entry.getFields().get(0).toXml());
+        XOMTestCase.assertEquals(expected, XmlUtil.fieldToXml(entry.getFields().get(0)));
     }
 }

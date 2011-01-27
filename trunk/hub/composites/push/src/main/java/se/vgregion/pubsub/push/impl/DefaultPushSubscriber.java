@@ -126,12 +126,9 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
             LOG.info("Distributing to {}", callback);
             HttpPost post = new HttpPost(callback);
             
-            // TODO revisit, how do we know what content type a subscriber wants?
-            ContentType contentType = ContentType.ATOM;
+            post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
             
-            post.addHeader(new BasicHeader("Content-Type", contentType.toString()));
-            
-            Document doc = AbstractSerializer.create(contentType).print(feed, 
+            Document doc = AbstractSerializer.create(feed.getContentType()).print(feed, 
                     new UpdatedSinceEntryFilter(getLastUpdated()));
             post.setEntity(HttpUtil.createEntity(doc));
             

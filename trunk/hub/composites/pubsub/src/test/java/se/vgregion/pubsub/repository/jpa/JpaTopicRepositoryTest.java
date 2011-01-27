@@ -22,7 +22,6 @@ package se.vgregion.pubsub.repository.jpa;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
@@ -31,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.UnitTestConstants;
 import se.vgregion.pubsub.impl.DefaultTopic;
-import se.vgregion.pubsub.repository.FeedRepository;
 import se.vgregion.pubsub.repository.TopicRepository;
 
 @ContextConfiguration({"classpath:spring/pubsub-jpa.xml", "classpath:spring/test-jpa.xml"})

@@ -22,20 +22,19 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
+import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.Field;
 
-@Entity
-@Table(name="FEEDS")
 public class DefaultFeed extends AbstractEntity<String> implements Feed {
 
     public static class FeedBuilder {
         
         private DefaultFeed feed;
         
-        public FeedBuilder() {
-            feed = new DefaultFeed();
+        public FeedBuilder(ContentType contentType) {
+            feed = new DefaultFeed(contentType);
         }
         
         public FeedBuilder id(String id) {
@@ -68,26 +67,20 @@ public class DefaultFeed extends AbstractEntity<String> implements Feed {
         }
     }
 
-    @Id
-    @GeneratedValue
-    @SuppressWarnings("unused") // only used by JPA
-    protected Long pk;
-    
-    @Column(nullable=false, unique=true)
     protected String feedId = UUID.randomUUID().toString();
 
-    @Basic
     private Long updated;
     
-    @OneToMany(cascade=CascadeType.ALL, targetEntity=DefaultField.class)
-    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+    private ContentType contentType;
+    
     private List<Field> fields = new ArrayList<Field>();
     
-    @OneToMany(cascade=CascadeType.ALL, targetEntity=DefaultEntry.class)
-    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-    @OrderBy("updated DESC")
     private List<Entry> entries = new ArrayList<Entry>();
     
+    public DefaultFeed(ContentType contentType) {
+        this.contentType = contentType;
+    }
+
     @Override
     public String getId() {
         return feedId;
@@ -143,43 +136,8 @@ public class DefaultFeed extends AbstractEntity<String> implements Feed {
     }
 
     @Override
-    public void merge(Feed other) {
-        this.feedId = other.getFeedId();
-        if(other.getUpdated() != null) {
-            this.updated = other.getUpdated().getMillis();
-        } else {
-            this.updated = null;
-        }
-        
-        fields.clear();
-        
-        for(Field otherField : other.getFields()) {
-            fields.add(otherField);
-        }
-        
-        List<Entry> newEntries = new ArrayList<Entry>();
-        
-        
-        // check for updated entries
-        for(Entry otherEntry : other.getEntries()) {
-            Entry existingEntry = getEntry(otherEntry.getEntryId());
-            if(existingEntry != null) {
-                existingEntry.merge(otherEntry);
-                newEntries.add(existingEntry);
-            } else {
-                newEntries.add(otherEntry);
-            }
-        }
-        
-        // check if any of the existing entries do not exist in the new feed
-        for(Entry entry : entries) {
-            Entry otherEntry = getEntry(other.getEntries(), entry.getEntryId());
-            if(otherEntry == null) {
-                newEntries.add(entry);
-            }
-        }
-
-        this.entries = newEntries;
+    public ContentType getContentType() {
+        return contentType;
     }
 
 }

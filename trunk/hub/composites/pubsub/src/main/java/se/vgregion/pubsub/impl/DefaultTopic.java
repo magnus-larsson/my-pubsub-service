@@ -40,9 +40,6 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     @Column(nullable=false, unique=true)
     private String url;
     
-    @OneToOne(targetEntity=DefaultFeed.class, cascade=CascadeType.ALL)
-    private Feed feed;
-    
     @Transient
     private List<Subscriber> subscribers = new ArrayList<Subscriber>();
     
@@ -78,27 +75,19 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     }
 
     @Override
-    public synchronized void publish(Feed publishedFeed) {
+    public synchronized void publish(Feed feed) {
         LOG.info("Publishing on topic {}", url);
-
-System.out.println(this.feed);
-        if(this.feed != null) {
-            
-            this.feed.merge(publishedFeed);
-        } else {
-            this.feed = publishedFeed;
-        }
 
         // if all publications success, purge until now
         DateTime lastUpdatedSubscriber = new DateTime();
         for(Subscriber subscriber : subscribers) {
             try {
-                publish(subscriber);
+                publish(subscriber, feed);
             } catch (PublicationFailedException e) {
                 LOG.warn("Subscriber failed: {}", e.getMessage());
                 
                 if(publicationRetryer != null) {
-                    publicationRetryer.addRetry(this, subscriber);
+                    publicationRetryer.addRetry(this, subscriber, feed);
                 }
                 lastUpdatedSubscriber = subscriber.getLastUpdated();
             }
@@ -107,9 +96,9 @@ System.out.println(this.feed);
         // TODO purge old entries based on lastUpdatedSubscriber
     }
     
-    protected synchronized void publish(Subscriber subscriber) throws PublicationFailedException {
+    protected synchronized void publish(Subscriber subscriber, Feed feed) throws PublicationFailedException {
         LOG.info("Publishing to {}", subscriber);
-        subscriber.publish(this.feed);
+        subscriber.publish(feed);
     }
 
     @Override
@@ -125,11 +114,6 @@ System.out.println(this.feed);
     @Override
     public synchronized void removeSubscriber(Subscriber subscriber) {
         subscribers.remove(subscriber);
-    }
-
-    @Override
-    public Feed getFeed() {
-        return feed;
     }
 
     protected void setSubscriberTimeoutNotifier(SubscriberTimeoutNotifier subscriberTimoutNotifier) {
