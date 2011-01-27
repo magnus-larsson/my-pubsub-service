@@ -24,6 +24,7 @@ import nu.xom.tests.XOMTestCase;
 import org.junit.Assert;
 import org.junit.Test;
 
+import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.UnitTestConstants;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
@@ -35,7 +36,7 @@ public class FeedBuilderTest {
 
     @Test
     public void merge() {
-        Feed feed = new FeedBuilder()
+        Feed feed = new FeedBuilder(ContentType.ATOM)
             .id("f1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.ATOM_TITLE)
             .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
             .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build())
@@ -44,7 +45,7 @@ public class FeedBuilderTest {
         Assert.assertEquals("f1", feed.getFeedId());
         Assert.assertEquals(UnitTestConstants.UPDATED1, feed.getUpdated());
         Assert.assertEquals(1, feed.getFields().size());
-        XOMTestCase.assertEquals(UnitTestConstants.ATOM_TITLE, feed.getFields().get(0).toXml());
+        XOMTestCase.assertEquals(UnitTestConstants.ATOM_TITLE, XmlUtil.fieldToXml(feed.getFields().get(0)));
         
         Assert.assertEquals(2, feed.getEntries().size());
         Assert.assertEquals("e1", feed.getEntries().get(0).getEntryId());

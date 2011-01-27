@@ -124,9 +124,7 @@ public class DefaultFeedRetriever implements FeedRetriever {
             }
 
             try {
-                System.out.println(contentType);
-                Feed feed = AbstractParser.create(contentType).parse(content);
-                System.out.println(feed.getEntries().size());
+                Feed feed = AbstractParser.create(contentType).parse(content, contentType);
                 LOG.debug("Feed downloaded: {}", url);
                 return feed;
             } catch (Exception e) {

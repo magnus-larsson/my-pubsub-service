@@ -11,6 +11,7 @@ import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.Field;
 import se.vgregion.pubsub.Namespaces;
+import se.vgregion.pubsub.impl.XmlUtil;
 
 public class AtomSerializer extends AbstractSerializer {
 
@@ -26,7 +27,7 @@ public class AtomSerializer extends AbstractSerializer {
         List<Field> customs = feed.getFields();
         
         for(Field custom : customs) {
-            feedElm.appendChild(custom.toXml());
+            feedElm.appendChild(XmlUtil.fieldToXml(custom));
         }
         
         for(Entry entry : feed.getEntries()) {
@@ -51,7 +52,7 @@ public class AtomSerializer extends AbstractSerializer {
         List<Field> customs = entry.getFields();
         
         for(Field custom : customs) {
-            entryElm.appendChild(custom.toXml());
+            entryElm.appendChild(XmlUtil.fieldToXml(custom));
         }
         
         Element content = entry.getContent();

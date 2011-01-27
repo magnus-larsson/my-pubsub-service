@@ -93,7 +93,7 @@ public class DefaultPushSubscriberPublishTest {
             }
         });
         
-        Feed feed = new FeedBuilder().id("e1").entry(new EntryBuilder().id("f1").updated(new DateTime()).build()).build();
+        Feed feed = new FeedBuilder(ContentType.ATOM).id("e1").entry(new EntryBuilder().id("f1").updated(new DateTime()).build()).build();
         
         subscriber.publish(feed);
         

@@ -3,6 +3,7 @@ package se.vgregion.pubsub.content;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
+import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
@@ -10,9 +11,9 @@ import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 
 public class Rss2Parser extends AbstractParser {
 
-    public Feed parse(Document document) {
+    public Feed parse(Document document, ContentType contentType) {
         Element rss = document.getRootElement();
-        FeedBuilder builder = new FeedBuilder();
+        FeedBuilder builder = new FeedBuilder(contentType);
         
         Element channel = rss.getFirstChildElement("channel");
         

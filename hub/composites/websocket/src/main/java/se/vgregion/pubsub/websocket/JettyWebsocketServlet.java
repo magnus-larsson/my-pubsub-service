@@ -19,7 +19,6 @@ public class JettyWebsocketServlet extends WebSocketServlet  {
         PubSubEngine pubSubEngine = ctx.getBean(PubSubEngine.class);
         
         String topic = request.getParameter("topic");
-        
         if(topic != null) {
             return new WebsocketSubscriber(pubSubEngine, URI.create(topic));
         } else {

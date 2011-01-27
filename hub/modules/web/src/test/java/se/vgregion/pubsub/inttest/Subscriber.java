@@ -90,7 +90,7 @@ public class Subscriber {
         ContentType contentType = ContentType.fromValue(entity.getContentType().getValue());
         Feed feed;
         try {
-            feed = AbstractParser.create(contentType).parse(entity.getContent());
+            feed = AbstractParser.create(contentType).parse(entity.getContent(), contentType);
             for(SubscriberListener listener : listeners) {
                 listener.published(feed);
             }

@@ -27,9 +27,11 @@ import org.joda.time.DateTimeZone;
 import org.junit.Assert;
 import org.junit.Test;
 
+import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.UnitTestConstants;
+import se.vgregion.pubsub.impl.XmlUtil;
 
 
 public class Rss2ParserTest {
@@ -37,7 +39,7 @@ public class Rss2ParserTest {
     @Test
     public void parse() throws Exception {
         Rss2Parser parser = new Rss2Parser();
-        Feed feed = parser.parse(UnitTestConstants.RSS1);
+        Feed feed = parser.parse(UnitTestConstants.RSS1, ContentType.RSS);
         
         Assert.assertEquals("http://www.example.com/", feed.getFeedId());
         Assert.assertEquals(new DateTime(2010, 1, 2, 3, 4, 5, 0, DateTimeZone.UTC), feed.getUpdated());
@@ -45,7 +47,7 @@ public class Rss2ParserTest {
         
         Element expected = new Element("title");
         expected.appendChild("foobar");
-        XOMTestCase.assertEquals(expected, feed.getFields().get(0).toXml());
+        XOMTestCase.assertEquals(expected, XmlUtil.fieldToXml(feed.getFields().get(0)));
         
         Assert.assertEquals(2, feed.getEntries().size());
         

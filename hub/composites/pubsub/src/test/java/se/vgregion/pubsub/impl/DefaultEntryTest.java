@@ -45,10 +45,10 @@ public class DefaultEntryTest {
 
         Element expected = new Element("n", "http://foo.com");
         expected.appendChild("v2");
-        XOMTestCase.assertEquals(expected, entry.getFields().get(0).toXml());
+        XOMTestCase.assertEquals(expected, XmlUtil.fieldToXml(entry.getFields().get(0)));
 
         expected = new Element("n2", "http://foo.com");
         expected.appendChild("v3");
-        XOMTestCase.assertEquals(expected, entry.getFields().get(1).toXml());
+        XOMTestCase.assertEquals(expected, XmlUtil.fieldToXml(entry.getFields().get(1)));
     }
 }

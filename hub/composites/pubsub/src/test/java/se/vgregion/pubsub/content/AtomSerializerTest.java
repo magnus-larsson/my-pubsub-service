@@ -25,6 +25,7 @@ import nu.xom.Element;
 import org.junit.Assert;
 import org.junit.Test;
 
+import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Namespaces;
 import se.vgregion.pubsub.UnitTestConstants;
@@ -37,7 +38,7 @@ public class AtomSerializerTest {
     
     @Test
     public void print() throws Exception {
-        FeedBuilder builder = new FeedBuilder();
+        FeedBuilder builder = new FeedBuilder(ContentType.ATOM);
         builder.id("f1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.ATOM_TITLE)
             .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.ATOM_TITLE).build())
             .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).field(UnitTestConstants.ATOM_TITLE).build());
@@ -63,7 +64,7 @@ public class AtomSerializerTest {
 
     @Test
     public void printWithFilter() throws Exception {
-        FeedBuilder builder = new FeedBuilder();
+        FeedBuilder builder = new FeedBuilder(ContentType.ATOM);
         builder.id("f1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.ATOM_TITLE)
             .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.ATOM_TITLE).build())
             .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).field(UnitTestConstants.ATOM_TITLE).build());

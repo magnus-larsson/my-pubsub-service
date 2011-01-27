@@ -3,6 +3,7 @@ package se.vgregion.pubsub.content;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
+import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.Namespaces;
@@ -11,9 +12,9 @@ import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 
 public class AtomParser extends AbstractParser {
 
-    public Feed parse(Document document) {
+    public Feed parse(Document document, ContentType contentType) {
         Element feed = document.getRootElement();
-        FeedBuilder builder = new FeedBuilder();
+        FeedBuilder builder = new FeedBuilder(contentType);
         
         Elements children = feed.getChildElements();
         

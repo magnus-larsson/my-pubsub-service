@@ -23,14 +23,14 @@ public abstract class AbstractParser {
     
     private static final Builder PARSER = new Builder();
     
-    public Feed parse(InputStream in) throws ParsingException, IOException {
-        return parse(PARSER.build(in));
+    public Feed parse(InputStream in, ContentType contentType) throws ParsingException, IOException {
+        return parse(PARSER.build(in), contentType);
     }
 
-    public Feed parse(String content) throws ParsingException, IOException {
-        return parse(PARSER.build(new StringReader(content)));
+    public Feed parse(String content, ContentType contentType) throws ParsingException, IOException {
+        return parse(PARSER.build(new StringReader(content)), contentType);
     }
     
-    public abstract Feed parse(Document document);
+    public abstract Feed parse(Document document, ContentType contentType);
     
 }

@@ -14,6 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
 
+import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.PublicationFailedException;
@@ -38,7 +39,7 @@ public class DefaultPubSubEngineTest extends AbstractTransactionalJUnit4SpringCo
         
         engine.subscribe(subscriber);
         
-        Feed feed = new FeedBuilder().id("f1").build();
+        Feed feed = new FeedBuilder(ContentType.ATOM).id("f1").build();
         
         topic.publish(feed);
         ArgumentCaptor<Feed> publishedFeed = ArgumentCaptor.forClass(Feed.class);
@@ -59,11 +60,11 @@ public class DefaultPubSubEngineTest extends AbstractTransactionalJUnit4SpringCo
         
         engine.subscribe(subscriber);
         
-        Feed feed = new FeedBuilder().id("f2").updated(
+        Feed feed = new FeedBuilder(ContentType.ATOM).id("f2").updated(
                 UnitTestConstants.UPDATED2).entry(
                 new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED2).build()).entry(
                 new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build()).build();
-        Feed feed2 = new FeedBuilder()
+        Feed feed2 = new FeedBuilder(ContentType.ATOM)
             .id("f2").updated(UnitTestConstants.UPDATED1)
             .entry(new EntryBuilder().id("e3").updated(UnitTestConstants.UPDATED1).build())
             .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())

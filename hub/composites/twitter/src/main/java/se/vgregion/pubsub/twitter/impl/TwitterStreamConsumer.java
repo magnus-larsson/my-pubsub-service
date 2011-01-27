@@ -21,6 +21,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
@@ -105,7 +106,7 @@ public class TwitterStreamConsumer implements Runnable {
                 @SuppressWarnings("unchecked")
                 Map<String, ?> tweet = mapper.readValue(line, Map.class);
 
-                Feed feed = new FeedBuilder().id(url.toString())
+                Feed feed = new FeedBuilder(ContentType.ATOM).id(url.toString())
                     .entry(new EntryBuilder().id(valueAsString(tweet.get("id_str"))).content(valueAsString(tweet.get("text"))).build()).build();
 
                 pubSubEngine.publish(url, feed);
