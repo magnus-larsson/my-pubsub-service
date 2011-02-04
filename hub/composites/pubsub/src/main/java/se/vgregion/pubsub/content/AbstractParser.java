@@ -15,8 +15,10 @@ public abstract class AbstractParser {
     public static AbstractParser create(ContentType type) {
         if(type == ContentType.ATOM) {
             return new AtomParser();
-        } else {
+        } else if(type == ContentType.RSS) {
             return new Rss2Parser();
+        } else {
+            throw new IllegalArgumentException("Can not create parser for content type: " + type);
         }
     }
 

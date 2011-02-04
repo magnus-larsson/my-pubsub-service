@@ -53,11 +53,11 @@ public class IntegrationTestTemplate {
             
             server.start();
 
-            hubUrl = URI.create("http://localhost:" + server.getConnectors()[0].getLocalPort());
+            hubUrl = URI.create("http://localhost:" + server.getConnectors()[0].getLocalPort() + "/push/");
         } else {
             hubUrl = URI.create(hubUrlString);
         }
-        
+
         publisher = new Publisher(localServerHost);
         
         subscriber = new Subscriber(localServerHost, createSubscriberResult());

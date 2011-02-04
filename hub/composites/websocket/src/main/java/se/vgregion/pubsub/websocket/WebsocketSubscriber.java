@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.JsonNodeFactory;
 import org.eclipse.jetty.websocket.WebSocket;
 import org.joda.time.DateTime;
 
@@ -54,7 +55,6 @@ public class WebsocketSubscriber implements Subscriber, WebSocket  {
     public void publish(Feed feed) throws PublicationFailedException {
         if(outbound != null) {
             try {
-                // TODO replace with real JSON encoding
                 StringWriter writer = new StringWriter();
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("id", feed.getId());
@@ -63,13 +63,10 @@ public class WebsocketSubscriber implements Subscriber, WebSocket  {
                 List<Map<String, Object>> entries = new ArrayList<Map<String,Object>>();
                 for(Entry entry : feed.getEntries()) {
                     Map<String, Object> entryMap = new HashMap<String, Object>();
-                    entryMap.put("id", entry.getId());
                     
                     for(Field field : entry.getFields()) {
                         entryMap.put(field.getName(), field.getContent());
                     }
-                    
-                    entryMap.put("title", XmlUtil.innerToString(entry.getContent()));
                     
                     entries.add(entryMap);
                 }

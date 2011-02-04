@@ -47,7 +47,7 @@ public class AtomParserTest {
         Assert.assertEquals(new DateTime(2010, 1, 2, 3, 4, 5, 0, DateTimeZone.UTC), feed.getUpdated());
         Assert.assertEquals(2, feed.getFields().size());
         
-        Element expected = new Element("title", Namespaces.NS_ATOM);
+        Element expected = new Element("title", Namespaces.ATOM);
         expected.appendChild("foobar");
         XOMTestCase.assertEquals(expected, XmlUtil.fieldToXml(feed.getFields().get(0)));
 
@@ -65,7 +65,7 @@ public class AtomParserTest {
     }
 
     private Element newAtomElement(String name, String value) {
-        Element elm = new Element(name, Namespaces.NS_ATOM);
+        Element elm = new Element(name, Namespaces.ATOM);
         elm.appendChild(value);
         return elm;
     }
@@ -74,14 +74,14 @@ public class AtomParserTest {
     public void parseRecursive() throws Exception {
         AtomParser parser = new AtomParser();
 
-        Element feedElm = new Element("feed", Namespaces.NS_ATOM);
+        Element feedElm = new Element("feed", Namespaces.ATOM);
         feedElm.appendChild(newAtomElement("id", "f1"));
         
-        Element entry = new Element("entry", Namespaces.NS_ATOM);
+        Element entry = new Element("entry", Namespaces.ATOM);
         entry.appendChild(newAtomElement("id", "e1"));
         
-        Element content = new Element("content", Namespaces.NS_ATOM);
-        Element div = new Element("div");
+        Element content = new Element("content", Namespaces.ATOM);
+        Element div = new Element("div", "http://html.org");
         Element span = new Element("span");
         span.appendChild("Hello");
         div.appendChild(span);
@@ -94,8 +94,6 @@ public class AtomParserTest {
         Feed feed = parser.parse(expected, ContentType.ATOM);
         Document actual = AbstractSerializer.printFeed(ContentType.ATOM, feed);
         
-        System.out.println(expected.toXML());
-        System.out.println(actual.toXML());
         XOMTestCase.assertEquals(expected, actual);
     }
 }

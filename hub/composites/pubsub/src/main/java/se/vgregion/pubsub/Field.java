@@ -1,11 +1,13 @@
 package se.vgregion.pubsub;
 
-import se.vgregion.dao.domain.patterns.entity.Entity;
+import java.util.List;
 
-public interface Field extends Entity<String> {
+public interface Field {
 
     String getNamespace();
     String getName();
     String getContent();
+    
+    List<Field> getFields();
     
 }

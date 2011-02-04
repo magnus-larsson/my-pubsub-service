@@ -12,10 +12,7 @@ public interface Entry extends Entity<String> {
 
     String getEntryId();
     DateTime getUpdated();
-    Element getContent();
     
     List<Field> getFields();
     boolean isNewerThan(DateTime since);
-    
-    void merge(Entry entry);
 }

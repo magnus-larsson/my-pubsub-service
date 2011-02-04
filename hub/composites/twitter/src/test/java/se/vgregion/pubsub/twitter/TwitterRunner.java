@@ -21,7 +21,7 @@ public class TwitterRunner {
         PubSubEngine engine = new PubSubEngine() {
             @Override
             public void publish(URI url, Feed feed) {
-                System.out.println(feed.getEntries().get(0).getContent().toXML());
+                System.out.println(feed);
             }
             
             @Override

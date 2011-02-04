@@ -24,8 +24,10 @@ public class AtomParser extends AbstractParser {
             if(isAtom(child)) {
                 if("id".equals(child.getLocalName())) {
                     builder.id(child.getValue());
+                    builder.field(child);
                 } else if("updated".equals(child.getLocalName())) {
                     builder.updated(DateTimeUtils.parseDateTime(child.getValue()));
+                    builder.field(child);
                 } else if("entry".equals(child.getLocalName())) {
                     builder.entry(parseEntry(child));
                 } else {
@@ -51,17 +53,17 @@ public class AtomParser extends AbstractParser {
                 entryBuilder.id(child.getValue());
             } else if("updated".equals(child.getLocalName()) && isAtom(child)) {
                 entryBuilder.updated(DateTimeUtils.parseDateTime(child.getValue()));
-            } else if("content".equals(child.getLocalName()) && isAtom(child)) {
-                entryBuilder.content(child);
-            } else {
-                entryBuilder.field(child);
             }
+            
+//            } else if("content".equals(child.getLocalName()) && isAtom(child)) {
+//                entryBuilder.content(child);
+            entryBuilder.field(child);
         }
 
         return entryBuilder.build();
     }
     
     private boolean isAtom(Element elm) {
-        return Namespaces.NS_ATOM.equals(elm.getNamespaceURI());
+        return Namespaces.ATOM.equals(elm.getNamespaceURI());
     }
 }

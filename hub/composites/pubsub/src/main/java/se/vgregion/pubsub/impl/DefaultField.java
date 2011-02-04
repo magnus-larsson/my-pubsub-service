@@ -1,7 +1,10 @@
 package se.vgregion.pubsub.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import nu.xom.Attribute;
 import nu.xom.Element;
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
 import se.vgregion.pubsub.Field;
@@ -13,21 +16,30 @@ public class DefaultField extends AbstractEntity<String> implements Field {
     private String namespace;
     private String name;
     private String content;
-
-    
-    private static Element createElement(String namespace, String name, String value) {
-        Element elm = new Element(name, namespace);
-        elm.appendChild(value);
-        return elm;
-    }
+    private List<Field> fields = new ArrayList<Field>();
 
     public DefaultField(String namespace, String name, String value) {
-        this(createElement(namespace, name, value));
+        this.namespace = namespace;
+        this.name = name;
+        this.content = value;
     }
 
+    public DefaultField(String namespace, String name, String value, List<Field> fields) {
+        this.namespace = namespace;
+        this.name = name;
+        this.content = value;
+        this.fields = fields;
+    }
+
+    
     public DefaultField(Element elm) {
         this.name = elm.getLocalName();
         this.namespace = elm.getNamespaceURI();
+        
+        for(int i = 0; i<elm.getAttributeCount(); i++) {
+            Attribute attribute = elm.getAttribute(i);
+            fields.add(new DefaultField(attribute.getNamespaceURI(), attribute.getLocalName(), attribute.getValue()));
+        }
         
         this.content = XmlUtil.innerToString(elm);
     }
@@ -52,4 +64,25 @@ public class DefaultField extends AbstractEntity<String> implements Field {
         return name;
     }
 
+    @Override
+    public List<Field> getFields() {
+        return fields;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if(namespace != null && namespace.length() > 0) {
+            sb.append("{");
+            sb.append(namespace);
+            sb.append("}");
+        }
+        sb.append(name);
+        sb.append("=");
+        sb.append(content);
+        
+        return sb.toString();
+    }
+
+    
 }

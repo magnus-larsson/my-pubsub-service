@@ -106,26 +106,27 @@ public class DefaultFeedRetriever implements FeedRetriever {
             Header[] contentTypes = response.getHeaders("Content-Type");
 
             String content = IOUtils.toString(entity.getContent());
-            
             // TODO is this a reasonable default?
             ContentType contentType = ContentType.ATOM;
             if (contentTypes.length > 0) {
-                try {
-                    contentType = ContentType.fromValue(contentTypes[0].getValue());
-                } catch (IllegalArgumentException e) {
-                    // TODO How to handle this, sniff the entity?
-                    
+                contentType = ContentType.fromValue(contentTypes[0].getValue());
+                
+                if(contentType != ContentType.ATOM && contentType != ContentType.RSS) {
+                    // unknown content type, try sniffing
                     if(content.contains("<rss")) {
                         contentType = ContentType.RSS;
-                    } else {
+                    } else if(content.contains("<feed")) {
                         contentType = ContentType.ATOM;
+                    } else {
+                        throw new RuntimeException("Unknown content type: " + contentType);
                     }
                 }
             }
 
             try {
                 Feed feed = AbstractParser.create(contentType).parse(content, contentType);
-                LOG.debug("Feed downloaded: {}", url);
+                
+                LOG.debug("Feed downloaded from {}; {}", url, feed);
                 return feed;
             } catch (Exception e) {
                 throw new IOException("Failed to parse feed", e);

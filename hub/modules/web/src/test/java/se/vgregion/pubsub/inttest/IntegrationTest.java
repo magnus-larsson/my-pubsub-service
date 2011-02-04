@@ -6,7 +6,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import se.vgregion.pubsub.ContentType;
+import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.Namespaces;
+import se.vgregion.pubsub.content.DateTimeUtils;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 import se.vgregion.pubsub.push.SubscriptionMode;
@@ -15,10 +18,9 @@ public class IntegrationTest extends IntegrationTestTemplate {
 
     @Test
     public void simpleAtomPublication() throws Exception {
-        Feed feed = new FeedBuilder(ContentType.ATOM).id("f1").updated(
-                UnitTestConstants.UPDATED1).entry(
-                new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build()).entry(
-                new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED1).build()).build();
+        Feed feed = new FeedBuilder(ContentType.ATOM).field(Namespaces.ATOM, "id", "f1").entry(
+                new EntryBuilder().field(Namespaces.ATOM, "id", "e1").build()).entry(
+                new EntryBuilder().field(Namespaces.ATOM, "id", "e2").build()).build();
 
         publisher.publish(hubUrl, feed);
 
@@ -31,10 +33,10 @@ public class IntegrationTest extends IntegrationTestTemplate {
 
     @Test
     public void simpleRssPublication() throws Exception {
-        Feed feed = new FeedBuilder(ContentType.ATOM).id("f1").updated(
-                UnitTestConstants.UPDATED1).entry(
-                new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build()).entry(
-                new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED1).build()).build();
+        Feed feed = new FeedBuilder(ContentType.ATOM).field(Namespaces.ATOM, "id", "f1")
+            .entry(
+                new EntryBuilder().field(Namespaces.ATOM, "id", "e1").build()).entry(
+                new EntryBuilder().field(Namespaces.ATOM, "id", "e2").build()).build();
 
         publisher.publish(hubUrl, feed);
 
@@ -48,15 +50,36 @@ public class IntegrationTest extends IntegrationTestTemplate {
     
     @Test
     public void doublePublication() throws Exception {
-        Feed feed = new FeedBuilder(ContentType.ATOM).id("f1").updated(
-                UnitTestConstants.UPDATED2).entry(
-                new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED2).build()).entry(
-                new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build()).build();
+        Entry e1Old = new EntryBuilder()
+            .field(Namespaces.ATOM, "id", "e1")
+            .field(Namespaces.ATOM, "updated", DateTimeUtils.print(UnitTestConstants.UPDATED2))
+            .build();
+        Entry e2Old = new EntryBuilder()            
+            .field(Namespaces.ATOM, "id", "e2")
+            .field(Namespaces.ATOM, "updated", DateTimeUtils.print(UnitTestConstants.UPDATED2))
+            .build();
+
+        Entry e1Future = new EntryBuilder()
+            .field(Namespaces.ATOM, "id", "e1")
+            .field(Namespaces.ATOM, "updated", DateTimeUtils.print(UnitTestConstants.FUTURE))
+            .build();
+        Entry e3Future = new EntryBuilder()
+            .field(Namespaces.ATOM, "id", "e3")
+            .field(Namespaces.ATOM, "updated", DateTimeUtils.print(UnitTestConstants.FUTURE))
+            .build();
+
+        
+        Feed feed = new FeedBuilder(ContentType.ATOM).updated(
+                UnitTestConstants.UPDATED2)
+                .field(Namespaces.ATOM, "id", "f1")
+                .entry(e1Old)
+                .entry(e2Old).build();
         Feed feed2 = new FeedBuilder(ContentType.ATOM)
-            .id("f1").updated(UnitTestConstants.FUTURE)
-            .entry(new EntryBuilder().id("e3").updated(UnitTestConstants.FUTURE).build())
-            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.FUTURE).build())
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build())
+            .updated(UnitTestConstants.FUTURE)
+            .field(Namespaces.ATOM, "id", "f1")
+            .entry(e3Future)
+            .entry(e1Future)
+            .entry(e1Old)
             .build();
 
         publisher.publish(hubUrl, feed);
@@ -80,10 +103,14 @@ public class IntegrationTest extends IntegrationTestTemplate {
 
     @Test
     public void doublePublicationWithoutUpdate() throws Exception {
-        Feed feed = new FeedBuilder(ContentType.ATOM).id("f1").updated(
-                UnitTestConstants.UPDATED2).entry(
-                new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED2).build()).entry(
-                new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).build()).build();
+        Feed feed = new FeedBuilder(ContentType.ATOM).field(Namespaces.ATOM, "id", "f1")
+            .entry(
+                new EntryBuilder().field(Namespaces.ATOM, "id", "e1")
+                .field(Namespaces.ATOM, "updated", DateTimeUtils.print(UnitTestConstants.UPDATED2))
+                .build()).entry(
+                new EntryBuilder().field(Namespaces.ATOM, "id", "e2")
+                .field(Namespaces.ATOM, "updated", DateTimeUtils.print(UnitTestConstants.UPDATED2))
+                .build()).build();
 
         publisher.publish(hubUrl, feed);
 

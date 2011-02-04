@@ -43,8 +43,8 @@ public class Rss2Serializer extends AbstractSerializer {
     private Element print(Entry entry) {
         Element entryElm = new Element("item");
         
-        entryElm.appendChild(print("guid", entry.getEntryId()));
-        entryElm.appendChild(print("pubDate", entry.getUpdated()));
+//        entryElm.appendChild(print("guid", entry.getEntryId()));
+//        entryElm.appendChild(print("pubDate", entry.getUpdated()));
         
         
         List<Field> customs = entry.getFields();
@@ -53,14 +53,14 @@ public class Rss2Serializer extends AbstractSerializer {
             entryElm.appendChild(XmlUtil.fieldToXml(custom));
         }
         
-        Element content = entry.getContent();
-        if(content != null) {
-            // in Atom NS, needs be be changed
-            Element rssContent = new Element("description");
-            for(int i = 0; i<content.getChildCount(); i++) {
-                rssContent.appendChild(content.getChild(i).copy());
-            }
-        }
+//        Element content = entry.getContent();
+//        if(content != null) {
+//            // in Atom NS, needs be be changed
+//            Element rssContent = new Element("description");
+//            for(int i = 0; i<content.getChildCount(); i++) {
+//                rssContent.appendChild(content.getChild(i).copy());
+//            }
+//        }
         
         return entryElm;
 

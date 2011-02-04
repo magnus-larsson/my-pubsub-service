@@ -19,20 +19,21 @@
 
 package se.vgregion.pubsub;
 
-public enum ContentType {
-    ATOM("application/atom+xml"),
-    RSS("application/rss+xml");
+public class ContentType {
+    public static final ContentType ATOM = new ContentType("application/atom+xml");
+    public static final ContentType RSS = new ContentType("application/rss+xml");
+    public static final ContentType JSON = new ContentType("application/json");
     
     private String value;
     
-    ContentType(String value) {
+    public ContentType(String value) {
         this.value = value;
     }
 
     public static ContentType fromValue(String value) {
         if("application/atom+xml".equals(value)) return ATOM;
         else if("application/rss+xml".equals(value)) return RSS;
-        else throw new IllegalArgumentException("Unknown content type: " + value);
+        else return new ContentType(value);
     }
     
     @Override

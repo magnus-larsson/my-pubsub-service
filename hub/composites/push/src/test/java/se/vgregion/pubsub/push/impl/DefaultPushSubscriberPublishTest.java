@@ -111,7 +111,7 @@ public class DefaultPushSubscriberPublishTest {
         
         Document actualAtom = new Builder().build(new ByteArrayInputStream(issuedRequestBodies.poll()));
 
-        Assert.assertEquals(1, actualAtom.getRootElement().getChildElements("entry", Namespaces.NS_ATOM).size());
+        Assert.assertEquals(1, actualAtom.getRootElement().getChildElements("entry", Namespaces.ATOM).size());
         
     }
     

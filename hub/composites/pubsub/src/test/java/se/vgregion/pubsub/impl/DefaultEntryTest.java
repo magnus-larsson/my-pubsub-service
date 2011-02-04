@@ -19,36 +19,8 @@
 
 package se.vgregion.pubsub.impl;
 
-import nu.xom.Element;
-import nu.xom.tests.XOMTestCase;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import se.vgregion.pubsub.Entry;
-import se.vgregion.pubsub.UnitTestConstants;
-import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 
 
 public class DefaultEntryTest {
 
-    @Test
-    public void merge() throws Exception {
-        Entry entry = new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED2).field("http://foo.com", "n", "v").build();
-        Entry entry2 = new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).field("http://foo.com", "n", "v2").field("http://foo.com", "n2", "v3").build();
-        
-        entry.merge(entry2);
-        
-        Assert.assertEquals("e1", entry.getEntryId());
-        Assert.assertEquals(UnitTestConstants.UPDATED1, entry.getUpdated());
-        Assert.assertEquals(2, entry.getFields().size());
-
-        Element expected = new Element("n", "http://foo.com");
-        expected.appendChild("v2");
-        XOMTestCase.assertEquals(expected, XmlUtil.fieldToXml(entry.getFields().get(0)));
-
-        expected = new Element("n2", "http://foo.com");
-        expected.appendChild("v3");
-        XOMTestCase.assertEquals(expected, XmlUtil.fieldToXml(entry.getFields().get(1)));
-    }
 }
