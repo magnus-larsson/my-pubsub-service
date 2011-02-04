@@ -64,6 +64,11 @@ public class PushController {
     @Resource
     private PushSubscriberManager pushSubscriberManager;
     
+    @RequestMapping(value="/", method=RequestMethod.GET)
+    public void get(HttpServletResponse response) throws IOException {
+        response.sendError(405, "This is the endpoint for the PubSubHubbub hub. " +
+        		"It only support POST requests according to the PubSubHubbub protocol");
+    }
     @RequestMapping(value="/", method=RequestMethod.POST)
     public void post(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String mode = request.getParameter("hub.mode");
