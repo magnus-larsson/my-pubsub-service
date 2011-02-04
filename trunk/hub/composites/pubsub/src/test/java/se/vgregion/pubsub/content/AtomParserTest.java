@@ -31,6 +31,7 @@ import org.junit.Test;
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.Field;
 import se.vgregion.pubsub.Namespaces;
 import se.vgregion.pubsub.UnitTestConstants;
 import se.vgregion.pubsub.impl.XmlUtil;
@@ -45,7 +46,7 @@ public class AtomParserTest {
         
         Assert.assertEquals("urn:f1", feed.getFeedId());
         Assert.assertEquals(new DateTime(2010, 1, 2, 3, 4, 5, 0, DateTimeZone.UTC), feed.getUpdated());
-        Assert.assertEquals(2, feed.getFields().size());
+        Assert.assertEquals(4, feed.getFields().size());
         
         Element expected = new Element("title", Namespaces.ATOM);
         expected.appendChild("foobar");
@@ -57,11 +58,48 @@ public class AtomParserTest {
         
         Assert.assertEquals("urn:e1", entry.getEntryId());
         Assert.assertEquals(new DateTime(2010, 1, 2, 3, 4, 6, 0, DateTimeZone.UTC), entry.getUpdated());
+        Assert.assertEquals(5, entry.getFields().size());
         
+        Field field = entry.getFields().get(0);
+        Assert.assertEquals(Namespaces.ATOM, field.getNamespace());
+        Assert.assertEquals("title", field.getName());
+        Assert.assertEquals("t1", field.getContent());
+        
+        field = entry.getFields().get(1);
+        Assert.assertEquals(Namespaces.ATOM, field.getNamespace());
+        Assert.assertEquals("link", field.getName());
+        Assert.assertEquals("", field.getContent());
+        
+        Assert.assertEquals(1, field.getFields().size());
+        Assert.assertEquals("", field.getFields().get(0).getNamespace());
+        Assert.assertEquals("href", field.getFields().get(0).getName());
+        Assert.assertEquals("http://example.org/", field.getFields().get(0).getContent());
+
+        field = entry.getFields().get(2);
+        Assert.assertEquals(Namespaces.ATOM, field.getNamespace());
+        Assert.assertEquals("id", field.getName());
+        Assert.assertEquals("urn:e1", field.getContent());
+        
+        field = entry.getFields().get(3);
+        Assert.assertEquals(Namespaces.ATOM, field.getNamespace());
+        Assert.assertEquals("updated", field.getName());
+        Assert.assertEquals("2010-01-02T03:04:06Z", field.getContent());
+        
+        field = entry.getFields().get(4);
+        Assert.assertEquals(Namespaces.ATOM, field.getNamespace());
+        Assert.assertEquals("content", field.getName());
+        Assert.assertEquals("<div xmlns=\"http://www.w3.org/1999/xhtml\">...</div>", field.getContent());
+        
+        Assert.assertEquals(1, field.getFields().size());
+        Assert.assertEquals("", field.getFields().get(0).getNamespace());
+        Assert.assertEquals("type", field.getFields().get(0).getName());
+        Assert.assertEquals("xhtml", field.getFields().get(0).getContent());
+
         entry = feed.getEntries().get(1);
         
         Assert.assertEquals("urn:e2", entry.getEntryId());
         Assert.assertEquals(new DateTime(2010, 1, 2, 3, 4, 7, 0, DateTimeZone.UTC), entry.getUpdated());
+        Assert.assertEquals(5, entry.getFields().size());
     }
 
     private Element newAtomElement(String name, String value) {

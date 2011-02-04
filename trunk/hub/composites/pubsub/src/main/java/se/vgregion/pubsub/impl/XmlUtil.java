@@ -2,6 +2,7 @@ package se.vgregion.pubsub.impl;
 
 import java.io.StringReader;
 
+import nu.xom.Attribute;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -56,8 +57,13 @@ public class XmlUtil {
             xml.append(">");
             
             Document doc = PARSER.build(new StringReader(xml.toString()));
-            Element elm = doc.getRootElement();
-            return (Element) elm.copy();
+            Element elm = (Element) doc.getRootElement().copy();
+            for(Field attrField : field.getFields()) {
+                Attribute attr = new Attribute(attrField.getName(), attrField.getNamespace(), attrField.getContent());
+                elm.addAttribute(attr);
+            }
+            
+            return elm;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

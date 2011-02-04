@@ -27,10 +27,12 @@ import org.junit.Test;
 
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Entry;
+import se.vgregion.pubsub.Field;
 import se.vgregion.pubsub.Namespaces;
 import se.vgregion.pubsub.UnitTestConstants;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
+import se.vgregion.pubsub.impl.DefaultField;
 
 
 public class AtomSerializerTest {
@@ -38,23 +40,31 @@ public class AtomSerializerTest {
     
     @Test
     public void print() throws Exception {
+        Field content = new DefaultField(Namespaces.ATOM, "content", "<div xmlns='http://www.w3.org/1999/xhtml'>foo</div>");
+        content.getFields().add(new DefaultField("", "type", "xhtml"));
+        
+        
         FeedBuilder builder = new FeedBuilder(ContentType.ATOM);
         builder.id("f1").updated(UnitTestConstants.UPDATED1)
             .field(Namespaces.ATOM, "id", "f1")
             .field(Namespaces.ATOM, "updated", UnitTestConstants.UPDATED1_STR)
             .field(UnitTestConstants.ATOM_TITLE)
-            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1)
+            .entry(new EntryBuilder()
                     .field(Namespaces.ATOM, "id", "e1")
                     .field(Namespaces.ATOM, "updated", UnitTestConstants.UPDATED1_STR)
-                    .field(UnitTestConstants.ATOM_TITLE).build()
+                    .field(UnitTestConstants.ATOM_TITLE)
+                    .field(content)
+                    .build()
                     )
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2)
+            .entry(new EntryBuilder()
                     .field(Namespaces.ATOM, "id", "e2")
                     .field(Namespaces.ATOM, "updated", UnitTestConstants.UPDATED2_STR)
                     .field(UnitTestConstants.ATOM_TITLE).build());
         
         AtomSerializer serializer = new AtomSerializer();
         Document doc = serializer.print(builder.build());
+        
+        System.out.println(doc.toXML());
         
         Assert.assertEquals(Namespaces.ATOM, doc.getRootElement().getNamespaceURI());
         Assert.assertEquals("feed", doc.getRootElement().getLocalName());
@@ -63,6 +73,7 @@ public class AtomSerializerTest {
         Assert.assertEquals("foobar", doc.getRootElement().getFirstChildElement("title", Namespaces.ATOM).getValue());
         Assert.assertEquals("2010-03-01T00:00:00.000Z", doc.getRootElement().getFirstChildElement("updated", Namespaces.ATOM).getValue());
         
+        
         Assert.assertEquals(2, doc.getRootElement().getChildElements("entry", Namespaces.ATOM).size());
         
         Element entry = doc.getRootElement().getChildElements("entry", Namespaces.ATOM).get(0);
@@ -70,6 +81,16 @@ public class AtomSerializerTest {
         Assert.assertEquals("foobar", entry.getFirstChildElement("title", Namespaces.ATOM).getValue());
         Assert.assertEquals("2010-03-01T00:00:00.000Z", entry.getFirstChildElement("updated", Namespaces.ATOM).getValue());
 
+        Element contentElm = entry.getFirstChildElement("content", Namespaces.ATOM);
+        Assert.assertNotNull(contentElm);
+        Assert.assertEquals(1, contentElm.getChildCount());
+        Assert.assertEquals("div", ((Element)contentElm.getChild(0)).getLocalName());
+        Assert.assertEquals("http://www.w3.org/1999/xhtml", ((Element)contentElm.getChild(0)).getNamespaceURI());
+        Assert.assertEquals("foo", ((Element)contentElm.getChild(0)).getValue());
+        Assert.assertEquals(1, contentElm.getAttributeCount());
+        Assert.assertEquals("type", contentElm.getAttribute(0).getLocalName());
+        Assert.assertEquals("", contentElm.getAttribute(0).getNamespaceURI());
+        Assert.assertEquals("xhtml", contentElm.getAttribute(0).getValue());
     }
 
     @Test

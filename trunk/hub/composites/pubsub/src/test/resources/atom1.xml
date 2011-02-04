@@ -32,9 +32,7 @@
         <link href="http://example.org/"/>
         <id>urn:e1</id>
         <updated>2010-01-02T03:04:06Z</updated>
-        <content type="xhtml">
-            <div xmlns="http://www.w3.org/1999/xhtml">...</div>
-        </content>
+        <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">...</div></content>
     </entry><entry>
         <title>t2</title>
         <link href="http://example.org/"/>
