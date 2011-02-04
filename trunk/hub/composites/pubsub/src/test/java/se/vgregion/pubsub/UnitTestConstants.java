@@ -15,12 +15,14 @@ public class UnitTestConstants {
     public static final URI TOPIC = URI.create("http://example.com/feed");
     public static final URI TOPIC2 = URI.create("http://example.com/feed2");
     
+    public static String UPDATED1_STR = "2010-03-01T00:00:00.000Z";
+    public static String UPDATED2_STR = "2010-02-01T00:00:00.000Z";
     public static DateTime UPDATED1 = new DateTime(2010, 3, 1, 0, 0, 0, 0, DateTimeZone.UTC);
     public static DateTime UPDATED2 = new DateTime(2010, 2, 1, 0, 0, 0, 0, DateTimeZone.UTC);
     public static DateTime UPDATED3 = new DateTime(2010, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
 
-    public static final Element ATOM_TITLE = new Element("title", Namespaces.NS_ATOM);
-    public static final Element ATOM_TITLE2 = new Element("title", Namespaces.NS_ATOM);
+    public static final Element ATOM_TITLE = new Element("title", Namespaces.ATOM);
+    public static final Element ATOM_TITLE2 = new Element("title", Namespaces.ATOM);
     public static final Element RSS2_TITLE = new Element("title");
     public static final Element RSS2_TITLE2 = new Element("title");
     static {

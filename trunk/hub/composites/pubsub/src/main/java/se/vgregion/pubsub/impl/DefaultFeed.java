@@ -56,6 +56,11 @@ public class DefaultFeed extends AbstractEntity<String> implements Feed {
             feed.fields.add(new DefaultField(namespace, name, value));
             return this;
         }
+
+        public FeedBuilder field(String name, String value) {
+            feed.fields.add(new DefaultField("", name, value));
+            return this;
+        }
         
         public FeedBuilder entry(Entry entry) {
             feed.entries.add(entry);

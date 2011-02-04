@@ -51,11 +51,11 @@ public class Rss2Parser extends AbstractParser {
                 entryBuilder.id(child.getValue());
             } else if("pubDate".equals(child.getLocalName())) {
                 entryBuilder.updated(DateTimeUtils.parseDateTime(child.getValue()));
-            } else if("description".equals(child.getLocalName())) {
-                entryBuilder.content(child);
-            } else {
-                entryBuilder.field(child);
-            }
+//            } else if("description".equals(child.getLocalName())) {
+//                entryBuilder.content(child);
+            } 
+                
+            entryBuilder.field(child);
         }
 
         return entryBuilder.build();

@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Entry;
+import se.vgregion.pubsub.Namespaces;
 import se.vgregion.pubsub.UnitTestConstants;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
@@ -39,9 +40,19 @@ public class Rss2SerializerTest {
     @Test
     public void print() throws Exception {
         FeedBuilder builder = new FeedBuilder(ContentType.RSS);
-        builder.id("f1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.RSS2_TITLE)
-            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.RSS2_TITLE).build())
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).field(UnitTestConstants.RSS2_TITLE).build());
+        builder.id("f1").updated(UnitTestConstants.UPDATED1)
+            .field("link", "f1")
+            .field("pubDate", UnitTestConstants.UPDATED1_STR)
+            .field("title", "foobar")
+            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1)
+                    .field("guid", "e1")
+                    .field("pubDate", UnitTestConstants.UPDATED1_STR)
+                    .field("title", "foobar").build()
+                    )
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2)
+                    .field("guid", "e2")
+                    .field("pubDate", UnitTestConstants.UPDATED2_STR)
+                    .field("title", "foobar").build());
         
         Rss2Serializer serializer = new Rss2Serializer();
         Document doc = serializer.print(builder.build());
@@ -69,9 +80,19 @@ public class Rss2SerializerTest {
     @Test
     public void printWithFilter() throws Exception {
         FeedBuilder builder = new FeedBuilder(ContentType.RSS);
-        builder.id("f1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.RSS2_TITLE)
-            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).field(UnitTestConstants.RSS2_TITLE).build())
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2).field(UnitTestConstants.RSS2_TITLE).build());
+        builder.id("f1").updated(UnitTestConstants.UPDATED1)
+            .field("link", "f1")
+            .field("pubDate", UnitTestConstants.UPDATED1_STR)
+            .field("title", "foobar")
+            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1)
+                    .field("guid", "e1")
+                    .field("pubDate", UnitTestConstants.UPDATED1_STR)
+                    .field("title", "foobar").build()
+                    )
+            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED2)
+                    .field("guid", "e2")
+                    .field("pubDate", UnitTestConstants.UPDATED2_STR)
+                    .field("title", "foobar").build());
         
         Rss2Serializer serializer = new Rss2Serializer();
         Document doc = serializer.print(builder.build(), new EntryFilter() {

@@ -4,12 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -19,10 +18,12 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.Field;
 import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
@@ -103,11 +104,15 @@ public class TwitterStreamConsumer implements Runnable {
             
             String line = reader.readLine();
             while(line != null && !stopped) {
-                @SuppressWarnings("unchecked")
-                Map<String, ?> tweet = mapper.readValue(line, Map.class);
+                JsonNode tweet = mapper.readValue(line, JsonNode.class);
 
-                Feed feed = new FeedBuilder(ContentType.ATOM).id(url.toString())
-                    .entry(new EntryBuilder().id(valueAsString(tweet.get("id_str"))).content(valueAsString(tweet.get("text"))).build()).build();
+                EntryBuilder entryBuilder = new EntryBuilder()
+                    .id(valueAsString(tweet.get("id_str")));
+                entryBuilder.field(new JsonNodeField("tweet", tweet));
+                
+                Feed feed = new FeedBuilder(ContentType.JSON)
+                    .id(url.toString())
+                    .entry(entryBuilder.build()).build();
 
                 pubSubEngine.publish(url, feed);
                 line = reader.readLine();
@@ -117,6 +122,49 @@ public class TwitterStreamConsumer implements Runnable {
                 // try to shut down nicely
                 responseEntity.consumeContent();
             }
+        }
+    }
+    
+    private static class JsonNodeField implements Field {
+
+        private String name;
+        private JsonNode node;
+        
+        public JsonNodeField(String name, JsonNode node) {
+            this.name = name;
+            this.node = node;
+        }
+
+        @Override
+        public String getNamespace() {
+            return "";
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String getContent() {
+            return node.getValueAsText();
+        }
+
+        @Override
+        public List<Field> getFields() {
+            List<Field> fields = new ArrayList<Field>();
+            Iterator<String> fieldNames = node.getFieldNames();
+            while(fieldNames.hasNext()) {
+                String fieldName = fieldNames.next();
+                fields.add(new JsonNodeField(fieldName, node.get(fieldName)));
+            }
+            
+            return fields;
+        }
+
+        @Override
+        public String toString() {
+            return "\"" + name + "\" : " + node.toString();
         }
     }
     
