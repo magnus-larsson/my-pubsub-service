@@ -6,6 +6,8 @@ import org.joda.time.DateTime;
 
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.Namespaces;
+import se.vgregion.pubsub.content.DateTimeUtils;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 
@@ -22,9 +24,16 @@ public class UnitTestConstants {
 
     public static Feed atom1() {
         return new FeedBuilder(ContentType.ATOM)
-            .id("f1").updated(UnitTestConstants.UPDATED1)
-            .entry(new EntryBuilder().id("e1").updated(UnitTestConstants.UPDATED1).build())
-            .entry(new EntryBuilder().id("e2").updated(UnitTestConstants.UPDATED1).build())
+            .field(Namespaces.ATOM, "id", "f1")
+            .field(Namespaces.ATOM, "updated", DateTimeUtils.print(UnitTestConstants.UPDATED1))
+            .entry(new EntryBuilder()
+                    .field(Namespaces.ATOM, "id", "e1")
+                    .field(Namespaces.ATOM, "updated", DateTimeUtils.print(UnitTestConstants.UPDATED1))
+                    .build())
+            .entry(new EntryBuilder()
+                .field(Namespaces.ATOM, "id", "e2")
+                .field(Namespaces.ATOM, "updated", DateTimeUtils.print(UnitTestConstants.UPDATED1))
+                .build())
             .build();
     }
 

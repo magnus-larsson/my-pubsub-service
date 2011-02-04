@@ -69,16 +69,16 @@
 	</servlet-mapping>
 
 	<!-- Only on Jetty -->
-	<servlet>
-		<servlet-name>websocket</servlet-name>
-		<servlet-class>se.vgregion.pubsub.websocket.JettyWebsocketServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>websocket</servlet-name>
-		<url-pattern>/ws</url-pattern>
-	</servlet-mapping>
+<!--	<servlet>-->
+<!--		<servlet-name>websocket</servlet-name>-->
+<!--		<servlet-class>se.vgregion.pubsub.websocket.JettyWebsocketServlet</servlet-class>-->
+<!--		<load-on-startup>1</load-on-startup>-->
+<!--	</servlet>-->
+<!---->
+<!--	<servlet-mapping>-->
+<!--		<servlet-name>websocket</servlet-name>-->
+<!--		<url-pattern>/ws</url-pattern>-->
+<!--	</servlet-mapping>-->
 
 	<servlet-mapping>
          <servlet-name>jsp</servlet-name>
