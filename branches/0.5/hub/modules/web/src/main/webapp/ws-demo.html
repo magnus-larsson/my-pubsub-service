@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+		<script>
+		function subscribe(e) {
+		    var topic = $("#topic").val()
+		    var ws = new WebSocket("ws://localhost:8080/ws?topic=" + encodeURIComponent(topic))
+		    ws.onmessage = function(data) {
+		        console.log(data.data)
+		        var content = $.parseJSON(data.data)
+		        var p = $("<p>" + content.entries[0].title + content.entries[0].content + "</p>")
+		        $("#dump").append(p)
+		    }
+		}
+		</script>
+		
+	</head>
+	<body>
+	    
+	    <form onsubmit="subscribe();return false">
+	        Topic <input id="topic" name="topic" value="http://stream.twitter.com/1/statuses/filter.json#bieber" />
+	        <input type="submit" value="Subscribe" />
+	    </form>
+	    <div id="dump"></div>
+	</body>
+</html>
