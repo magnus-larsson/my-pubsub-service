@@ -217,6 +217,15 @@
 		</dependencies>
 	</dependencyManagement>
 
+    <repositories>
+        <repository>
+          <id>JBoss repository</id>
+          <url>http://repository.jboss.com/maven2/</url>
+        </repository>
+     </repositories>
+
+    
+
 <pluginRepositories>
     <pluginRepository>
       <id>jrebel</id>
