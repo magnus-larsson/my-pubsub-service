@@ -5,12 +5,12 @@
   <parent>
     <groupId>se.vgregion.pubsubhubbub</groupId>
     <artifactId>pubsubhubbub-system</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.5</version>
   </parent>
   <groupId>se.vgregion.pubsubhubbub</groupId>
   <artifactId>pubsubhubbub-hub</artifactId>
   <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.5</version>
   <name>${project.artifactId}</name>
 
   <modules>
