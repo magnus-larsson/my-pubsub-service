@@ -5,8 +5,8 @@
 	<parent>
 		<groupId>se.vgregion.pubsubhubbub</groupId>
 		<artifactId>pubsubhubbub-hub</artifactId>
-		<version>0.6-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
+		<version>0.5</version>
+		<relativePath>../..</relativePath>
 	</parent>
 	<groupId>se.vgregion.pubsubhubbub</groupId>
 	<artifactId>pubsubhubbub-hub-module-web</artifactId>
