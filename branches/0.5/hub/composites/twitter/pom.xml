@@ -6,6 +6,7 @@
 		<groupId>se.vgregion.pubsubhubbub</groupId>
 		<artifactId>pubsubhubbub-hub</artifactId>
 		<version>0.5</version>
+		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<groupId>se.vgregion.pubsubhubbub</groupId>
 	<artifactId>pubsubhubbub-hub-composite-twitter</artifactId>
