@@ -5,12 +5,12 @@
   <parent>
     <groupId>se.vgregion.pubsubhubbub</groupId>
     <artifactId>pubsubhubbub-system</artifactId>
-    <version>0.6-SNAPSHOT</version>
+    <version>0.5.1</version>
   </parent>
   <groupId>se.vgregion.pubsubhubbub</groupId>
   <artifactId>pubsubhubbub-hub</artifactId>
   <packaging>pom</packaging>
-  <version>0.6-SNAPSHOT</version>
+  <version>0.5.1</version>
   <name>${project.artifactId}</name>
 
   <modules>
@@ -117,9 +117,9 @@
     		</dependency>
 
     		<dependency>
-    			<groupId>commons-dbcp</groupId>
-    			<artifactId>commons-dbcp</artifactId>
-    			<version>1.4</version>
+    		    <groupId>c3p0</groupId>
+    		    <artifactId>c3p0</artifactId>
+    		    <version>0.9.1</version>
     		</dependency>
 		    
 		<dependency>
