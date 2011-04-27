@@ -15,7 +15,6 @@ import javax.persistence.UniqueConstraint;
 
 import nu.xom.Document;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -28,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
-import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.content.AbstractSerializer;
@@ -121,9 +119,11 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
 
     @Override
     public synchronized void publish(Feed feed) throws PublicationFailedException {
+        LOG.info("Getting subscribed feed for {}", callback);
+        
         //Feed feed = topic.getFeed();
         if(feed.hasUpdates(getLastUpdated())) {
-            LOG.info("Distributing to {}", callback);
+            LOG.info("Feed has updates, distributing to {}", callback);
             HttpPost post = new HttpPost(callback);
             
             post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
@@ -141,28 +141,32 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
                 httpClient.setRedirectHandler(new DontRedirectHandler());
                 response = httpClient.execute(post);
                 if(HttpUtil.successStatus(response)) {
-                    LOG.debug("Succeeded distributing to subscriber {}", callback);
+                    LOG.info("Succeeded distributing to subscriber {}", callback);
                     
                     // update last update
                     lastUpdated = new DateTime().getMillis();
                 } else {
                     // TODO revisit
                     // subscription.markForVerification();
+                    String msg = "Failed distributing to subscriber \"" + callback + "\" with error \"" + response.getStatusLine() + "\"";
                     
-                    throw new PublicationFailedException("Failed distributing to subscriber \"" + callback + "\" with error \"" + response.getStatusLine() + "\"");
+                    LOG.warn(msg);
+                    throw new PublicationFailedException(msg);
                 }
             } catch(IOException e) {
                 // TODO revisit
                 //subscription.markForVerification();
-                
-                throw new PublicationFailedException("Failed distributing to subscriber \"" + callback + "\" with error \"" + e.getMessage() + "\"", e);
+
+                String msg = "Failed distributing to subscriber \"" + callback + "\" with error \"" + response.getStatusLine() + "\"";
+                LOG.warn(msg);
+                throw new PublicationFailedException(msg);
             } finally {
                 HttpUtil.closeQuitely(response);
     
                 subscriberRepository.merge(this);
             }
         } else {
-            LOG.info("No updates for subscriber {}", this);
+            LOG.info("No updates for subscriber {}", callback);
         }
 
     }
