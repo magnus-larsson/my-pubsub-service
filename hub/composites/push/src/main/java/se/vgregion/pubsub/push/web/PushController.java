@@ -148,15 +148,17 @@ public class PushController {
             if(allowScheme(uri)) {
                 boolean wasAdded = false;
                 try {
-                    LOG.info("Published feed queued for retrieval");
-                    wasAdded = retrieverQueue.offer(uri, 2000, TimeUnit.MILLISECONDS);
+                    LOG.info("Published feed queued for retrieval: {}", url);
+                    wasAdded = retrieverQueue.offer(uri, 5000, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
                     wasAdded = false;
                 }
                 
                 if(wasAdded) {
+                    LOG.info("Published feed successfully queued, returning 204 to publisher: {}", url);
                     response.sendError(204);
                 } else {
+                    LOG.error("Published feed could not be queued for retrieval, returning 500 to publisher: {}", url);
                     response.sendError(500, "Internal error, failed to publish update");
                 }
             } else {

@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -62,19 +63,27 @@ public class DefaultFeedRetriever implements FeedRetriever {
             public void run() {
                 while (true) {
                     try {
-                        URI url = retrieveQueue.take();
-                        try {
-                            retrieve(url);
-                        } catch (IOException e) {
-                            LOG.warn("Failed to download feed from " + url.toString(), e);
+                        URI url = retrieveQueue.poll(10000, TimeUnit.MILLISECONDS);
+                        
+                        // null if poll timed out, in which case we start polling again
+                        if(url != null) {
+                            try {
+                                LOG.info("FeedRetriever got URL {} for download, retrieving now", url);
+                                retrieve(url);
+                            } catch (IOException e) {
+                                LOG.warn("Failed to download feed from " + url.toString(), e);
+                            }
                         }
                     } catch (InterruptedException e) {
+                        try {
+                            LOG.warn("FeedRetriever is getting interrupted and will stop");
+                        } catch (NullPointerException npe) {
+                            // logging might throw a NPE during app server shutdown, if so, ignore
+                        }
                         // shutting down
                         break;
                     }
                 }
-
-                LOG.info("Stopped FeedRetriever");
             }
         });
     }
