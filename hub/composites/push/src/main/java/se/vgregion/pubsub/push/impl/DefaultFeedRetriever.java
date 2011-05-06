@@ -61,28 +61,42 @@ public class DefaultFeedRetriever implements FeedRetriever {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                while (true) {
-                    try {
-                        URI url = retrieveQueue.poll(10000, TimeUnit.MILLISECONDS);
-                        
-                        // null if poll timed out, in which case we start polling again
-                        if(url != null) {
-                            try {
-                                LOG.info("FeedRetriever got URL {} for download, retrieving now", url);
-                                retrieve(url);
-                            } catch (IOException e) {
-                                LOG.warn("Failed to download feed from " + url.toString(), e);
-                            }
-                        }
-                    } catch (InterruptedException e) {
+                try {
+                    while (true) {
                         try {
-                            LOG.warn("FeedRetriever is getting interrupted and will stop");
-                        } catch (NullPointerException npe) {
-                            // logging might throw a NPE during app server shutdown, if so, ignore
+                            LOG.debug("FeedRetriever polling");
+                            URI url = retrieveQueue.poll(10000, TimeUnit.MILLISECONDS);
+                            
+                            // null if poll timed out, in which case we start polling again
+                            if(url != null) {
+                                try {
+                                    LOG.info("FeedRetriever got URL {} for download, retrieving now", url);
+                                    retrieve(url);
+                                } catch (IOException e) {
+                                    LOG.warn("Failed to download feed from " + url.toString(), e);
+                                }
+                            } else {
+                                LOG.debug("FeedRetriever timed out waiting, polling again. Size of queue: {}", retrieveQueue.size());
+                            }
+                        } catch (InterruptedException e) {
+                            try {
+                                LOG.warn("FeedRetriever is getting interrupted and will stop");
+                            } catch (NullPointerException npe) {
+                                // logging might throw a NPE during app server shutdown, if so, ignore
+                            }
+                            // shutting down
+                            break;
                         }
-                        // shutting down
-                        break;
                     }
+                    
+                    try {
+                        LOG.info("FeedRetriever stopping");   
+                    } catch(NullPointerException e) {
+                        // ignore, might happen during shutdown
+                    }
+                } catch(RuntimeException e) {
+                    LOG.warn("FeedRetriever threw an exception, shutting down", e);
+                    throw e;
                 }
             }
         });
@@ -96,6 +110,8 @@ public class DefaultFeedRetriever implements FeedRetriever {
         LOG.info("Feed successfully retrived, putting for distribution: {}", topicUrl);
 
         pubSubEngine.publish(topicUrl, feed);
+        
+        LOG.info("Feed published on topic: {}", topicUrl);
     }
 
     private Feed download(URI url) throws IOException {

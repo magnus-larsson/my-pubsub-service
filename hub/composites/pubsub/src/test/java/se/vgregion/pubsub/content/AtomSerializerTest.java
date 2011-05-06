@@ -64,8 +64,6 @@ public class AtomSerializerTest {
         AtomSerializer serializer = new AtomSerializer();
         Document doc = serializer.print(builder.build());
         
-        System.out.println(doc.toXML());
-        
         Assert.assertEquals(Namespaces.ATOM, doc.getRootElement().getNamespaceURI());
         Assert.assertEquals("feed", doc.getRootElement().getLocalName());
         

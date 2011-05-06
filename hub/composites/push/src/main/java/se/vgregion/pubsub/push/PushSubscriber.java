@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import se.vgregion.dao.domain.patterns.entity.Entity;
 import se.vgregion.pubsub.Subscriber;
+import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 public interface PushSubscriber extends Subscriber, Entity<UUID>  {
 
@@ -16,4 +17,5 @@ public interface PushSubscriber extends Subscriber, Entity<UUID>  {
     
     void verify(SubscriptionMode mode) throws IOException, FailedSubscriberVerificationException;
 
+    void setSubscriberRepository(PushSubscriberRepository subscriberRepository);
 }
