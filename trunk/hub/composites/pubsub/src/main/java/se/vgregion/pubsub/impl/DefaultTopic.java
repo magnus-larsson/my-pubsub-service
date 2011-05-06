@@ -78,21 +78,24 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     public synchronized void publish(Feed feed) {
         LOG.info("Publishing on topic {}", url);
 
-        // if all publications success, purge until now
-        DateTime lastUpdatedSubscriber = new DateTime();
-        for(Subscriber subscriber : subscribers) {
-            try {
-                publish(subscriber, feed);
-            } catch (PublicationFailedException e) {
-                LOG.warn("Subscriber failed: {}", e.getMessage());
-                
-                if(publicationRetryer != null) {
-                    publicationRetryer.addRetry(this, subscriber, feed);
+        if(!subscribers.isEmpty()) {
+            // if all publications success, purge until now
+            DateTime lastUpdatedSubscriber = new DateTime();
+            for(Subscriber subscriber : subscribers) {
+                try {
+                    publish(subscriber, feed);
+                } catch (PublicationFailedException e) {
+                    LOG.warn("Subscriber failed: {}", e.getMessage());
+                    
+                    if(publicationRetryer != null) {
+                        publicationRetryer.addRetry(this, subscriber, feed);
+                    }
+                    lastUpdatedSubscriber = subscriber.getLastUpdated();
                 }
-                lastUpdatedSubscriber = subscriber.getLastUpdated();
             }
+        } else {
+            LOG.info("No subscribers for topic {}, publication dropped", url);
         }
-        
         // TODO purge old entries based on lastUpdatedSubscriber
     }
     

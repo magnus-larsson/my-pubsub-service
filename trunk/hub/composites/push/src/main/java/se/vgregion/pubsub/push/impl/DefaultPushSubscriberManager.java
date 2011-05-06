@@ -30,6 +30,8 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
         
         for(PushSubscriber subscriber : subscribers) {
             pubSubEngine.subscribe(subscriber);
+            subscriber.setSubscriberRepository(subscriptionRepository);
+            
         }
     }
 

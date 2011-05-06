@@ -121,7 +121,6 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     public synchronized void publish(Feed feed) throws PublicationFailedException {
         LOG.info("Getting subscribed feed for {}", callback);
         
-        //Feed feed = topic.getFeed();
         if(feed.hasUpdates(getLastUpdated())) {
             LOG.info("Feed has updates, distributing to {}", callback);
             HttpPost post = new HttpPost(callback);
@@ -130,7 +129,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
             
             Document doc = AbstractSerializer.create(feed.getContentType()).print(feed, 
                     new UpdatedSinceEntryFilter(getLastUpdated()));
-            
+
             post.setEntity(HttpUtil.createEntity(doc));
             
             HttpResponse response = null;
@@ -163,6 +162,8 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
             } finally {
                 HttpUtil.closeQuitely(response);
     
+                LOG.info("Merging subscriber in repository {}", subscriberRepository);
+                
                 subscriberRepository.merge(this);
             }
         } else {
@@ -215,7 +216,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         if(lastUpdated == null) {
             return null;
         } else {
-            return new DateTime(lastUpdated, DateTimeZone.UTC);
+            return new DateTime(lastUpdated);
         }
     }
 
@@ -268,4 +269,10 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
             throw new RuntimeException(e);
         }
     }
+
+    public void setSubscriberRepository(PushSubscriberRepository subscriberRepository) {
+        this.subscriberRepository = subscriberRepository;
+    }
+    
+    
 }

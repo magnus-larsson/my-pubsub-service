@@ -42,7 +42,6 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -98,7 +97,7 @@ public class DefaultPushSubscriberPublishTest {
         subscriber.publish(feed);
         
         // subscriber should be updated
-        Assert.assertEquals(new DateTime(DateTimeZone.UTC), subscriber.getLastUpdated());
+        Assert.assertEquals(new DateTime(), subscriber.getLastUpdated());
 
         HttpRequest request = issuedRequests.poll(10000, TimeUnit.MILLISECONDS);
         Assert.assertNotNull(request);
