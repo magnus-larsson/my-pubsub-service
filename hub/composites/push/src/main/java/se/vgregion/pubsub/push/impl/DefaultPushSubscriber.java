@@ -20,6 +20,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
+import org.hibernate.annotations.Index;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -58,6 +59,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     private Long lastUpdated;
     
     @Column(nullable=false)
+    @Index(name="topic")
     private String topic;
     
     @Column(nullable=false)

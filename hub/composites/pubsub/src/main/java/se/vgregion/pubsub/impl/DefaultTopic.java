@@ -84,7 +84,7 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
             for(Subscriber subscriber : subscribers) {
                 try {
                     publish(subscriber, feed);
-                } catch (PublicationFailedException e) {
+                } catch (Exception e) {
                     LOG.warn("Subscriber failed: {}", e.getMessage());
                     
                     if(publicationRetryer != null) {

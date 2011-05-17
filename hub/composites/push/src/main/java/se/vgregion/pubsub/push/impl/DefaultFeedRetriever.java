@@ -65,7 +65,7 @@ public class DefaultFeedRetriever implements FeedRetriever {
                     while (true) {
                         try {
                             LOG.debug("FeedRetriever polling");
-                            URI url = retrieveQueue.poll(10000, TimeUnit.MILLISECONDS);
+                            URI url = retrieveQueue.poll(5 * 60 * 1000, TimeUnit.MILLISECONDS);
                             
                             // null if poll timed out, in which case we start polling again
                             if(url != null) {
@@ -76,7 +76,7 @@ public class DefaultFeedRetriever implements FeedRetriever {
                                     LOG.warn("Failed to download feed from " + url.toString(), e);
                                 }
                             } else {
-                                LOG.debug("FeedRetriever timed out waiting, polling again. Size of queue: {}", retrieveQueue.size());
+                                LOG.info("FeedRetriever timed out waiting, polling again. Size of queue: {}", retrieveQueue.size());
                             }
                         } catch (InterruptedException e) {
                             try {
