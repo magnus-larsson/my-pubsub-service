@@ -18,12 +18,14 @@
 		<h2>PubSubHubbub prenumerant</h2>
 		
 		<form action='' method="post">
-			<p><label for="topic">Topic URL</label><input name="topic" value="${topic}" /></p>
-			<p><label for="callback">Callback URL</label><input name="callback" value="${callback}" /></p>
-			<p><label for="leaseSeconds">Lease seconds</label><input name="leaseSeconds" value="${leaseSeconds}" /></p>
-			<p><label for="verifyToken">Verify token</label><input name="verifyToken" value="${verifyToken}" /></p>
+			<p><label for="topic">Topic URL</label><input name="topic" value="${subscriber.topic}" /></p>
+			<p><label for="callback">Callback URL</label><input name="callback" value="${subscriber.callback}" /></p>
+			<p><label for="leaseSeconds">Lease seconds</label><input name="leaseSeconds" value="${subscriber.leaseSeconds}" /></p>
+			<p><label for="verifyToken">Verify token</label><input name="verifyToken" value="${subscriber.verifyToken}" /></p>
+			<input type="hidden" name="id" value="${subscriber.id}" /></p>
 			
-			<p><input type='submit' value='Spara'></p>
+			
+			<p><input type='submit' value='Spara'> <c:if test="${not empty subscriber}"><input type='submit' name='delete' value='Ta bort prenumerant'></c:if></p>
 		</form>	
 	</body>
 </html>
