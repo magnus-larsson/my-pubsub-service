@@ -29,6 +29,7 @@
 						<td>${pushSubscriber.topic}</td>
 						<td>${pushSubscriber.callback}</td>
 						<td><!--<input type="submit" value="Ta bort" name="delete-${pushSubscriber.id}">--></td>
+						<td><a href="${pageContext.request.contextPath}/push/admin/${pushSubscriber.id}/edit">Ändra</a></td>
 					</tr>
 				</c:forEach>
 			</table>
