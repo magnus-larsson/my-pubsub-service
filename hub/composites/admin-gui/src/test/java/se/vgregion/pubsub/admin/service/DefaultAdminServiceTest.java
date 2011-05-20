@@ -23,20 +23,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.pubsub.PubSubEngine;
-import se.vgregion.pubsub.admin.service.AdminService;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.impl.PushSubscriberManager;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;

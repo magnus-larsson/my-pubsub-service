@@ -59,7 +59,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     private Long lastUpdated;
     
     @Column(nullable=false)
-    @Index(name="topic")
+    @Index(name="push_subscriber_topic")
     private String topic;
     
     @Column(nullable=false)
