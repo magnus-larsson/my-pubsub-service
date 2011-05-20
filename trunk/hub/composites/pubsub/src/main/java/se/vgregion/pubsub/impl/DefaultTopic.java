@@ -4,15 +4,14 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Index;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +37,7 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     private Long pk;
     
     @Column(nullable=false, unique=true)
+    @Index(name="topic_url")
     private String url;
     
     @Transient
