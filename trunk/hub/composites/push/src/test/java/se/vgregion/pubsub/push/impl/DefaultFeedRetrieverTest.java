@@ -22,6 +22,9 @@ package se.vgregion.pubsub.push.impl;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
@@ -66,13 +69,11 @@ public class DefaultFeedRetrieverTest {
     @Test
     public void simpleRetrieval() throws Exception {
         server.register("/*", new HttpRequestHandler() {
-
             @Override
             public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException,
                     IOException {
                 response.setEntity(testEntity);
             }});
-        
         
         URI url = buildTestUrl("/test");
         
@@ -84,6 +85,42 @@ public class DefaultFeedRetrieverTest {
         Assert.assertEquals("f1", publishedFeed.getValue().getFeedId());
     }
 
+    /**
+     * Fragments should only be used during retrievel and stripped before publication
+     */
+    @Test
+    public void retrievalWithFragment() throws Exception {
+        final BlockingQueue<String> paths = new LinkedBlockingQueue<String>();
+        
+        server.register("/*", new HttpRequestHandler() {
+            @Override
+            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException,
+                    IOException {
+                paths.add(request.getRequestLine().getUri());
+                response.setEntity(testEntity);
+            }});
+        
+        String retrivalPath = "/test#foo";
+        URI publicationUrl = buildTestUrl("/test");
+        URI url = buildTestUrl(retrivalPath);
+        
+        retriever.retrieve(url);
+        
+        String path = paths.poll(2000, TimeUnit.MILLISECONDS);
+
+        // retrived URI must contain fragment
+        Assert.assertEquals(retrivalPath, path);
+        
+        ArgumentCaptor<Feed> publishedFeed = ArgumentCaptor.forClass(Feed.class);
+        
+        // published URI must no contain fragment
+        Mockito.verify(pubSubEngine).publish(Mockito.eq(publicationUrl), publishedFeed.capture());
+        
+        Assert.assertEquals("f1", publishedFeed.getValue().getFeedId());
+    }
+
+
+    
     @Test(expected=IOException.class)
     public void nonExistingFeed() throws Exception {
         server.register("/*", new HttpRequestHandler() {

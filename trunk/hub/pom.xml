@@ -20,6 +20,7 @@
     <module>composites/websocket</module>
     <module>composites/admin-gui</module>
     <module>modules/web</module>
+    <module>modules/loadtesting</module>
   </modules>
 
 	<dependencyManagement>
@@ -49,7 +50,7 @@
     			<artifactId>pubsubhubbub-hub-composite-websocket</artifactId>
     			<version>${project.version}</version>
     		</dependency>
-
+            
     		<dependency>
     			<groupId>org.apache.httpcomponents</groupId>
     			<artifactId>httpclient</artifactId>
