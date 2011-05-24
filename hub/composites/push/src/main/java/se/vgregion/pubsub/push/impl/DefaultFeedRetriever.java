@@ -107,6 +107,9 @@ public class DefaultFeedRetriever implements FeedRetriever {
 
         Feed feed = download(topicUrl);
 
+        // remove fragment of the URL as it's only used during the retrieval phase
+        topicUrl = URI.create(topicUrl.toString().replace("#" + topicUrl.getFragment(), ""));
+        
         LOG.info("Feed successfully retrived, putting for distribution: {}", topicUrl);
 
         pubSubEngine.publish(topicUrl, feed);
