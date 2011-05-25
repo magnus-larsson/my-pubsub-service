@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import se.vgregion.pubsub.PubSubEngine;
-import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.SubscriptionMode;
 import se.vgregion.pubsub.push.impl.DefaultPushSubscriber;
