@@ -25,6 +25,10 @@ import java.util.UUID;
 import se.vgregion.dao.domain.patterns.repository.Repository;
 import se.vgregion.pubsub.push.PushSubscriber;
     
+/**
+ * Repository for {@link PushSubscriber}s
+ *
+ */
 public interface PushSubscriberRepository extends Repository<PushSubscriber, UUID> {
 
     PushSubscriber findByTopicAndCallback(URI topic, URI callback);

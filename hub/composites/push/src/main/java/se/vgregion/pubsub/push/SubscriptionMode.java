@@ -19,7 +19,10 @@
 
 package se.vgregion.pubsub.push;
 
-
+/**
+ * Enum for the hub.mode parameter
+ *
+ */
 public enum SubscriptionMode {
     SUBSCRIBE,
     UNSUBSCRIBE

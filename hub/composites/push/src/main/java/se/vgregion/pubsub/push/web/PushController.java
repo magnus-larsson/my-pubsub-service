@@ -44,6 +44,10 @@ import se.vgregion.pubsub.push.impl.DefaultPushSubscriber;
 import se.vgregion.pubsub.push.impl.PushSubscriberManager;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
+/**
+ * Spring MVC controller for handling the HTTP parts of PuSH. Receives publications, subscriptions and unsubscriptions.
+ *
+ */
 @Controller
 public class PushController {
 

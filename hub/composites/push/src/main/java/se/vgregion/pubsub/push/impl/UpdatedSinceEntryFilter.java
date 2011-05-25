@@ -24,7 +24,10 @@ import org.joda.time.DateTime;
 import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.content.EntryFilter;
 
-
+/**
+ * Filters {@link Entry}s based update time
+ *
+ */
 public class UpdatedSinceEntryFilter implements EntryFilter {
 
     private DateTime updatedSince;
@@ -33,6 +36,9 @@ public class UpdatedSinceEntryFilter implements EntryFilter {
         this.updatedSince = updatedSince;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean include(Entry entry) {
         return updatedSince == null || entry.isNewerThan(updatedSince);
