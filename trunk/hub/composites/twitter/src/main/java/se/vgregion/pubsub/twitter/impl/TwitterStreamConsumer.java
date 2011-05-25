@@ -47,6 +47,10 @@ import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 
+/**
+ * Consumes a specific Twitter HTTP stream and publishes every entry on a {@link PubSubEngine}
+ *
+ */
 public class TwitterStreamConsumer implements Runnable {
 
     private PubSubEngine pubSubEngine;

@@ -40,7 +40,10 @@ import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.content.AbstractParser;
 import se.vgregion.pubsub.push.FeedRetriever;
 
-// TODO separate runner from rest
+/**
+ * Implementation of {@link FeedRetriever}
+ *
+ */
 public class DefaultFeedRetriever implements FeedRetriever {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultFeedRetriever.class);
@@ -56,6 +59,9 @@ public class DefaultFeedRetriever implements FeedRetriever {
         this.pubSubEngine = pubSubEngine;
     }
 
+    /**
+     * Start the retriever so that it will listen for incoming publications to download and publish
+     */
     public void start() {
         LOG.info("Starting FeedRetriever");
         executor.execute(new Runnable() {
@@ -64,6 +70,7 @@ public class DefaultFeedRetriever implements FeedRetriever {
                 try {
                     while (true) {
                         try {
+                        	// wait for publications to retrieve
                             LOG.debug("FeedRetriever polling");
                             URI url = retrieveQueue.poll(5 * 60 * 1000, TimeUnit.MILLISECONDS);
                             
@@ -102,6 +109,9 @@ public class DefaultFeedRetriever implements FeedRetriever {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void retrieve(URI topicUrl) throws InterruptedException, IOException {
         LOG.info("Retrieving feed: {}", topicUrl);
 
@@ -164,6 +174,9 @@ public class DefaultFeedRetriever implements FeedRetriever {
         }
     }
 
+    /**
+     * Stops the retriver
+     */
     public void stop() {
         LOG.info("Stopping FeedRetriever");
         executor.shutdownNow();

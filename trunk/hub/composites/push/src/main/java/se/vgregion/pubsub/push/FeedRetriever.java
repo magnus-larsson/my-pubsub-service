@@ -22,7 +22,19 @@ package se.vgregion.pubsub.push;
 import java.io.IOException;
 import java.net.URI;
 
+import se.vgregion.pubsub.PubSubEngine;
+
+/**
+ * Interface for retrieving a feed from a URL
+ *
+ */
 public interface FeedRetriever {
 
+	/**
+	 * Retrieve a feed from the provided URL and publish to a {@link PubSubEngine}
+	 * @param topicUrl
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
     void retrieve(URI topicUrl) throws InterruptedException, IOException;
 }

@@ -21,11 +21,32 @@ package se.vgregion.pubsub.push.impl;
 
 import java.net.URI;
 
+import se.vgregion.pubsub.PubSubEngine;
+
+/**
+ * Service for handling PuSH subscriptions
+ *
+ */
 public interface PushSubscriberManager {
 
+	/**
+	 * Load all persisted subscribers and add these to a {@link PubSubEngine}
+	 */
     public void loadSubscribers();
 
+    /**
+     * Create a new subscriber
+     * @param topicUrl
+     * @param callback
+     * @param leaseSeconds
+     * @param verifyToken
+     */
     public void subscribe(URI topicUrl, URI callback, int leaseSeconds, String verifyToken);
 
+    /**
+     * Unsubscribe a subscriber if one exists with the provided topic and callback
+     * @param topic
+     * @param callback
+     */
     public void unsubscribe(URI topic, URI callback);
 }

@@ -28,6 +28,10 @@ import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.protocol.HttpContext;
 
+/**
+ * Interceptor which authenticates an HTTP request directly
+ *
+ */
 public class PreemptiveBasicAuth implements HttpRequestInterceptor {
 
     private String username;

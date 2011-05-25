@@ -51,10 +51,15 @@ import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.content.AbstractSerializer;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
+import se.vgregion.pubsub.push.FeedRetriever;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.SubscriptionMode;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
+/**
+ * Implementation of {@link PushSubscriber} with support for JPA
+ *
+ */
 @Entity
 @Table(name="PUSH_SUBSCRIBERS",
     uniqueConstraints={
@@ -124,11 +129,17 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     }
 
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public UUID getId() {
         return id;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DateTime getTimeout() {
         if(timeout != null && timeout > 0) {
@@ -138,6 +149,9 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void publish(Feed feed) throws PublicationFailedException {
         LOG.info("Getting subscribed feed for {}", callback);
@@ -193,6 +207,9 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void timedOut() {
         // TODO verify
@@ -206,6 +223,9 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public void verify(SubscriptionMode mode) throws IOException, FailedSubscriberVerificationException {
         String challenge = UUID.randomUUID().toString();
         
@@ -232,6 +252,9 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DateTime getLastUpdated() {
         if(lastUpdated == null) {
@@ -240,12 +263,18 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
             return new DateTime(lastUpdated);
         }
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public URI getTopic() {
         return URI.create(topic);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public URI getCallback() {
         return URI.create(callback);
     }
@@ -258,6 +287,12 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         return verifyToken;
     }
     
+    /**
+     * Builds the URL used for verifying a subscriber
+     * @param mode
+     * @param challenge
+     * @return
+     */
     public URI getVerificationUrl(SubscriptionMode mode, String challenge) {
         try {
             StringBuffer url = new StringBuffer();

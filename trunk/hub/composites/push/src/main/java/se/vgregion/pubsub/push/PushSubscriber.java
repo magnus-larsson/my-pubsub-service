@@ -27,13 +27,27 @@ import se.vgregion.dao.domain.patterns.entity.Entity;
 import se.vgregion.pubsub.Subscriber;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
+/**
+ * A PuSH subscriber
+ *
+ */
 public interface PushSubscriber extends Subscriber, Entity<UUID>  {
 
     // 24 hours
     public static final int DEFAULT_LEASE_SECONDS = 60*60*24;
 
+    /**
+     * The callback URL on which the subscribers will be notified on publications
+     * @return
+     */
     URI getCallback();
     
+    /**
+     * Verify subscriptions and unsubscriptions
+     * @param mode
+     * @throws IOException
+     * @throws FailedSubscriberVerificationException
+     */
     void verify(SubscriptionMode mode) throws IOException, FailedSubscriberVerificationException;
 
     void setSubscriberRepository(PushSubscriberRepository subscriberRepository);

@@ -32,6 +32,10 @@ import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.impl.DefaultPushSubscriber;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
+/**
+ * Repository for {@link PushSubscriber}s based on JPA
+ *
+ */
 public class JpaPushSubscriberRepository extends AbstractJpaRepository<PushSubscriber, UUID, UUID> implements PushSubscriberRepository {
 
     public JpaPushSubscriberRepository() {

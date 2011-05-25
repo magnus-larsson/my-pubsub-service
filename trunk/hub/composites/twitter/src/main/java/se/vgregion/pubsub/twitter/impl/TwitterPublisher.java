@@ -30,6 +30,10 @@ import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.PubSubEventListener;
 import se.vgregion.pubsub.Subscriber;
 
+/**
+ * Pubsub publisher which listens on the Twitter Stream API and publishes all matching entries
+ *
+ */
 public class TwitterPublisher implements PubSubEventListener {
 
     public static final String FILTER_URL = "http://stream.twitter.com/1/statuses/filter.json";
