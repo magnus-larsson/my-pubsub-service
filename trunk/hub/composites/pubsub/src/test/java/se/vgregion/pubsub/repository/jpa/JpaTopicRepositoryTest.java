@@ -1,4 +1,3 @@
-package se.vgregion.pubsub.repository.jpa;
 /**
  * Copyright 2010 Västra Götalandsregionen
  *
@@ -18,6 +17,7 @@ package se.vgregion.pubsub.repository.jpa;
  *
  */
 
+package se.vgregion.pubsub.repository.jpa;
 
 import org.junit.Assert;
 import org.junit.Before;

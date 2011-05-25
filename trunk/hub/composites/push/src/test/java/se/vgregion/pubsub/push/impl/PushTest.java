@@ -1,4 +1,3 @@
-package se.vgregion.pubsub.push.impl;
 /**
  * Copyright 2010 Västra Götalandsregionen
  *
@@ -17,6 +16,8 @@ package se.vgregion.pubsub.push.impl;
  *   Boston, MA 02111-1307  USA
  *
  */
+
+package se.vgregion.pubsub.push.impl;
 
 
 import java.net.URI;

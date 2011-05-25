@@ -19,6 +19,10 @@
 
 package se.vgregion.pubsub;
 
+/**
+ * Representation of a content type
+ *
+ */
 public class ContentType {
     public static final ContentType ATOM = new ContentType("application/atom+xml");
     public static final ContentType RSS = new ContentType("application/rss+xml");
@@ -26,10 +30,19 @@ public class ContentType {
     
     private String value;
     
+    /**
+     * Create a content type using it's string representation, e.g. application/json
+     * @param value
+     */
     public ContentType(String value) {
         this.value = value;
     }
 
+    /**
+     * Parse a content type and return constants for common content types
+     * @param value
+     * @return
+     */
     public static ContentType fromValue(String value) {
         if("application/atom+xml".equals(value)) return ATOM;
         else if("application/rss+xml".equals(value)) return RSS;
