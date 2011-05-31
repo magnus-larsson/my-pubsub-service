@@ -81,6 +81,8 @@ public class DefaultFeedRetriever implements FeedRetriever {
                                     retrieve(url);
                                 } catch (IOException e) {
                                     LOG.warn("Failed to download feed from " + url.toString(), e);
+                                } catch (RuntimeException e) {
+                                	LOG.warn("Failed to publish feed from " + url.toString(), e);
                                 }
                             } else {
                                 LOG.info("FeedRetriever timed out waiting, polling again. Size of queue: {}", retrieveQueue.size());
