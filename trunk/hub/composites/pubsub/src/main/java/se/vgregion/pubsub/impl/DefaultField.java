@@ -33,18 +33,21 @@ public class DefaultField extends AbstractEntity<String> implements Field {
     private String id = UUID.randomUUID().toString();
     
     private String namespace;
+    private String prefix;
     private String name;
     private String content;
     private List<Field> fields = new ArrayList<Field>();
 
-    public DefaultField(String namespace, String name, String value) {
+    public DefaultField(String namespace, String prefix, String name, String value) {
         this.namespace = namespace;
+        this.prefix = prefix;
         this.name = name;
         this.content = value;
     }
 
-    public DefaultField(String namespace, String name, String value, List<Field> fields) {
+    public DefaultField(String namespace, String prefix, String name, String value, List<Field> fields) {
         this.namespace = namespace;
+        this.prefix = prefix;
         this.name = name;
         this.content = value;
         this.fields = fields;
@@ -54,10 +57,11 @@ public class DefaultField extends AbstractEntity<String> implements Field {
     public DefaultField(Element elm) {
         this.name = elm.getLocalName();
         this.namespace = elm.getNamespaceURI();
+        this.prefix = elm.getNamespacePrefix();
         
         for(int i = 0; i<elm.getAttributeCount(); i++) {
             Attribute attribute = elm.getAttribute(i);
-            fields.add(new DefaultField(attribute.getNamespaceURI(), attribute.getLocalName(), attribute.getValue()));
+            fields.add(new DefaultField(attribute.getNamespaceURI(), attribute.getNamespacePrefix(), attribute.getLocalName(), attribute.getValue()));
         }
         
         this.content = XmlUtil.innerToString(elm);
@@ -78,6 +82,11 @@ public class DefaultField extends AbstractEntity<String> implements Field {
         return namespace;
     }
 
+    @Override
+    public String getPrefix() {
+    	return prefix;
+    }
+    
     @Override
     public String getName() {
         return name;

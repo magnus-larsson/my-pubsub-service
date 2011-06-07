@@ -30,6 +30,7 @@ public interface Field {
     String getNamespace();
     String getName();
     String getContent();
+    String getPrefix();
     
     List<Field> getFields();
     

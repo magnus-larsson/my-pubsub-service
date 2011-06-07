@@ -38,7 +38,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
@@ -50,16 +52,16 @@ public class DefaultFeedRetrieverTest {
 
     private LocalTestServer server = new LocalTestServer(null, null);
     private HttpEntity testEntity = HttpUtil.createEntity(AbstractSerializer.printFeed(ContentType.ATOM, UnitTestConstants.atom1()));
-    private PubSubEngine pubSubEngine;
+    @Mock private PushSubscriberManager pushSubscriberManager;
     private DefaultFeedRetriever retriever;
     
     @Before
     public void before() throws Exception {
+    	MockitoAnnotations.initMocks(this);
+    	
         server.start();
 
-        pubSubEngine = Mockito.mock(PubSubEngine.class);
-        retriever = new DefaultFeedRetriever(null, pubSubEngine);
-
+        retriever = new DefaultFeedRetriever(pushSubscriberManager);
     }
     
     private URI buildTestUrl(String path) throws URISyntaxException {
@@ -80,7 +82,7 @@ public class DefaultFeedRetrieverTest {
         retriever.retrieve(url);
         
         ArgumentCaptor<Feed> publishedFeed = ArgumentCaptor.forClass(Feed.class);
-        Mockito.verify(pubSubEngine).publish(Mockito.eq(url), publishedFeed.capture());
+        Mockito.verify(pushSubscriberManager).publish(Mockito.eq(url), publishedFeed.capture());
         
         Assert.assertEquals("f1", publishedFeed.getValue().getFeedId());
     }
@@ -114,7 +116,7 @@ public class DefaultFeedRetrieverTest {
         ArgumentCaptor<Feed> publishedFeed = ArgumentCaptor.forClass(Feed.class);
         
         // published URI must no contain fragment
-        Mockito.verify(pubSubEngine).publish(Mockito.eq(publicationUrl), publishedFeed.capture());
+        Mockito.verify(pushSubscriberManager).publish(Mockito.eq(publicationUrl), publishedFeed.capture());
         
         Assert.assertEquals("f1", publishedFeed.getValue().getFeedId());
     }

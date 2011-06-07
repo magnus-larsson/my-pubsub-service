@@ -19,6 +19,7 @@
 
 package se.vgregion.pubsub.admin.controller;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
 
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.pubsub.admin.service.AdminService;
+import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 import se.vgregion.pubsub.push.PushSubscriber;
 
 /**
@@ -79,7 +81,7 @@ public class AdminController {
         @RequestParam("topic") URI topic,    
         @RequestParam("callback") URI callback,    
         @RequestParam(value="leaseSeconds", required=false) Integer leaseSeconds,    
-        @RequestParam(value="verifyToken", required=false) String verifyToken) {
+        @RequestParam(value="verifyToken", required=false) String verifyToken) throws IOException, FailedSubscriberVerificationException {
 
         if(leaseSeconds == null) {
             leaseSeconds = 0;
@@ -96,7 +98,7 @@ public class AdminController {
         @RequestParam("callback") URI callback,    
         @RequestParam(value="leaseSeconds", required=false) Integer leaseSeconds,    
         @RequestParam(value="verifyToken", required=false) String verifyToken,
-        @RequestParam(value="delete", required=false) String delete) {
+        @RequestParam(value="delete", required=false) String delete) throws IOException, FailedSubscriberVerificationException {
 
         if(leaseSeconds == null) {
             leaseSeconds = 0;

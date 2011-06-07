@@ -19,10 +19,12 @@
 
 package se.vgregion.pubsub.admin.service;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.UUID;
 
+import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 import se.vgregion.pubsub.push.PushSubscriber;
 
 /**
@@ -33,11 +35,11 @@ public interface AdminService {
 
     Collection<PushSubscriber> getAllPushSubscribers();
     
-    void createPushSubscriber(URI topic, URI callback, int leaseSeconds, String verifyToken);
+    void createPushSubscriber(URI topic, URI callback, int leaseSeconds, String verifyToken) throws IOException, FailedSubscriberVerificationException;
 
     PushSubscriber getPushSubscriber(UUID id);
 
-    void updatePushSubscriber(UUID id, URI topic, URI callback, int leaseSeconds, String verifyToken);
+    void updatePushSubscriber(UUID id, URI topic, URI callback, int leaseSeconds, String verifyToken) throws IOException, FailedSubscriberVerificationException;
 
     void removePushSubscriber(UUID id);
     

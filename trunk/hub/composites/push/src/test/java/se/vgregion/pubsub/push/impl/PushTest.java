@@ -87,8 +87,8 @@ public class PushTest extends AbstractTransactionalJUnit4SpringContextTests {
 //                applicationContext.getBean(PushSubscriberRepository.class),
 //                testUri, URI.create("http://localhost:9000"), 100, "verify"));
         
-        LinkedBlockingQueue<URI> retreiverQueue = applicationContext.getBean(LinkedBlockingQueue.class);
-        retreiverQueue.put(testUri);
+        PushSubscriberManager pushSubscriberManager = applicationContext.getBean(PushSubscriberManager.class);
+        pushSubscriberManager.retrive(testUri);
 
         Feed feed = publishedFeeds.poll(10000, TimeUnit.MILLISECONDS);
         

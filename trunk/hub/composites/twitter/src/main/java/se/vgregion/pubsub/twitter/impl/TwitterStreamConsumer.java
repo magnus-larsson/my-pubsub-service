@@ -164,6 +164,11 @@ public class TwitterStreamConsumer implements Runnable {
         }
 
         @Override
+        public String getPrefix() {
+        	return "";
+        }
+        
+        @Override
         public String getName() {
             return name;
         }

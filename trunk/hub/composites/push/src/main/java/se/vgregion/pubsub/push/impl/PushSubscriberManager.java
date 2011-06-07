@@ -19,9 +19,12 @@
 
 package se.vgregion.pubsub.push.impl;
 
+import java.io.IOException;
 import java.net.URI;
 
+import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
+import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 
 /**
  * Service for handling PuSH subscriptions
@@ -40,13 +43,21 @@ public interface PushSubscriberManager {
      * @param callback
      * @param leaseSeconds
      * @param verifyToken
+     * @throws FailedSubscriberVerificationException 
+     * @throws IOException 
      */
-    public void subscribe(URI topicUrl, URI callback, int leaseSeconds, String verifyToken);
+    public void subscribe(URI topicUrl, URI callback, int leaseSeconds, String verifyToken, boolean verify) throws IOException, FailedSubscriberVerificationException;
 
     /**
      * Unsubscribe a subscriber if one exists with the provided topic and callback
      * @param topic
      * @param callback
      */
-    public void unsubscribe(URI topic, URI callback);
+    public void unsubscribe(URI topic, URI callback, boolean verify);
+
+	void retrive(URI topicUrl) throws InterruptedException;
+
+	void publish(URI topicUrl, Feed feed);
+
+	URI pollForRetrieval() throws InterruptedException;
 }

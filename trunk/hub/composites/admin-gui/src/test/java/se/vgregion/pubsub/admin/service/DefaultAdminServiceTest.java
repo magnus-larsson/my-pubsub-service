@@ -27,9 +27,10 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
-import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.impl.PushSubscriberManager;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
@@ -42,15 +43,15 @@ public class DefaultAdminServiceTest {
     private static final int LEASE = 123;
     private static final String TOKEN = "vt";
 
-    private PubSubEngine pubSubEngine = mock(PubSubEngine.class);
-    private PushSubscriberRepository subscriberRepository = mock(PushSubscriberRepository.class);
-    private PushSubscriberManager pushSubscriberManager = mock(PushSubscriberManager.class);
+    @Mock private PushSubscriberRepository subscriberRepository;
+    @Mock private PushSubscriberManager pushSubscriberManager;
     
     private DefaultAdminService adminService = new DefaultAdminService();
     
     @Before
     public void before() throws Exception {
-        adminService.setPubSubEngine(pubSubEngine);
+    	MockitoAnnotations.initMocks(this);
+    	
         adminService.setPushSubscriberManager(pushSubscriberManager);
         adminService.setSubscriberRepository(subscriberRepository);
     }
@@ -59,24 +60,25 @@ public class DefaultAdminServiceTest {
     public void createPushSubscriber() throws Exception {
         adminService.createPushSubscriber(TOPIC, CALLBACK, LEASE, TOKEN);
 
-        Mockito.verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, LEASE, TOKEN);
+        Mockito.verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, LEASE, TOKEN, false);
     }
 
     @Test
     public void updatePushSubscriber() throws Exception {
         adminService.updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN);
         
-        Mockito.verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, LEASE, TOKEN);
+        Mockito.verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, LEASE, TOKEN, false);
     }
     
     @Test
     public void deletePushSubscriber() throws Exception {
         PushSubscriber subscriber = mock(PushSubscriber.class);
+        when(subscriber.getTopic()).thenReturn(TOPIC);
+        when(subscriber.getCallback()).thenReturn(CALLBACK);
         
         when(subscriberRepository.find(ID)).thenReturn(subscriber);
         adminService.removePushSubscriber(ID);
         
-        Mockito.verify(pubSubEngine).unsubscribe(subscriber);
-        Mockito.verify(subscriberRepository).remove(subscriber);
+        Mockito.verify(pushSubscriberManager).unsubscribe(TOPIC, CALLBACK, false);
     }
 }

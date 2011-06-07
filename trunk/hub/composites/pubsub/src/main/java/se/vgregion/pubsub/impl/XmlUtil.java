@@ -76,14 +76,27 @@ public class XmlUtil {
             xml.append(">");
             
             Document doc = PARSER.build(new StringReader(xml.toString()));
+
             Element elm = (Element) doc.getRootElement().copy();
             for(Field attrField : field.getFields()) {
-                Attribute attr = new Attribute(attrField.getName(), attrField.getNamespace(), attrField.getContent());
+            	String ns = attrField.getNamespace();
+
+            	String name;
+            	if(ns.equals("http://www.w3.org/XML/1998/namespace")) {
+            		name = "xml:" + attrField.getName();
+            	} else if(attrField.getPrefix().length() > 0) {
+            		name = attrField.getPrefix() + ":" + attrField.getName();
+            	} else {
+            		name = attrField.getName();
+            	}
+            	
+            	Attribute attr = new Attribute(name, ns, attrField.getContent());
                 elm.addAttribute(attr);
             }
             
             return elm;
         } catch (Exception e) {
+        	e.printStackTrace();
             throw new RuntimeException(e);
         }
         

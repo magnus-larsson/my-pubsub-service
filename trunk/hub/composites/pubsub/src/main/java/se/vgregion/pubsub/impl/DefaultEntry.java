@@ -57,14 +57,17 @@ public class DefaultEntry extends AbstractEntity<String> implements Entry {
             return this;
         }
 
-        public EntryBuilder field(String namespace, String name, String value) {
-            entry.fields.add(new DefaultField(namespace, name, value));
+        public EntryBuilder field(String namespace, String prefix, String name, String value) {
+            entry.fields.add(new DefaultField(namespace, prefix, name, value));
             return this;
         }
 
+        public EntryBuilder field(String namespace, String name, String value) {
+        	return field(namespace, "", name, value);
+        }
+        
         public EntryBuilder field(String name, String value) {
-            entry.fields.add(new DefaultField("", name, value));
-            return this;
+        	return field("", "", name, value);
         }
 
         public EntryBuilder field(Field field) {

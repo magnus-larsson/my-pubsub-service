@@ -48,15 +48,12 @@ public class DefaultFeedRetriever implements FeedRetriever {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultFeedRetriever.class);
 
-    private final BlockingQueue<URI> retrieveQueue;
+    private final PushSubscriberManager pushSubscriberManager;
 
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
 
-    private final PubSubEngine pubSubEngine;
-
-    public DefaultFeedRetriever(BlockingQueue<URI> retrieveQueue, PubSubEngine pubSubEngine) {
-        this.retrieveQueue = retrieveQueue;
-        this.pubSubEngine = pubSubEngine;
+    public DefaultFeedRetriever(PushSubscriberManager pushSubscriberManager) {
+        this.pushSubscriberManager = pushSubscriberManager;
     }
 
     /**
@@ -72,7 +69,7 @@ public class DefaultFeedRetriever implements FeedRetriever {
                         try {
                         	// wait for publications to retrieve
                             LOG.debug("FeedRetriever polling");
-                            URI url = retrieveQueue.poll(5 * 60 * 1000, TimeUnit.MILLISECONDS);
+                            URI url = pushSubscriberManager.pollForRetrieval();
                             
                             // null if poll timed out, in which case we start polling again
                             if(url != null) {
@@ -85,7 +82,7 @@ public class DefaultFeedRetriever implements FeedRetriever {
                                 	LOG.warn("Failed to publish feed from " + url.toString(), e);
                                 }
                             } else {
-                                LOG.info("FeedRetriever timed out waiting, polling again. Size of queue: {}", retrieveQueue.size());
+                                LOG.info("FeedRetriever timed out waiting, polling again");
                             }
                         } catch (InterruptedException e) {
                             try {
@@ -124,7 +121,7 @@ public class DefaultFeedRetriever implements FeedRetriever {
         
         LOG.info("Feed successfully retrived, putting for distribution: {}", topicUrl);
 
-        pubSubEngine.publish(topicUrl, feed);
+        pushSubscriberManager.publish(topicUrl, feed);
         
         LOG.info("Feed published on topic: {}", topicUrl);
     }

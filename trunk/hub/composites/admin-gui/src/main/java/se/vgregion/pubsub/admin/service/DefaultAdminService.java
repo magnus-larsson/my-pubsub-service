@@ -19,6 +19,7 @@
 
 package se.vgregion.pubsub.admin.service;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.UUID;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.pubsub.PubSubEngine;
+import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.impl.PushSubscriberManager;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
@@ -41,9 +43,6 @@ import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 public class DefaultAdminService implements AdminService {
 
     @Resource
-    private PubSubEngine pubSubEngine;
-    
-    @Resource
     private PushSubscriberRepository subscriberRepository;
     
     @Resource
@@ -51,13 +50,13 @@ public class DefaultAdminService implements AdminService {
     
     @Override
     @Transactional
-    public void createPushSubscriber(URI topic, URI callback, int leaseSeconds, String verifyToken) {
-        pushSubscriberManager.subscribe(topic, callback, leaseSeconds, verifyToken);
+    public void createPushSubscriber(URI topic, URI callback, int leaseSeconds, String verifyToken) throws IOException, FailedSubscriberVerificationException {
+        pushSubscriberManager.subscribe(topic, callback, leaseSeconds, verifyToken, false);
     }
 
     @Override
     @Transactional
-    public void updatePushSubscriber(UUID id, URI topic, URI callback, int leaseSeconds, String verifyToken) {
+    public void updatePushSubscriber(UUID id, URI topic, URI callback, int leaseSeconds, String verifyToken) throws IOException, FailedSubscriberVerificationException {
         removePushSubscriber(id);
         createPushSubscriber(topic, callback, leaseSeconds, verifyToken);
     }
@@ -68,8 +67,7 @@ public class DefaultAdminService implements AdminService {
         PushSubscriber subscriber = subscriberRepository.find(id);
         
         if(subscriber != null) {
-            pubSubEngine.unsubscribe(subscriber);
-            subscriberRepository.remove(subscriber);
+        	pushSubscriberManager.unsubscribe(subscriber.getTopic(), subscriber.getCallback(), false);
         }
     }
     
@@ -83,14 +81,6 @@ public class DefaultAdminService implements AdminService {
     @Transactional
     public PushSubscriber getPushSubscriber(UUID id) {
         return subscriberRepository.find(id);
-    }
-
-    public PubSubEngine getPubSubEngine() {
-        return pubSubEngine;
-    }
-
-    public void setPubSubEngine(PubSubEngine pubSubEngine) {
-        this.pubSubEngine = pubSubEngine;
     }
 
     public PushSubscriberRepository getSubscriberRepository() {
