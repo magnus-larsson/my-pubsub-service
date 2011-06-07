@@ -25,7 +25,6 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -37,10 +36,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.SubscriptionMode;
-import se.vgregion.pubsub.push.impl.DefaultPushSubscriber;
 import se.vgregion.pubsub.push.impl.PushSubscriberManager;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
@@ -55,12 +52,6 @@ public class PushController {
 
     private final static List<String> ALLOWED_SCHEMES = Arrays.asList("http", "https");
     
-    @Resource(name="retrieveQueue")
-    private BlockingQueue<URI> retrieverQueue;
-    
-    @Resource
-    private PubSubEngine pubSubEngine;
-
     @Resource
     private PushSubscriberRepository subscriberRepository;
     
@@ -95,31 +86,35 @@ public class PushController {
             if(topicUrl != null) {
                 String verify = request.getParameter("hub.verify");
                 if("sync".equals(verify) || "async".equals(verify)) {
-                    String leaseSecondsString = request.getParameter("hub.lease_seconds");
-                    
-                    try {
-                        int leaseSeconds = leaseSecondsString != null ? Integer.parseInt(leaseSecondsString) : PushSubscriber.DEFAULT_LEASE_SECONDS;
-                        
-                        String secret = request.getParameter("hub.secret");
-                        String verifyToken = request.getParameter("hub.verify_token");
-                        
-                        try {
-                            if(mode == SubscriptionMode.SUBSCRIBE) {
-                                PushSubscriber subscriber = new DefaultPushSubscriber(subscriberRepository, topicUrl, callback, leaseSeconds, verifyToken);
-                                subscriber.verify(mode);
-                                pushSubscriberManager.subscribe(topicUrl, callback, leaseSeconds, verifyToken);
-                            } else {
-                                pushSubscriberManager.unsubscribe(topicUrl, callback);
-                            }
-                            
-                            response.setStatus(204);
-                        } catch(Exception e) {
-                            e.printStackTrace();
-                            response.sendError(500);
-                        }
-                    } catch(NumberFormatException e) {
-                        response.sendError(500, "Invalid hub.lease_seconds");
-                    }
+                	if(mode == SubscriptionMode.SUBSCRIBE) {
+
+                		String leaseSecondsString = request.getParameter("hub.lease_seconds");
+                		try {
+                			int leaseSeconds = leaseSecondsString != null ? Integer.parseInt(leaseSecondsString) : PushSubscriber.DEFAULT_LEASE_SECONDS;
+                			
+                			String secret = request.getParameter("hub.secret");
+                			String verifyToken = request.getParameter("hub.verify_token");
+                			
+                			try {
+                				pushSubscriberManager.subscribe(topicUrl, callback, leaseSeconds, verifyToken, true);
+                			
+                				response.setStatus(204);
+                			} catch(Exception e) {
+                				LOG.warn("Exception thrown during subscription", e);
+                				response.sendError(500);
+                			}
+                		} catch(NumberFormatException e) {
+                			response.sendError(500, "Invalid hub.lease_seconds");
+                		}
+                	} else {
+                		try {
+                			pushSubscriberManager.unsubscribe(topicUrl, callback, true);
+            				response.setStatus(204);
+            			} catch(Exception e) {
+            				LOG.warn("Exception thrown during unsubscription", e);
+            				response.sendError(500);
+            			}
+                	}
                 } else {
                     response.sendError(500, "Invalid hub.verify");
                 } 
@@ -137,41 +132,27 @@ public class PushController {
         if(urls != null) {
         	try {
 	            for(String url : urls) {
-	                publish(url, response);
+	                publish(url);
 	            }
 	            
 	            LOG.info("Published feeds successfully queued, returning 204 to publisher");
 	            response.setStatus(204);
-        	} catch(IOException e) {
+        	} catch(Exception e) {
         		LOG.warn("Exception thrown during publication", e);
-        		response.sendError(500, e.getMessage());
-        	} catch(RuntimeException e) {
-        		LOG.warn("Exception thrown during publication", e);
-        		response.sendError(500, e.getMessage());
-        	}
+        		response.sendError(500);
+			}
         } else {
             response.sendError(500, "Missing hub.url parameter");
         }
 
     }
     
-    private void publish(String url, HttpServletResponse response) throws IOException {
+    private void publish(String url) throws IOException, InterruptedException {
         try {
             URI uri = new URI(url);
             
             if(allowScheme(uri)) {
-                boolean wasAdded = false;
-                try {
-                    LOG.info("Published feed queued for retrieval: {}", url);
-                    wasAdded = retrieverQueue.offer(uri, 5000, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException e) {
-                    wasAdded = false;
-                }
-                
-                if(!wasAdded) {
-                    LOG.error("Published feed could not be queued for retrieval, returning 500 to publisher: {}", url);
-                    throw new RuntimeException("Internal error, failed to publish update");
-                }
+            	pushSubscriberManager.retrive(uri);
             } else {
             	throw new RuntimeException("Only HTTP URLs allowed: " + url);
             }
@@ -180,15 +161,24 @@ public class PushController {
         }
     }
 
-    public BlockingQueue<URI> getRetrieverQueue() {
-        return retrieverQueue;
-    }
-
-    public void setRetrieverQueue(BlockingQueue<URI> retrieverQueue) {
-        this.retrieverQueue = retrieverQueue;
-    }
-
-    private URI notNullAndValidUrl(String url) {
+    public PushSubscriberRepository getSubscriberRepository() {
+		return subscriberRepository;
+	}
+	
+    public void setSubscriberRepository(
+			PushSubscriberRepository subscriberRepository) {
+		this.subscriberRepository = subscriberRepository;
+	}
+	
+	public PushSubscriberManager getPushSubscriberManager() {
+		return pushSubscriberManager;
+	}
+	
+	public void setPushSubscriberManager(PushSubscriberManager pushSubscriberManager) {
+		this.pushSubscriberManager = pushSubscriberManager;
+	}
+	
+	private URI notNullAndValidUrl(String url) {
         if(url != null) {
             try {
                 return new URI(url);

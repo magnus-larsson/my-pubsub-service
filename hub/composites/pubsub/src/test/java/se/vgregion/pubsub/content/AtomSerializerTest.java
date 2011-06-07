@@ -40,8 +40,8 @@ public class AtomSerializerTest {
     
     @Test
     public void print() throws Exception {
-        Field content = new DefaultField(Namespaces.ATOM, "content", "<div xmlns='http://www.w3.org/1999/xhtml'>foo</div>");
-        content.getFields().add(new DefaultField("", "type", "xhtml"));
+        Field content = new DefaultField(Namespaces.ATOM, "", "content", "<div xmlns='http://www.w3.org/1999/xhtml'>foo</div>");
+        content.getFields().add(new DefaultField("", "", "type", "xhtml"));
         
         
         FeedBuilder builder = new FeedBuilder(ContentType.ATOM);

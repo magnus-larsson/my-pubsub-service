@@ -60,14 +60,17 @@ public class DefaultFeed extends AbstractEntity<String> implements Feed {
             return this;
         }
 
-        public FeedBuilder field(String namespace, String name, String value) {
-            feed.fields.add(new DefaultField(namespace, name, value));
+        public FeedBuilder field(String namespace, String prefix, String name, String value) {
+            feed.fields.add(new DefaultField(namespace, prefix, name, value));
             return this;
         }
 
+        public FeedBuilder field(String namespace, String name, String value) {
+        	return field(namespace, "", name, value);
+        }
+        
         public FeedBuilder field(String name, String value) {
-            feed.fields.add(new DefaultField("", name, value));
-            return this;
+        	return field("", "", name, value);
         }
         
         public FeedBuilder entry(Entry entry) {
