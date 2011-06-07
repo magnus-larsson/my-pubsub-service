@@ -37,6 +37,7 @@ import org.apache.http.localserver.LocalTestServer;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
+import org.junit.Assert;
 
 import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
@@ -69,18 +70,26 @@ public class Publisher {
     }
     
     public void publish(URI hub, Feed feed) throws URISyntaxException, IOException {
-        this.feed = feed;
-        
-        HttpPost post = new HttpPost(hub);
-        
-        List<NameValuePair> parameters = new ArrayList<NameValuePair>();
-        parameters.add(new BasicNameValuePair("hub.mode", "publish"));
-        parameters.add(new BasicNameValuePair("hub.url", getUrl().toString()));
-        
-        post.setEntity(new UrlEncodedFormEntity(parameters));
-        
-        DefaultHttpClient client = new DefaultHttpClient();
-        client.execute(post);
+    	publish(hub, feed, getUrl().toString());
+    }
+    
+    public void publish(URI hub, Feed feed, String...urls) throws URISyntaxException, IOException {
+    	this.feed = feed;
+    	
+    	HttpPost post = new HttpPost(hub);
+    	
+    	List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+    	parameters.add(new BasicNameValuePair("hub.mode", "publish"));
+    	for(String url : urls) {
+    		parameters.add(new BasicNameValuePair("hub.url", url));
+    	}
+    	
+    	post.setEntity(new UrlEncodedFormEntity(parameters));
+    	
+    	DefaultHttpClient client = new DefaultHttpClient();
+    	HttpResponse response = client.execute(post);
+    	
+    	Assert.assertEquals(204, response.getStatusLine().getStatusCode());
     }
     
     private static URI buildTestUrl(String host, LocalTestServer server, String path) {

@@ -51,6 +51,24 @@ public class IntegrationTest extends IntegrationTestTemplate {
     }
 
     @Test
+    public void multiUrlPublication() throws Exception {
+    	Feed feed = new FeedBuilder(ContentType.ATOM).field(Namespaces.ATOM, "id", "f1").entry(
+    			new EntryBuilder().field(Namespaces.ATOM, "id", "e1").build()).entry(
+    					new EntryBuilder().field(Namespaces.ATOM, "id", "e2").build()).build();
+    	
+    	publisher.publish(hubUrl, feed, publisher.getUrl().toString(), publisher.getUrl().toString());
+    	
+    	Feed publishedFeed = publishedFeeds.poll(5000, TimeUnit.MILLISECONDS);
+    	
+    	Assert.assertNotNull(publishedFeed);
+    	Assert.assertEquals("f1", publishedFeed.getFeedId());
+    	Assert.assertEquals(2, publishedFeed.getEntries().size());
+    	
+    	publishedFeed = publishedFeeds.poll(5000, TimeUnit.MILLISECONDS);
+    	Assert.assertNotNull(publishedFeed);
+    }
+    
+    @Test
     public void simpleRssPublication() throws Exception {
         Feed feed = new FeedBuilder(ContentType.ATOM).field(Namespaces.ATOM, "id", "f1")
             .entry(

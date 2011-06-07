@@ -135,9 +135,20 @@ public class PushController {
         LOG.info("Received publish request");
         String[] urls = request.getParameterValues("hub.url");
         if(urls != null) {
-            for(String url : urls) {
-                publish(url, response);
-            }
+        	try {
+	            for(String url : urls) {
+	                publish(url, response);
+	            }
+	            
+	            LOG.info("Published feeds successfully queued, returning 204 to publisher");
+	            response.setStatus(204);
+        	} catch(IOException e) {
+        		LOG.warn("Exception thrown during publication", e);
+        		response.sendError(500, e.getMessage());
+        	} catch(RuntimeException e) {
+        		LOG.warn("Exception thrown during publication", e);
+        		response.sendError(500, e.getMessage());
+        	}
         } else {
             response.sendError(500, "Missing hub.url parameter");
         }
@@ -157,18 +168,15 @@ public class PushController {
                     wasAdded = false;
                 }
                 
-                if(wasAdded) {
-                    LOG.info("Published feed successfully queued, returning 204 to publisher: {}", url);
-                    response.sendError(204);
-                } else {
+                if(!wasAdded) {
                     LOG.error("Published feed could not be queued for retrieval, returning 500 to publisher: {}", url);
-                    response.sendError(500, "Internal error, failed to publish update");
+                    throw new RuntimeException("Internal error, failed to publish update");
                 }
             } else {
-                response.sendError(500, "Only HTTP URLs allowed: " + url);
+            	throw new RuntimeException("Only HTTP URLs allowed: " + url);
             }
         } catch (URISyntaxException e1) {
-            response.sendError(500, "Invalid hub.url value: " + url);
+        	throw new RuntimeException("Invalid hub.url value: " + url);
         }
     }
 
