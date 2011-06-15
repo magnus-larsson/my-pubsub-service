@@ -164,6 +164,10 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
             
             Document doc = AbstractSerializer.create(feed.getContentType()).print(feed, 
                     new UpdatedSinceEntryFilter(getLastUpdated()));
+            
+            LOG.debug("XML being pushed to subscriber:");
+            LOG.debug(doc.toXML());
+            
             post.setEntity(HttpUtil.createEntity(doc));
             
             HttpResponse response = null;

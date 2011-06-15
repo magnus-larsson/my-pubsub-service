@@ -143,6 +143,10 @@ public class DefaultFeedRetriever implements FeedRetriever {
             Header[] contentTypes = response.getHeaders("Content-Type");
 
             String content = IOUtils.toString(entity.getContent());
+            
+            LOG.debug("Feed retrieved:");
+            LOG.debug(content);
+            
             // TODO is this a reasonable default?
             ContentType contentType = ContentType.ATOM;
             if (contentTypes.length > 0) {
