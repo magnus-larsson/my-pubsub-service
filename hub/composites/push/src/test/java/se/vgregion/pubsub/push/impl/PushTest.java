@@ -56,7 +56,7 @@ public class PushTest extends AbstractTransactionalJUnit4SpringContextTests {
         
         final LinkedBlockingQueue<Feed> publishedFeeds = new LinkedBlockingQueue<Feed>();
         
-        pubSubEngine.getOrCreateTopic(testUri).addSubscriber(new Subscriber() {
+        pubSubEngine.subscribe(new Subscriber() {
             
             @Override
             public void timedOut() {

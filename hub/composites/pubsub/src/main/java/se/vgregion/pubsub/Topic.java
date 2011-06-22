@@ -41,16 +41,4 @@ public interface Topic extends Entity<URI> {
      */
     void publish(Feed feed);
     
-    /**
-     * Subscribe a {@link Subscriber} to this topic
-     * @param subscriber
-     */
-    void addSubscriber(Subscriber subscriber);
-
-    /**
-     * Unsubscribe a {@link Subscriber} from this topic
-     * @param subscriber
-     */
-    void removeSubscriber(Subscriber subscriber);
-
 }
