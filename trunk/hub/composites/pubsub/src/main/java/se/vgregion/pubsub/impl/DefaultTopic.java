@@ -37,13 +37,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
-import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.Subscriber;
-import se.vgregion.pubsub.SubscriberTimeoutNotifier;
 import se.vgregion.pubsub.Topic;
-import se.vgregion.pubsub.content.AtomSerializer;
 
 @Entity
 @Table(name="TOPICS")
@@ -65,22 +62,17 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     private List<Subscriber> subscribers = new ArrayList<Subscriber>();
     
     @Transient
-    private SubscriberTimeoutNotifier subscriberTimeoutNotifier;
-
-    @Transient
     private PublicationRetryer publicationRetryer;
 
     // For JPA
     protected DefaultTopic() {
     }
     
-    public DefaultTopic(URI url, SubscriberTimeoutNotifier subscriberTimoutNotifier, 
+    public DefaultTopic(URI url,  
             PublicationRetryer publicationRetryer) {
         Assert.notNull(url);
-        Assert.notNull(subscriberTimoutNotifier);
         
         this.url = url.toString();
-        this.subscriberTimeoutNotifier = subscriberTimoutNotifier;
         this.publicationRetryer = publicationRetryer;
     }
     
@@ -126,22 +118,23 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
         subscriber.publish(feed);
     }
 
-    @Override
+    /**
+     * Subscribe a {@link Subscriber} to this topic
+     * @param subscriber
+     */
     public synchronized void addSubscriber(Subscriber subscriber) {
         Assert.notNull(subscriber);
         
         removeSubscriber(subscriber);
         
-        subscriberTimeoutNotifier.addSubscriber(subscriber);
         subscribers.add(subscriber);
     }
 
-    @Override
+    /**
+     * Unsubscribe a {@link Subscriber} from this topic
+     * @param subscriber
+     */
     public synchronized void removeSubscriber(Subscriber subscriber) {
         subscribers.remove(subscriber);
-    }
-
-    protected void setSubscriberTimeoutNotifier(SubscriberTimeoutNotifier subscriberTimoutNotifier) {
-        this.subscriberTimeoutNotifier = subscriberTimoutNotifier;
     }
 }

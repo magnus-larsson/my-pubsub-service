@@ -43,7 +43,9 @@ public class DefaultSubscriberTimeoutNotifier implements SubscriberTimeoutNotifi
 
     public void removeSubscriber(Subscriber subscriber) {
         SubscriberTimeoutTask task = tasks.remove(subscriber);
-        task.cancel();
+        if(task != null) {
+        	task.cancel();
+        }
     }
     
     public static class SubscriberTimeoutTask extends TimerTask {

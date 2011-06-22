@@ -42,7 +42,7 @@ public class DefaultPubSubEngine implements PubSubEngine {
     private SubscriberTimeoutNotifier subscriberTimeoutNotifier = new DefaultSubscriberTimeoutNotifier();
     private PublicationRetryer publicationRetryer;
 
-    private Map<URI, Topic> topics = new ConcurrentHashMap<URI, Topic>();
+    private Map<URI, DefaultTopic> topics = new ConcurrentHashMap<URI, DefaultTopic>();
     
     private List<PubSubEventListener> eventListeners = new ArrayList<PubSubEventListener>();
     
@@ -55,20 +55,19 @@ public class DefaultPubSubEngine implements PubSubEngine {
         for(Topic storedTopic : storedTopics) {
             DefaultTopic defaultTopic = (DefaultTopic) storedTopic;
             
-            defaultTopic.setSubscriberTimeoutNotifier(subscriberTimeoutNotifier);
             topics.put(defaultTopic.getUrl(), defaultTopic);
         }
     }
 
     @Transactional
-    public Topic getTopic(URI url) {
+    public DefaultTopic getTopic(URI url) {
         return topics.get(url);
     }
 
     @Override
     @Transactional
-    public synchronized Topic createTopic(URI url) {
-        Topic topic = new DefaultTopic(url, subscriberTimeoutNotifier, publicationRetryer);
+    public synchronized DefaultTopic createTopic(URI url) {
+    	DefaultTopic topic = new DefaultTopic(url, publicationRetryer);
         topics.put(url, topic);
         
         topicRepository.persist(topic);
@@ -77,8 +76,8 @@ public class DefaultPubSubEngine implements PubSubEngine {
 
     @Override
     @Transactional
-    public Topic getOrCreateTopic(URI url) {
-        Topic topic = getTopic(url);
+    public DefaultTopic getOrCreateTopic(URI url) {
+    	DefaultTopic topic = getTopic(url);
         if(topic == null) {
             topic = createTopic(url);
         }
@@ -95,8 +94,10 @@ public class DefaultPubSubEngine implements PubSubEngine {
     @Override
     @Transactional
     public void subscribe(Subscriber subscriber) {
-        Topic topic = getOrCreateTopic(subscriber.getTopic());
+    	DefaultTopic topic = getOrCreateTopic(subscriber.getTopic());
         topic.addSubscriber(subscriber);
+        
+        subscriberTimeoutNotifier.addSubscriber(subscriber);
         
         for(PubSubEventListener listener : eventListeners) {
             listener.onSubscribe(subscriber);
@@ -106,11 +107,13 @@ public class DefaultPubSubEngine implements PubSubEngine {
     @Override
     @Transactional
     public void unsubscribe(Subscriber subscriber) {
-        Topic topic = getTopic(subscriber.getTopic());
+    	DefaultTopic topic = getTopic(subscriber.getTopic());
         
         if(topic != null) {
             topic.removeSubscriber(subscriber);
         }
+        
+        subscriberTimeoutNotifier.removeSubscriber(subscriber);
 
         for(PubSubEventListener listener : eventListeners) {
             listener.onUnsubscribe(subscriber);
