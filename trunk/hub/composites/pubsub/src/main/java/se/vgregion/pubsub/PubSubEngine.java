@@ -78,4 +78,6 @@ public interface PubSubEngine {
      * @param eventListener
      */
     void removePubSubEventListener(PubSubEventListener eventListener);
+
+	void subscribe(SubscriberManager subscriberManager);
 }

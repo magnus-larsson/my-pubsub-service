@@ -108,7 +108,7 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
                 }
             }
         } else {
-            LOG.info("No subscribers for topic {}, publication dropped", url);
+            LOG.info("No direct subscribers for topic {}", url);
         }
         // TODO purge old entries based on lastUpdatedSubscriber
     }

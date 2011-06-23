@@ -20,6 +20,9 @@
 package se.vgregion.pubsub.push.repository.jpa;
 
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +42,7 @@ public class JpaPushSubscriberRepositoryTest extends AbstractTransactionalJUnit4
     private PushSubscriberRepository subscriberRepository;
     
     private DefaultPushSubscriber expected;
+    private DefaultPushSubscriber expected2;
     
     @Before
     @Transactional
@@ -46,7 +50,9 @@ public class JpaPushSubscriberRepositoryTest extends AbstractTransactionalJUnit4
     public void setup() {
         subscriberRepository = applicationContext.getBean(PushSubscriberRepository.class);
         expected = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 100, "verify");
+        expected2 = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK2, 100, "verify");
         subscriberRepository.persist(expected);
+        subscriberRepository.persist(expected2);
     }
     
     @Test
@@ -67,4 +73,13 @@ public class JpaPushSubscriberRepositoryTest extends AbstractTransactionalJUnit4
         Assert.assertEquals(expected.getTopic(), actual.getTopic());
     }
 
+    @Test
+    @Transactional
+    @Rollback
+    public void findByTopic() {
+    	List<PushSubscriber> actual = subscriberRepository.findByTopic(UnitTestConstants.TOPIC);
+    	
+    	Assert.assertEquals(Arrays.asList(expected, expected2), actual);
+    }
+    
 }

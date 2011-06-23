@@ -40,10 +40,11 @@
 
  	<bean id="pushManager"
 		class="se.vgregion.pubsub.push.impl.DefaultPushSubscriberManager"
-		init-method="loadSubscribers"
+		init-method="start"
 		>
 		<constructor-arg ref="pubSubEngine" />
 		<constructor-arg ref="pushSubscriberRepository" />
+		<constructor-arg ref="publicationRetryer" />
 	</bean>
 
  	<bean id="feedRetriver"

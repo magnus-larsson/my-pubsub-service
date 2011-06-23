@@ -87,6 +87,7 @@ public class PushController {
                 String verify = request.getParameter("hub.verify");
                 if("sync".equals(verify) || "async".equals(verify)) {
                 	if(mode == SubscriptionMode.SUBSCRIBE) {
+                		LOG.info("Received subscription request");
 
                 		String leaseSecondsString = request.getParameter("hub.lease_seconds");
                 		try {
@@ -99,29 +100,37 @@ public class PushController {
                 				pushSubscriberManager.subscribe(topicUrl, callback, leaseSeconds, verifyToken, true);
                 			
                 				response.setStatus(204);
+                				LOG.info("Subscription request for topic {} with callback {} successful", topicUrl, callback);
                 			} catch(Exception e) {
-                				LOG.warn("Exception thrown during subscription", e);
+                				LOG.warn("Exception thrown during subscription from callback " + callback, e);
                 				response.sendError(500);
                 			}
                 		} catch(NumberFormatException e) {
+                        	LOG.warn("Invalid hub.lease_seconds from callback {}", callback);
+
                 			response.sendError(500, "Invalid hub.lease_seconds");
                 		}
                 	} else {
+                		LOG.info("Received unsubscription request");
                 		try {
                 			pushSubscriberManager.unsubscribe(topicUrl, callback, true);
             				response.setStatus(204);
+            				LOG.info("Unsubscription request for topic {} with callback {} successful", topicUrl, callback);
             			} catch(Exception e) {
-            				LOG.warn("Exception thrown during unsubscription", e);
+            				LOG.warn("Exception thrown during unsubscription from callback " + callback, e);
             				response.sendError(500);
             			}
                 	}
                 } else {
+                	LOG.warn("Invalid hub.verify from callback {}", callback);
                     response.sendError(500, "Invalid hub.verify");
                 } 
             } else {
+            	LOG.warn("Invalid hub.topic from callback {}", callback);
                 response.sendError(500, "Invalid hub.topic");
             }
         } else {
+        	LOG.warn("Invalid hub.callback from {}", request.getRemoteAddr());
             response.sendError(500, "Invalid hub.callback");
         }
     }

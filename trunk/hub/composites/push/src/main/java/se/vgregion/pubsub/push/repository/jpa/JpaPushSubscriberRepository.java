@@ -20,6 +20,8 @@
 package se.vgregion.pubsub.push.repository.jpa;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.NoResultException;
@@ -69,5 +71,20 @@ public class JpaPushSubscriberRepository extends AbstractJpaRepository<PushSubsc
             return null;
         }
     }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<PushSubscriber> findByTopic(URI topic) {
+        try {
+            return (List<PushSubscriber>) entityManager.createQuery("select l from DefaultPushSubscriber l " +
+                        "where l.topic = :topic ")
+                .setParameter("topic", topic.toString())
+                .getResultList();
+            
+        } catch(NoResultException e) {
+            return Collections.emptyList();
+        }
+
+	}
 
 }

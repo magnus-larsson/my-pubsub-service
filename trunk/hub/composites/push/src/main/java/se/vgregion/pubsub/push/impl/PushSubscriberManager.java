@@ -24,18 +24,14 @@ import java.net.URI;
 
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
+import se.vgregion.pubsub.SubscriberManager;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 
 /**
  * Service for handling PuSH subscriptions
  *
  */
-public interface PushSubscriberManager {
-
-	/**
-	 * Load all persisted subscribers and add these to a {@link PubSubEngine}
-	 */
-    public void loadSubscribers();
+public interface PushSubscriberManager extends SubscriberManager {
 
     /**
      * Create a new subscriber
@@ -55,9 +51,26 @@ public interface PushSubscriberManager {
      */
     public void unsubscribe(URI topic, URI callback, boolean verify);
 
+    /**
+     * Queue a feed for retrieval
+     * @param topicUrl The URL of the feed to retrieve
+     * @throws InterruptedException
+     */
 	void retrive(URI topicUrl) throws InterruptedException;
 
+	/**
+	 * PuSH internal method for invoking {@link PubSubEngine#publish(URI, Feed)}
+	 * @param topicUrl
+	 * @param feed
+	 */
 	void publish(URI topicUrl, Feed feed);
 
+	/**
+	 * Ask for feeds queued to retrieve
+	 * @return The URL of the next feed to retreive
+	 * @throws InterruptedException
+	 */
 	URI pollForRetrieval() throws InterruptedException;
+
+	
 }

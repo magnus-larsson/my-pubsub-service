@@ -32,6 +32,7 @@ import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 
 public class UnitTestConstants {
     public static final URI CALLBACK = URI.create("http://example.com/sub11");
+    public static final URI CALLBACK2 = URI.create("http://example.com/sub22");
     public static final URI TOPIC = URI.create("http://example.com/feed");
     public static final URI TOPIC2 = URI.create("http://example.com/feed2");
     
