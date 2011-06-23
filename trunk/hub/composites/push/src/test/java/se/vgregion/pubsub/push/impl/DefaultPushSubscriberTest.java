@@ -25,34 +25,25 @@ import java.net.URLEncoder;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import se.vgregion.pubsub.push.SubscriptionMode;
 import se.vgregion.pubsub.push.UnitTestConstants;
-import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 
 public class DefaultPushSubscriberTest {
 
-    private PushSubscriberRepository subscriberRepository = Mockito.mock(PushSubscriberRepository.class);
-    
-    @Test(expected=IllegalArgumentException.class)
-    public void cstrNullRepository() {
-        new DefaultPushSubscriber(null, UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 123, "token");
-    }    
-
     @Test(expected=IllegalArgumentException.class)
     public void cstrNullTopic() {
-        new DefaultPushSubscriber(subscriberRepository, null, UnitTestConstants.CALLBACK, 123, "token");
+        new DefaultPushSubscriber(null, UnitTestConstants.CALLBACK, 123, "token");
     }    
     @Test(expected=IllegalArgumentException.class)
     public void cstrNullCallback() {
-        new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, null, 123, "token");
+        new DefaultPushSubscriber(UnitTestConstants.TOPIC, null, 123, "token");
     }    
 
     @Test
     public void getTimeout() {
-        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 0, "token");
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 0, "token");
         
         Assert.assertNull(subscriber.getTimeout());
         
@@ -61,7 +52,7 @@ public class DefaultPushSubscriberTest {
     
     @Test
     public void verificationUrl() throws UnsupportedEncodingException {
-        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 123, "token");
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 123, "token");
         
         Assert.assertEquals(
                 URI.create(UnitTestConstants.CALLBACK + "?hub.mode=subscribe&hub.topic=" + URLEncoder.encode(UnitTestConstants.TOPIC.toString(), "UTF-8") + "&hub.challenge=ch&hub.lease_seconds=123&hub.verify_token=token"), 
@@ -70,7 +61,7 @@ public class DefaultPushSubscriberTest {
 
     @Test
     public void verificationUrlUnsubscribe() throws UnsupportedEncodingException {
-        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 123, "token");
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 123, "token");
         
         Assert.assertEquals(
                 URI.create(UnitTestConstants.CALLBACK + "?hub.mode=unsubscribe&hub.topic=" + URLEncoder.encode(UnitTestConstants.TOPIC.toString(), "UTF-8") + "&hub.challenge=ch&hub.lease_seconds=123&hub.verify_token=token"), 
@@ -80,7 +71,7 @@ public class DefaultPushSubscriberTest {
     
     @Test
     public void verificationUrlNoLeaseSecondsAndToken() throws UnsupportedEncodingException {
-        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 0, null);
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 0, null);
         
         Assert.assertEquals(
                 URI.create(UnitTestConstants.CALLBACK + "?hub.mode=subscribe&hub.topic=" + URLEncoder.encode(UnitTestConstants.TOPIC.toString(), "UTF-8") + "&hub.challenge=ch"), 
@@ -89,7 +80,7 @@ public class DefaultPushSubscriberTest {
 
     @Test
     public void verificationUrlCallbackWithQuery() throws UnsupportedEncodingException {
-        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, URI.create(UnitTestConstants.CALLBACK.toString() + "?abc=def"), 0, null);
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, URI.create(UnitTestConstants.CALLBACK.toString() + "?abc=def"), 0, null);
         
         Assert.assertEquals(
                 URI.create(UnitTestConstants.CALLBACK + "?abc=def&hub.mode=subscribe&hub.topic=" + URLEncoder.encode(UnitTestConstants.TOPIC.toString(), "UTF-8") + "&hub.challenge=ch"), 

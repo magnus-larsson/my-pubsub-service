@@ -19,8 +19,6 @@
 
 package se.vgregion.pubsub.push.impl;
 
-import static org.mockito.Mockito.mock;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -53,7 +51,6 @@ import se.vgregion.pubsub.Namespaces;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 import se.vgregion.pubsub.push.UnitTestConstants;
-import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 public class DefaultPushSubscriberPublishTest {
 
@@ -73,9 +70,7 @@ public class DefaultPushSubscriberPublishTest {
     @Test
     public void publish() throws Exception {
         
-        PushSubscriberRepository subscriberRepository = mock(PushSubscriberRepository.class);
-
-        subscriber = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, buildTestUrl("/"), UnitTestConstants.FUTURE, UnitTestConstants.UPDATED1, 100, "verify" );
+        subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, buildTestUrl("/"), UnitTestConstants.FUTURE, UnitTestConstants.UPDATED1, 100, "verify" );
         
         final LinkedBlockingQueue<HttpRequest> issuedRequests = new LinkedBlockingQueue<HttpRequest>();
         final LinkedBlockingQueue<byte[]> issuedRequestBodies = new LinkedBlockingQueue<byte[]>();

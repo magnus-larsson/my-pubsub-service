@@ -49,6 +49,4 @@ public interface PushSubscriber extends Subscriber, Entity<UUID>  {
      * @throws FailedSubscriberVerificationException
      */
     void verify(SubscriptionMode mode) throws IOException, FailedSubscriberVerificationException;
-
-    void setSubscriberRepository(PushSubscriberRepository subscriberRepository);
 }

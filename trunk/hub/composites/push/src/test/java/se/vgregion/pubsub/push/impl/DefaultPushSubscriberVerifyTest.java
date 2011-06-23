@@ -19,8 +19,6 @@
 
 package se.vgregion.pubsub.push.impl;
 
-import static org.mockito.Mockito.mock;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,7 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 import se.vgregion.pubsub.push.SubscriptionMode;
 import se.vgregion.pubsub.push.UnitTestConstants;
-import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 public class DefaultPushSubscriberVerifyTest {
 
@@ -58,9 +55,7 @@ public class DefaultPushSubscriberVerifyTest {
         DateTimeUtils.setCurrentMillisFixed(new DateTime().getMillis());
         server.start();
         
-        PushSubscriberRepository subscriberRepository = mock(PushSubscriberRepository.class);
-
-        subscriber = new DefaultPushSubscriber(subscriberRepository, UnitTestConstants.TOPIC, buildTestUrl("/"), UnitTestConstants.FUTURE, UnitTestConstants.UPDATED1, 123, "verify" );
+        subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, buildTestUrl("/"), UnitTestConstants.FUTURE, UnitTestConstants.UPDATED1, 123, "verify" );
     }
     
     private URI buildTestUrl(String path) throws URISyntaxException {

@@ -70,7 +70,7 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
     public void subscribe(URI topicUrl, URI callback, int leaseSeconds, String verifyToken, boolean verify) throws IOException, FailedSubscriberVerificationException {
         unsubscribe(topicUrl, callback, verify);
         
-        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(subscriptionRepository, topicUrl, callback, leaseSeconds, verifyToken);
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(topicUrl, callback, leaseSeconds, verifyToken);
         
         if(verify) {
         	subscriber.verify(SubscriptionMode.SUBSCRIBE);
@@ -125,6 +125,7 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
     }
 
 	@Override
+	@Transactional
 	public void publishToSubscribers(Topic topic, Feed feed) {
 		List<PushSubscriber> subscribers = subscriptionRepository.findByTopic(topic.getUrl());
 		
@@ -142,6 +143,9 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
                         publicationRetryer.addRetry(topic, subscriber, feed);
                     }
                     lastUpdatedSubscriber = subscriber.getLastUpdated();
+                } finally {
+                	// merge the updated subscriber
+                	subscriptionRepository.merge(subscriber);
                 }
             }
         } else {
