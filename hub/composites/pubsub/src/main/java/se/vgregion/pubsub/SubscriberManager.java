@@ -17,22 +17,20 @@
  *
  */
 
-package se.vgregion.pubsub.push.repository;
+package se.vgregion.pubsub;
 
-import java.net.URI;
-import java.util.List;
-import java.util.UUID;
 
-import se.vgregion.dao.domain.patterns.repository.Repository;
-import se.vgregion.pubsub.push.PushSubscriber;
-    
 /**
- * Repository for {@link PushSubscriber}s
+ * A {@link SubscriberManager} for a {@link Topic} in a {@link PubSubEngine}. 
+ * SubscriberManagers are a sort of meta subscriber, which gets all publications and 
+ * gets to handle themselves which to accept and publish to subscribers it manages.
  *
  */
-public interface PushSubscriberRepository extends Repository<PushSubscriber, UUID> {
+public interface SubscriberManager {
 
-	List<PushSubscriber> findByTopic(URI topic);
-
-	PushSubscriber findByTopicAndCallback(URI topic, URI callback);
+    /**
+     * Publish a {@link Feed} to this {@link SubscriberManager}
+     * @param feed
+     */
+	void publishToSubscribers(Topic topic, Feed feed);
 }

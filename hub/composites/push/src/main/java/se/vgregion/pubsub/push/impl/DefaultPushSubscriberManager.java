@@ -22,16 +22,21 @@ package se.vgregion.pubsub.push.impl;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
+import se.vgregion.pubsub.Subscriber;
+import se.vgregion.pubsub.Topic;
+import se.vgregion.pubsub.impl.PublicationRetryer;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.SubscriptionMode;
@@ -45,25 +50,21 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
     private PubSubEngine pubSubEngine;
     private PushSubscriberRepository subscriptionRepository;
     private BlockingQueue<URI> retrieverQueue = new LinkedBlockingQueue<URI>();
-
+    private PublicationRetryer publicationRetryer;
     
-    public DefaultPushSubscriberManager(PubSubEngine pubSubEngine, PushSubscriberRepository subscriptionRepository) {
+    public DefaultPushSubscriberManager(PubSubEngine pubSubEngine, PushSubscriberRepository subscriptionRepository, PublicationRetryer publicationRetryer) {
         this.pubSubEngine = pubSubEngine;
         this.subscriptionRepository = subscriptionRepository;
+        this.publicationRetryer = publicationRetryer;
     }
 
-    @Override
-    @Transactional
-    public void loadSubscribers() {
-        Collection<PushSubscriber> subscribers = subscriptionRepository.findAll();
-        
-        for(PushSubscriber subscriber : subscribers) {
-            pubSubEngine.subscribe(subscriber);
-            subscriber.setSubscriberRepository(subscriptionRepository);
-            
-        }
+    /**
+     * Initiates and starts the manager
+     */
+    public void start() {
+    	pubSubEngine.subscribe(this);
     }
-
+    
     @Override
     @Transactional
     public void subscribe(URI topicUrl, URI callback, int leaseSeconds, String verifyToken, boolean verify) throws IOException, FailedSubscriberVerificationException {
@@ -74,8 +75,6 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
         if(verify) {
         	subscriber.verify(SubscriptionMode.SUBSCRIBE);
         }
-        
-        pubSubEngine.subscribe(subscriber);
         
         subscriptionRepository.persist(subscriber);
     }
@@ -90,7 +89,6 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
             		subscriber.verify(SubscriptionMode.UNSUBSCRIBE);
             	}
 
-                pubSubEngine.unsubscribe(subscriber);
                 subscriptionRepository.remove(subscriber);
             } catch (IOException e) {
                 // ignore
@@ -125,5 +123,29 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
     public void publish(URI topicUrl, Feed feed) {
     	pubSubEngine.publish(topicUrl, feed);
     }
-    
+
+	@Override
+	public void publishToSubscribers(Topic topic, Feed feed) {
+		List<PushSubscriber> subscribers = subscriptionRepository.findByTopic(topic.getUrl());
+		
+        if(!subscribers.isEmpty()) {
+            // if all publications success, purge until now
+            DateTime lastUpdatedSubscriber = new DateTime();
+            for(PushSubscriber subscriber : subscribers) {
+                try {
+                	
+                    subscriber.publish(feed);
+                } catch (Exception e) {
+                    LOG.warn("Subscriber failed: {}", e.getMessage());
+                    
+                    if(publicationRetryer != null) {
+                        publicationRetryer.addRetry(topic, subscriber, feed);
+                    }
+                    lastUpdatedSubscriber = subscriber.getLastUpdated();
+                }
+            }
+        } else {
+            LOG.info("No PuSH subscribers for topic {}, publication dropped", topic);
+        }
+	}
 }

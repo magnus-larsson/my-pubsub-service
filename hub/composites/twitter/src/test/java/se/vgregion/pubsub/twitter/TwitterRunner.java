@@ -27,6 +27,7 @@ import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.PubSubEventListener;
 import se.vgregion.pubsub.Subscriber;
+import se.vgregion.pubsub.SubscriberManager;
 import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.twitter.impl.TwitterPublisher;
 
@@ -67,6 +68,11 @@ public class TwitterRunner {
             @Override
             public void removePubSubEventListener(PubSubEventListener eventListener) {
             }
+
+			@Override
+			public void subscribe(SubscriberManager subscriberManager) {
+				
+			}
         };
         
         TwitterPublisher consumer = new TwitterPublisher(engine, username, password);

@@ -26,18 +26,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.PubSubEventListener;
 import se.vgregion.pubsub.Subscriber;
+import se.vgregion.pubsub.SubscriberManager;
 import se.vgregion.pubsub.SubscriberTimeoutNotifier;
 import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.repository.TopicRepository;
 
 public class DefaultPubSubEngine implements PubSubEngine {
 
+    private final static Logger LOG = LoggerFactory.getLogger(DefaultPubSubEngine.class);
+	
     private TopicRepository topicRepository;
     private SubscriberTimeoutNotifier subscriberTimeoutNotifier = new DefaultSubscriberTimeoutNotifier();
     private PublicationRetryer publicationRetryer;
@@ -45,6 +50,7 @@ public class DefaultPubSubEngine implements PubSubEngine {
     private Map<URI, DefaultTopic> topics = new ConcurrentHashMap<URI, DefaultTopic>();
     
     private List<PubSubEventListener> eventListeners = new ArrayList<PubSubEventListener>();
+    private List<SubscriberManager> subscriberManagers = new ArrayList<SubscriberManager>();
     
     public DefaultPubSubEngine(TopicRepository topicRepository, PublicationRetryer publicationRetryer) {
         this.topicRepository = topicRepository;
@@ -88,7 +94,21 @@ public class DefaultPubSubEngine implements PubSubEngine {
     @Transactional
     public void publish(URI url, Feed feed) {
         Topic topic = getOrCreateTopic(url);
+        
+        LOG.debug("Publishing directly on topic");
         topic.publish(feed);
+        LOG.debug("Done publishing directly on topic");
+        
+        // now, also notify all SubscriberManagers
+        if(!subscriberManagers.isEmpty()) {
+        	LOG.debug("Publishing to subscriber managers");
+	        for(SubscriberManager subscriberManager : subscriberManagers) {
+	        	subscriberManager.publishToSubscribers(topic, feed);
+	        }
+	        LOG.debug("Done publishing to subscriber managers");
+        } else {
+        	LOG.debug("No subscriber managers registered for publication");
+        }
     }
 
     @Override
@@ -104,6 +124,14 @@ public class DefaultPubSubEngine implements PubSubEngine {
         }
     }
 
+    @Override
+    @Transactional
+    public void subscribe(SubscriberManager subscriberManager) {
+    	subscriberManagers.add(subscriberManager);
+    }
+
+
+    
     @Override
     @Transactional
     public void unsubscribe(Subscriber subscriber) {

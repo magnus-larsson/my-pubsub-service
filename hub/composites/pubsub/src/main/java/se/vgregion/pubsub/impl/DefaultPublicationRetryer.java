@@ -73,7 +73,7 @@ public class DefaultPublicationRetryer implements PublicationRetryer {
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
                     try {
                         LOG.info("Attempt " + attempts + " at retrying publication on {} to {}", topic.getUrl(), subscriber);
-                        topic.publish(subscriber, feed);
+                        subscriber.publish(feed);
                         
                         // success! don't attempt retrying again
                         cancel();
