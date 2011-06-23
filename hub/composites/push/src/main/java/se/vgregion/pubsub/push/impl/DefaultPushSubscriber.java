@@ -70,9 +70,6 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultPushSubscriber.class);
     
-    @Transient
-    private PushSubscriberRepository subscriberRepository;
-    
     @Id
     private UUID id;
 
@@ -103,16 +100,14 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         
     }
     
-    public DefaultPushSubscriber(PushSubscriberRepository subscriberRepository, URI topic, URI callback, 
+    public DefaultPushSubscriber(URI topic, URI callback, 
             DateTime timeout, DateTime lastUpdated,
             int leaseSeconds, String verifyToken) {
         id = UUID.randomUUID();
         
-        Assert.notNull(subscriberRepository);
         Assert.notNull(topic);
         Assert.notNull(callback);
         
-        this.subscriberRepository = subscriberRepository;
         if(timeout != null) this.timeout = timeout.getMillis();
         if(lastUpdated != null) this.lastUpdated = lastUpdated.getMillis();
         this.topic = topic.toString();
@@ -121,9 +116,9 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         this.verifyToken = verifyToken;
     }
 
-    public DefaultPushSubscriber(PushSubscriberRepository subscriberRepository, URI topic, URI callback, 
+    public DefaultPushSubscriber(URI topic, URI callback, 
             int leaseSeconds, String verifyToken) {
-        this(subscriberRepository, topic, callback, 
+        this(topic, callback, 
                 (leaseSeconds > 0) ? new DateTime().plusSeconds(leaseSeconds) : null, null,
                 leaseSeconds, verifyToken);
     }
@@ -199,10 +194,6 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
                 throw new PublicationFailedException(msg);
             } finally {
                 HttpUtil.closeQuitely(response);
-    
-                LOG.info("Merging subscriber in repository {}", subscriberRepository);
-                
-                subscriberRepository.merge(this);
             }
         } else {
             LOG.info("No updates for subscriber {}", callback);
@@ -328,10 +319,4 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
             throw new RuntimeException(e);
         }
     }
-
-    public void setSubscriberRepository(PushSubscriberRepository subscriberRepository) {
-        this.subscriberRepository = subscriberRepository;
-    }
-    
-    
 }
