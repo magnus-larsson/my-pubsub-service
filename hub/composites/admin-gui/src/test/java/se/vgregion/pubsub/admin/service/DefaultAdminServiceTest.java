@@ -31,8 +31,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import se.vgregion.pubsub.push.PolledPublisher;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.impl.PushSubscriberManager;
+import se.vgregion.pubsub.push.repository.PolledPublisherRepository;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 public class DefaultAdminServiceTest {
@@ -45,6 +47,7 @@ public class DefaultAdminServiceTest {
 
     @Mock private PushSubscriberRepository subscriberRepository;
     @Mock private PushSubscriberManager pushSubscriberManager;
+    @Mock private PolledPublisherRepository polledPublisherRepository;
     
     private DefaultAdminService adminService = new DefaultAdminService();
     
@@ -54,6 +57,7 @@ public class DefaultAdminServiceTest {
     	
         adminService.setPushSubscriberManager(pushSubscriberManager);
         adminService.setSubscriberRepository(subscriberRepository);
+        adminService.setPolledPublisherRepository(polledPublisherRepository);
     }
     
     @Test
@@ -80,5 +84,29 @@ public class DefaultAdminServiceTest {
         adminService.removePushSubscriber(ID);
         
         Mockito.verify(pushSubscriberManager).unsubscribe(TOPIC, CALLBACK, false);
+    }
+
+    @Test
+    public void createPolledPublisher() throws Exception {
+    	adminService.createPolledPublishers(TOPIC);
+    	
+    	Mockito.verify(polledPublisherRepository).persist(Mockito.any(PolledPublisher.class));
+    }
+    
+    @Test
+    public void updatePolledPublisher() throws Exception {
+    	PolledPublisher polledPublisher = mock(PolledPublisher.class);
+    	when(polledPublisherRepository.find(ID)).thenReturn(polledPublisher);
+    	
+    	adminService.updatePolledPublishers(ID, TOPIC);
+    	
+    	Mockito.verify(polledPublisher).setUrl(TOPIC);
+    }
+    
+    @Test
+    public void deletePolledPublisher() throws Exception {
+    	adminService.removePolledPublishers(ID);
+    	
+    	Mockito.verify(polledPublisherRepository).remove(ID);
     }
 }

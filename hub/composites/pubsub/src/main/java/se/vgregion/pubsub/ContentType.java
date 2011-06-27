@@ -19,6 +19,8 @@
 
 package se.vgregion.pubsub;
 
+import java.util.List;
+
 /**
  * Representation of a content type
  *
@@ -47,6 +49,25 @@ public class ContentType {
         if("application/atom+xml".equals(value)) return ATOM;
         else if("application/rss+xml".equals(value)) return RSS;
         else return new ContentType(value);
+    }
+    
+    public static ContentType sniff(List<String> contentTypeHeaders, String content) {
+        ContentType contentType = null;
+        if (!contentTypeHeaders.isEmpty()) {
+            contentType = ContentType.fromValue(contentTypeHeaders.get(0));            
+        }
+        if(contentType != ContentType.ATOM && contentType != ContentType.RSS) {
+        	// unknown content type, try sniffing
+        	if(content.contains("<rss")) {
+        		contentType = ContentType.RSS;
+        	} else if(content.contains("<feed")) {
+        		contentType = ContentType.ATOM;
+        	} else {
+        		throw new RuntimeException("Unknown content type: " + contentType);
+        	}
+        }
+        
+        return contentType;
     }
     
     @Override

@@ -34,6 +34,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.pubsub.admin.service.AdminService;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
+import se.vgregion.pubsub.push.PolledPublisher;
 import se.vgregion.pubsub.push.PushSubscriber;
 
 /**
@@ -51,22 +52,23 @@ public class AdminController {
         ModelAndView mav = new ModelAndView("admin/index");
         
         mav.addObject("pushSubscribers", adminService.getAllPushSubscribers());
+        mav.addObject("polledPublishers", adminService.getAllPolledPublishers());
         
         return mav;
     }
 
-    @RequestMapping("/admin/new")
+    @RequestMapping("/admin/push/new")
     public ModelAndView newPushSubscriber() {
-        ModelAndView mav = new ModelAndView("admin/edit");
+        ModelAndView mav = new ModelAndView("admin/push-edit");
         
         return mav;
     }
 
-    @RequestMapping("/admin/{id}/edit")
+    @RequestMapping("/admin/push/{id}/edit")
     public ModelAndView editPushSubscriber(@PathVariable("id") UUID id) {
         PushSubscriber subscriber = adminService.getPushSubscriber(id);
         if(subscriber != null) {
-            ModelAndView mav = new ModelAndView("admin/edit");
+            ModelAndView mav = new ModelAndView("admin/push-edit");
             mav.addObject("subscriber", subscriber);
             return mav;
         } else {
@@ -76,7 +78,7 @@ public class AdminController {
         
     }
     
-    @RequestMapping(value="/admin/new", method=RequestMethod.POST)
+    @RequestMapping(value="/admin/push/new", method=RequestMethod.POST)
     public ModelAndView createPushSubscriber(
         @RequestParam("topic") URI topic,    
         @RequestParam("callback") URI callback,    
@@ -88,10 +90,10 @@ public class AdminController {
         }
         adminService.createPushSubscriber(topic, callback, leaseSeconds, verifyToken);
         
-        return new ModelAndView("redirect:");
+        return new ModelAndView("redirect:..");
     }
 
-    @RequestMapping(value="/admin/{id}/edit", method=RequestMethod.POST)
+    @RequestMapping(value="/admin/push/{id}/edit", method=RequestMethod.POST)
     public ModelAndView updatePushSubscriber(
         @RequestParam("id") UUID id,    
         @RequestParam("topic") URI topic,    
@@ -112,9 +114,59 @@ public class AdminController {
             adminService.updatePushSubscriber(id, topic, callback, leaseSeconds, verifyToken);
         }
         
+        return new ModelAndView("redirect:../..");
+    }
+
+    
+    @RequestMapping("/admin/polled/new")
+    public ModelAndView newPolledPublisher() {
+        ModelAndView mav = new ModelAndView("admin/polled-edit");
+        
+        return mav;
+    }
+
+    @RequestMapping("/admin/polled/{id}/edit")
+    public ModelAndView editPolledPublisher(@PathVariable("id") UUID id) {
+        PolledPublisher publisher = adminService.getPolledPublishers(id);
+        if(publisher != null) {
+            ModelAndView mav = new ModelAndView("admin/polled-edit");
+            mav.addObject("publisher", publisher);
+            return mav;
+        } else {
+            throw new RuntimeException("Unknown publisher");
+        }
+        
+        
+    }
+    
+    @RequestMapping(value="/admin/polled/new", method=RequestMethod.POST)
+    public ModelAndView createPolledPublisher(
+        @RequestParam("url") URI url    
+    	) throws IOException, FailedSubscriberVerificationException {
+
+        adminService.createPolledPublishers(url);
+        
         return new ModelAndView("redirect:..");
     }
 
+    @RequestMapping(value="/admin/polled/{id}/edit", method=RequestMethod.POST)
+    public ModelAndView updatePolledPublisher(
+        @RequestParam("id") UUID id,    
+        @RequestParam("url") URI url,    
+        @RequestParam(value="delete", required=false) String delete) throws IOException, FailedSubscriberVerificationException {
+
+        if(delete != null) {
+            // delete the subscriber
+            adminService.removePolledPublishers(id);
+        } else {
+            // update
+            adminService.updatePolledPublishers(id, url);
+        }
+        
+        return new ModelAndView("redirect:../..");
+    }
+
+    
     public AdminService getAdminService() {
         return adminService;
     }

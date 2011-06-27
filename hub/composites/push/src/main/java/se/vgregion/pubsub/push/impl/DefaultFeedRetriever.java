@@ -21,6 +21,7 @@ package se.vgregion.pubsub.push.impl;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -140,7 +141,7 @@ public class DefaultFeedRetriever implements FeedRetriever {
 
             HttpEntity entity = response.getEntity();
 
-            Header[] contentTypes = response.getHeaders("Content-Type");
+            List<String> contentTypes = HttpUtil.getContentTypes(response);
 
             String content = IOUtils.toString(entity.getContent());
             
@@ -148,21 +149,7 @@ public class DefaultFeedRetriever implements FeedRetriever {
             LOG.debug(content);
             
             // TODO is this a reasonable default?
-            ContentType contentType = ContentType.ATOM;
-            if (contentTypes.length > 0) {
-                contentType = ContentType.fromValue(contentTypes[0].getValue());
-                
-                if(contentType != ContentType.ATOM && contentType != ContentType.RSS) {
-                    // unknown content type, try sniffing
-                    if(content.contains("<rss")) {
-                        contentType = ContentType.RSS;
-                    } else if(content.contains("<feed")) {
-                        contentType = ContentType.ATOM;
-                    } else {
-                        throw new RuntimeException("Unknown content type: " + contentType);
-                    }
-                }
-            }
+            ContentType contentType = ContentType.sniff(contentTypes, content);
 
             try {
                 Feed feed = AbstractParser.create(contentType).parse(content, contentType);
