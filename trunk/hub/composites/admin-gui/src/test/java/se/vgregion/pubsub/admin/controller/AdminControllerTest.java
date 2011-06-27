@@ -34,6 +34,7 @@ import org.mockito.Mockito;
 import org.springframework.web.servlet.ModelAndView;
 
 import se.vgregion.pubsub.admin.service.AdminService;
+import se.vgregion.pubsub.push.PolledPublisher;
 import se.vgregion.pubsub.push.PushSubscriber;
 
 public class AdminControllerTest {
@@ -56,19 +57,22 @@ public class AdminControllerTest {
     @Test
     public void index() throws Exception {
         List<PushSubscriber> subscribers = Arrays.asList(mock(PushSubscriber.class), mock(PushSubscriber.class));
+        List<PolledPublisher> publishers = Arrays.asList(mock(PolledPublisher.class), mock(PolledPublisher.class));
         when(adminService.getAllPushSubscribers()).thenReturn(subscribers);
+        when(adminService.getAllPolledPublishers()).thenReturn(publishers);
         
         ModelAndView mav = controller.index();
         
         Assert.assertEquals("admin/index", mav.getViewName());
         Assert.assertEquals(subscribers, mav.getModel().get("pushSubscribers"));
+        Assert.assertEquals(publishers, mav.getModel().get("polledPublishers"));
     }
 
     @Test
     public void newSubscriber() throws Exception {
         ModelAndView mav = controller.newPushSubscriber();
         
-        Assert.assertEquals("admin/edit", mav.getViewName());
+        Assert.assertEquals("admin/push-edit", mav.getViewName());
     }
 
     @Test
@@ -79,7 +83,7 @@ public class AdminControllerTest {
         
         ModelAndView mav = controller.editPushSubscriber(id);
         
-        Assert.assertEquals("admin/edit", mav.getViewName());
+        Assert.assertEquals("admin/push-edit", mav.getViewName());
         Assert.assertEquals(subscriber, mav.getModel().get("subscriber"));
     }
 
@@ -88,7 +92,7 @@ public class AdminControllerTest {
         
         ModelAndView mav = controller.createPushSubscriber(TOPIC, CALLBACK, LEASE, TOKEN);
 
-        Assert.assertEquals("redirect:", mav.getViewName());
+        Assert.assertEquals("redirect:..", mav.getViewName());
         Mockito.verify(adminService).createPushSubscriber(TOPIC, CALLBACK, LEASE, TOKEN);
     }
 
@@ -97,7 +101,7 @@ public class AdminControllerTest {
         
         ModelAndView mav = controller.updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN, null);
         
-        Assert.assertEquals("redirect:..", mav.getViewName());
+        Assert.assertEquals("redirect:../..", mav.getViewName());
         Mockito.verify(adminService).updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN);
     }
 
@@ -106,7 +110,52 @@ public class AdminControllerTest {
         
         ModelAndView mav = controller.updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN, "some value");
         
-        Assert.assertEquals("redirect:..", mav.getViewName());
+        Assert.assertEquals("redirect:../..", mav.getViewName());
         Mockito.verify(adminService).removePushSubscriber(ID);
+    }
+
+    @Test
+    public void newPolledPublisher() throws Exception {
+    	ModelAndView mav = controller.newPolledPublisher();
+    	
+    	Assert.assertEquals("admin/polled-edit", mav.getViewName());
+    }
+    
+    @Test
+    public void editPolledPublisher() throws Exception {
+    	UUID id = UUID.randomUUID();
+    	PolledPublisher publisher = mock(PolledPublisher.class);
+    	when(adminService.getPolledPublishers(id)).thenReturn(publisher);
+    	
+    	ModelAndView mav = controller.editPolledPublisher(id);
+    	
+    	Assert.assertEquals("admin/polled-edit", mav.getViewName());
+    	Assert.assertEquals(publisher, mav.getModel().get("publisher"));
+    }
+    
+    @Test
+    public void createPolledPublisher() throws Exception {
+    	ModelAndView mav = controller.createPolledPublisher(TOPIC);
+    	
+    	Assert.assertEquals("redirect:..", mav.getViewName());
+    	Mockito.verify(adminService).createPolledPublishers(TOPIC);
+    }
+    
+    @Test
+    public void updatePolledPublisher() throws Exception {
+    	
+    	ModelAndView mav = controller.updatePolledPublisher(ID, TOPIC, null);
+    	
+    	Assert.assertEquals("redirect:../..", mav.getViewName());
+    	Mockito.verify(adminService).updatePolledPublishers(ID, TOPIC);
+    }
+    
+    @Test
+    public void deletePolledPublisher() throws Exception {
+    	
+    	ModelAndView mav = controller.updatePolledPublisher(ID, TOPIC, "some value");
+    	
+    	Assert.assertEquals("redirect:../..", mav.getViewName());
+    	Mockito.verify(adminService).removePolledPublishers(ID);
     }
 }

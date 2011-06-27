@@ -39,5 +39,6 @@
 	<tx:annotation-driven />
 
 	<bean id="pushSubscriberRepository" class="se.vgregion.pubsub.push.repository.jpa.JpaPushSubscriberRepository"  />
+	<bean id="pushPolledPublisherRepository" class="se.vgregion.pubsub.push.repository.jpa.JpaPolledPublisherRepository"  />
 
 </beans>

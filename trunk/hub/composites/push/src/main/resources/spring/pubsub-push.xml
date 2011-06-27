@@ -1,31 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    /**
-     * Copyright 2010 Västra Götalandsregionen
-     *
-     *   This library is free software; you can redistribute it and/or modify
-     *   it under the terms of version 2.1 of the GNU Lesser General Public
-     *   License as published by the Free Software Foundation.
-     *
-     *   This library is distributed in the hope that it will be useful,
-     *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-     *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     *   GNU Lesser General Public License for more details.
-     *
-     *   You should have received a copy of the GNU Lesser General Public
-     *   License along with this library; if not, write to the
-     *   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
-     *   Boston, MA 02111-1307  USA
-     *
-     */
-
--->
+<!-- /** * Copyright 2010 Västra Götalandsregionen * * This library is free 
+	software; you can redistribute it and/or modify * it under the terms of version 
+	2.1 of the GNU Lesser General Public * License as published by the Free Software 
+	Foundation. * * This library is distributed in the hope that it will be useful, 
+	* but WITHOUT ANY WARRANTY; without even the implied warranty of * MERCHANTABILITY 
+	or FITNESS FOR A PARTICULAR PURPOSE. See the * GNU Lesser General Public 
+	License for more details. * * You should have received a copy of the GNU 
+	Lesser General Public * License along with this library; if not, write to 
+	the * Free Software Foundation, Inc., 59 Temple Place, Suite 330, * Boston, 
+	MA 02111-1307 USA * */ -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:task="http://www.springframework.org/schema/task"
-	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/context
@@ -38,20 +25,28 @@
 	<context:annotation-config />
 	<tx:annotation-driven />
 
- 	<bean id="pushManager"
+	<bean id="pushManager"
 		class="se.vgregion.pubsub.push.impl.DefaultPushSubscriberManager"
-		init-method="start"
-		>
+		init-method="start">
 		<constructor-arg ref="pubSubEngine" />
 		<constructor-arg ref="pushSubscriberRepository" />
 		<constructor-arg ref="publicationRetryer" />
 	</bean>
 
- 	<bean id="feedRetriver"
-		class="se.vgregion.pubsub.push.impl.DefaultFeedRetriever"
-		init-method="start"
-		destroy-method="stop">
+	<bean id="feedRetriver" class="se.vgregion.pubsub.push.impl.DefaultFeedRetriever"
+		init-method="start" destroy-method="stop">
 		<constructor-arg ref="pushManager" />
 	</bean>
 
+	<bean id="pollManager" class="se.vgregion.pubsub.push.impl.DefaultPolledPublisherManager">
+		<constructor-arg ref="pubSubEngine" />
+		<constructor-arg ref="pushPolledPublisherRepository" />
+	</bean>
+
+	<task:scheduled-tasks scheduler="pollingScheduler">
+		<!-- 900000 == 15 min -->
+		<task:scheduled ref="pollManager" method="poll" fixed-delay="900000" />
+	</task:scheduled-tasks>
+
+	<task:scheduler id="pollingScheduler" />
 </beans>

@@ -22,9 +22,12 @@ package se.vgregion.pubsub.push.impl;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import nu.xom.Document;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.StringEntity;
@@ -68,6 +71,16 @@ public class HttpUtil {
         } catch (UnsupportedEncodingException shouldNeverHappen) {
             throw new RuntimeException(shouldNeverHappen);
         }
+    }
+    
+    public static List<String> getContentTypes(HttpResponse response) {
+        Header[] contentTypes = response.getHeaders("Content-Type");
+        List<String> contentTypesStr = new ArrayList<String>();
+        
+        for(Header contentType : contentTypes) {
+        	contentTypesStr.add(contentType.getValue());
+        }
+        return contentTypesStr;
     }
     
     public static void closeQuitely(HttpResponse response) {

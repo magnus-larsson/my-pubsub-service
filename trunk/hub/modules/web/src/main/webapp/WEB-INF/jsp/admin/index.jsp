@@ -15,9 +15,10 @@
 
 	</head>
 	<body>
-		<h2>PubSubHubbub prenumeranter</h2>
-		
-		<form action='' method="post">
+		<div class="section">
+			<h2>PubSubHubbub prenumeranter</h2>
+			
+			
 			<table>
 				<tr>
 					<th>Topic</th>
@@ -28,12 +29,28 @@
 					<tr>
 						<td>${pushSubscriber.topic}</td>
 						<td>${pushSubscriber.callback}</td>
-						<td><!--<input type="submit" value="Ta bort" name="delete-${pushSubscriber.id}">--></td>
-						<td><a href="${pageContext.request.contextPath}/push/admin/${pushSubscriber.id}/edit">Ändra</a></td>
+						<td><a href="${pageContext.request.contextPath}/push/admin/push/${pushSubscriber.id}/edit">Ändra</a></td>
 					</tr>
 				</c:forEach>
 			</table>
-		</form>
-		<div><a href="${pageContext.request.contextPath}/push/admin/new"><img src="${pageContext.request.contextPath}/push/resources/img/page_add.png" /> Skapa ny prenumerant</a></div>
+			<div><a href="${pageContext.request.contextPath}/push/admin/push/new"><img src="${pageContext.request.contextPath}/push/resources/img/page_add.png" /> Skapa ny prenumerant</a></div>
+		</div>
+		<div class="section">
+			<h2>Pollande publicerare</h2>
+			
+			<table>
+				<tr>
+					<th>URL</th>
+					<th></th>
+				</tr>
+				<c:forEach var="polledPublisher" items="${polledPublishers}">
+					<tr>
+						<td>${polledPublisher.url}</td>
+						<td><a href="${pageContext.request.contextPath}/push/admin/polled/${polledPublisher.id}/edit">Ändra</a></td>
+					</tr>
+				</c:forEach>
+			</table>
+			<div><a href="${pageContext.request.contextPath}/push/admin/polled/new"><img src="${pageContext.request.contextPath}/push/resources/img/page_add.png" /> Skapa ny publicerare</a></div>
+		</div>
 	</body>
 </html>

@@ -31,8 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
+import se.vgregion.pubsub.push.PolledPublisher;
 import se.vgregion.pubsub.push.PushSubscriber;
+import se.vgregion.pubsub.push.impl.DefaultPolledPublisher;
 import se.vgregion.pubsub.push.impl.PushSubscriberManager;
+import se.vgregion.pubsub.push.repository.PolledPublisherRepository;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 /**
@@ -44,9 +47,13 @@ public class DefaultAdminService implements AdminService {
 
     @Resource
     private PushSubscriberRepository subscriberRepository;
-    
+
     @Resource
     private PushSubscriberManager pushSubscriberManager;
+
+    @Resource
+    private PolledPublisherRepository polledPublisherRepository;
+    
     
     @Override
     @Transactional
@@ -83,6 +90,41 @@ public class DefaultAdminService implements AdminService {
         return subscriberRepository.find(id);
     }
 
+    @Override
+    @Transactional
+	public Collection<PolledPublisher> getAllPolledPublishers() {
+		return polledPublisherRepository.findAll();
+	}
+
+	@Override
+	@Transactional
+	public void createPolledPublishers(URI url) throws IOException {
+		polledPublisherRepository.persist(new DefaultPolledPublisher(url));
+	}
+
+	@Override
+	@Transactional
+	public PolledPublisher getPolledPublishers(UUID id) {
+		return polledPublisherRepository.find(id);
+	}
+
+	@Override
+	@Transactional
+	public void updatePolledPublishers(UUID id, URI url) throws IOException {
+		PolledPublisher polledPublisher = getPolledPublishers(id);
+		if(polledPublisher != null) {
+			polledPublisher.setUrl(url);
+		} else {
+			throw new RuntimeException("Unknown publisher: " + id);
+		}
+	}
+
+	@Override
+	@Transactional
+	public void removePolledPublishers(UUID id) {
+		polledPublisherRepository.remove(id);
+	}
+
     public PushSubscriberRepository getSubscriberRepository() {
         return subscriberRepository;
     }
@@ -98,4 +140,13 @@ public class DefaultAdminService implements AdminService {
     public void setPushSubscriberManager(PushSubscriberManager pushSubscriberManager) {
         this.pushSubscriberManager = pushSubscriberManager;
     }
+
+	public PolledPublisherRepository getPolledPublisherRepository() {
+		return polledPublisherRepository;
+	}
+
+	public void setPolledPublisherRepository(
+			PolledPublisherRepository polledPublisherRepository) {
+		this.polledPublisherRepository = polledPublisherRepository;
+	}
 }

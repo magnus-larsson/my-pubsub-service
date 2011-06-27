@@ -28,5 +28,6 @@
              version="1.0">
     <persistence-unit name="pubsub">
         <class>se.vgregion.pubsub.push.impl.DefaultPushSubscriber</class>
+        <class>se.vgregion.pubsub.push.impl.DefaultPolledPublisher</class>
     </persistence-unit>
 </persistence>

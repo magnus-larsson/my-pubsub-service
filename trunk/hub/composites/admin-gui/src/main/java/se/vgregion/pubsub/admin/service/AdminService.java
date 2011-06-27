@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
+import se.vgregion.pubsub.push.PolledPublisher;
 import se.vgregion.pubsub.push.PushSubscriber;
 
 /**
@@ -42,5 +43,15 @@ public interface AdminService {
     void updatePushSubscriber(UUID id, URI topic, URI callback, int leaseSeconds, String verifyToken) throws IOException, FailedSubscriberVerificationException;
 
     void removePushSubscriber(UUID id);
+
+    Collection<PolledPublisher> getAllPolledPublishers();
+    
+    void createPolledPublishers(URI url) throws IOException;
+    
+    PolledPublisher getPolledPublishers(UUID id);
+    
+    void updatePolledPublishers(UUID id, URI url) throws IOException;
+    
+    void removePolledPublishers(UUID id);
     
 }
