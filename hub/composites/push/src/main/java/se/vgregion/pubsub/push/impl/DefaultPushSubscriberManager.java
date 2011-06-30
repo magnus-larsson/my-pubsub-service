@@ -21,7 +21,6 @@ package se.vgregion.pubsub.push.impl;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -34,13 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
-import se.vgregion.pubsub.Subscriber;
 import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.impl.PublicationRetryer;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.SubscriptionMode;
-import se.vgregion.pubsub.push.UnitTestConstants;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 public class DefaultPushSubscriberManager implements PushSubscriberManager {
