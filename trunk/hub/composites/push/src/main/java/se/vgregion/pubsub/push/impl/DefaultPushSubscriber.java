@@ -23,8 +23,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -34,6 +38,8 @@ import javax.persistence.UniqueConstraint;
 
 import nu.xom.Document;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -92,6 +98,9 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     @Column
     private String verifyToken;
     
+    @Column
+    private String secret;
+    
     @Transient
     private int failedVerifications;
     
@@ -102,7 +111,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     
     public DefaultPushSubscriber(URI topic, URI callback, 
             DateTime timeout, DateTime lastUpdated,
-            int leaseSeconds, String verifyToken) {
+            int leaseSeconds, String verifyToken, String secret) {
         id = UUID.randomUUID();
         
         Assert.notNull(topic);
@@ -114,13 +123,14 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         this.callback = callback.toString();
         this.leaseSeconds = leaseSeconds;
         this.verifyToken = verifyToken;
+        this.secret = secret;
     }
 
     public DefaultPushSubscriber(URI topic, URI callback, 
-            int leaseSeconds, String verifyToken) {
+            int leaseSeconds, String verifyToken, String secret) {
         this(topic, callback, 
                 (leaseSeconds > 0) ? new DateTime().plusSeconds(leaseSeconds) : null, null,
-                leaseSeconds, verifyToken);
+                leaseSeconds, verifyToken, secret);
     }
 
     
@@ -160,10 +170,17 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
             Document doc = AbstractSerializer.create(feed.getContentType()).print(feed, 
                     new UpdatedSinceEntryFilter(getLastUpdated()));
             
-            LOG.debug("XML being pushed to subscriber:");
-            LOG.debug(doc.toXML());
+            String xml = doc.toXML();
             
-            post.setEntity(HttpUtil.createEntity(doc));
+            LOG.debug("XML being pushed to subscriber:");
+            LOG.debug(xml);
+            
+            post.setEntity(HttpUtil.createEntity(xml));
+            
+            if(StringUtils.isNotBlank(secret)) {
+            	// calculate HMAC header
+            	post.addHeader(new BasicHeader("X-Hub-Signature", "sha1=" + CryptoUtil.calculateHmacSha1(secret, xml)));
+            }
             
             HttpResponse response = null;
             try {
@@ -198,9 +215,8 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         } else {
             LOG.info("No updates for subscriber {}", callback);
         }
-
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -279,6 +295,10 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
 
     public String getVerifyToken() {
         return verifyToken;
+    }
+    
+    public String getSecret() {
+    	return secret;
     }
     
     /**

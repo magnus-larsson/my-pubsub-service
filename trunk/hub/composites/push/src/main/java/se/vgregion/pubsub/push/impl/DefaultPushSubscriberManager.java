@@ -40,6 +40,7 @@ import se.vgregion.pubsub.impl.PublicationRetryer;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.SubscriptionMode;
+import se.vgregion.pubsub.push.UnitTestConstants;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 public class DefaultPushSubscriberManager implements PushSubscriberManager {
@@ -67,10 +68,10 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
     
     @Override
     @Transactional
-    public void subscribe(URI topicUrl, URI callback, int leaseSeconds, String verifyToken, boolean verify) throws IOException, FailedSubscriberVerificationException {
+    public void subscribe(URI topicUrl, URI callback, int leaseSeconds, String verifyToken, String secret, boolean verify) throws IOException, FailedSubscriberVerificationException {
         unsubscribe(topicUrl, callback, verify);
         
-        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(topicUrl, callback, leaseSeconds, verifyToken);
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(topicUrl, callback, leaseSeconds, verifyToken, secret);
         
         if(verify) {
         	subscriber.verify(SubscriptionMode.SUBSCRIBE);

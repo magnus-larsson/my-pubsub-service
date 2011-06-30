@@ -42,7 +42,7 @@ public interface PushSubscriberManager extends SubscriberManager {
      * @throws FailedSubscriberVerificationException 
      * @throws IOException 
      */
-    public void subscribe(URI topicUrl, URI callback, int leaseSeconds, String verifyToken, boolean verify) throws IOException, FailedSubscriberVerificationException;
+    public void subscribe(URI topicUrl, URI callback, int leaseSeconds, String verifyToken, String secret, boolean verify) throws IOException, FailedSubscriberVerificationException;
 
     /**
      * Unsubscribe a subscriber if one exists with the provided topic and callback

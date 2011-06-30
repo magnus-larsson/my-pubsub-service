@@ -44,6 +44,7 @@ public class AdminControllerTest {
     private static final URI CALLBACK = URI.create("http://bar");
     private static final int LEASE = 123;
     private static final String TOKEN = "vt";
+    private static final String SECRET = "sekrit";
 
     
     private AdminController controller = new AdminController();
@@ -90,25 +91,25 @@ public class AdminControllerTest {
     @Test
     public void createPushSubscriber() throws Exception {
         
-        ModelAndView mav = controller.createPushSubscriber(TOPIC, CALLBACK, LEASE, TOKEN);
+        ModelAndView mav = controller.createPushSubscriber(TOPIC, CALLBACK, LEASE, TOKEN, SECRET);
 
         Assert.assertEquals("redirect:..", mav.getViewName());
-        Mockito.verify(adminService).createPushSubscriber(TOPIC, CALLBACK, LEASE, TOKEN);
+        Mockito.verify(adminService).createPushSubscriber(TOPIC, CALLBACK, LEASE, TOKEN, SECRET);
     }
 
     @Test
     public void updatePushSubscriber() throws Exception {
         
-        ModelAndView mav = controller.updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN, null);
+        ModelAndView mav = controller.updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN, SECRET, null);
         
         Assert.assertEquals("redirect:../..", mav.getViewName());
-        Mockito.verify(adminService).updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN);
+        Mockito.verify(adminService).updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN, SECRET);
     }
 
     @Test
     public void deletePushSubscriber() throws Exception {
         
-        ModelAndView mav = controller.updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN, "some value");
+        ModelAndView mav = controller.updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN, SECRET, "some value");
         
         Assert.assertEquals("redirect:../..", mav.getViewName());
         Mockito.verify(adminService).removePushSubscriber(ID);

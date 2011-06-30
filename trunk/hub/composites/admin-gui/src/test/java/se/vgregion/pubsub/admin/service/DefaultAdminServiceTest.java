@@ -44,6 +44,7 @@ public class DefaultAdminServiceTest {
     private static final URI CALLBACK = URI.create("http://bar");
     private static final int LEASE = 123;
     private static final String TOKEN = "vt";
+    private static final String SECRET = "sekrit";
 
     @Mock private PushSubscriberRepository subscriberRepository;
     @Mock private PushSubscriberManager pushSubscriberManager;
@@ -62,16 +63,16 @@ public class DefaultAdminServiceTest {
     
     @Test
     public void createPushSubscriber() throws Exception {
-        adminService.createPushSubscriber(TOPIC, CALLBACK, LEASE, TOKEN);
+        adminService.createPushSubscriber(TOPIC, CALLBACK, LEASE, TOKEN, SECRET);
 
-        Mockito.verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, LEASE, TOKEN, false);
+        Mockito.verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, LEASE, TOKEN, SECRET, false);
     }
 
     @Test
     public void updatePushSubscriber() throws Exception {
-        adminService.updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN);
+        adminService.updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN, SECRET);
         
-        Mockito.verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, LEASE, TOKEN, false);
+        Mockito.verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, LEASE, TOKEN, SECRET, false);
     }
     
     @Test

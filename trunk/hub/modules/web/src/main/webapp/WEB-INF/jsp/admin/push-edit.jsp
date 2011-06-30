@@ -22,6 +22,7 @@
 			<p><label for="callback">Callback URL</label><input name="callback" value="${subscriber.callback}" /></p>
 			<p><label for="leaseSeconds">Lease seconds</label><input name="leaseSeconds" value="${subscriber.leaseSeconds}" /></p>
 			<p><label for="verifyToken">Verify token</label><input name="verifyToken" value="${subscriber.verifyToken}" /></p>
+			<p><label for="secret">Secret</label><input name="secret" value="${subscriber.secret}" /></p>
 			<input type="hidden" name="id" value="${subscriber.id}" /></p>
 			
 			

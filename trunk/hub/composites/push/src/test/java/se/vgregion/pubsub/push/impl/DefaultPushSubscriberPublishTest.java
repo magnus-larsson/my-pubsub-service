@@ -70,7 +70,7 @@ public class DefaultPushSubscriberPublishTest {
     @Test
     public void publish() throws Exception {
         
-        subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, buildTestUrl("/"), UnitTestConstants.FUTURE, UnitTestConstants.UPDATED1, 100, "verify" );
+        subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, buildTestUrl("/"), UnitTestConstants.FUTURE, UnitTestConstants.UPDATED1, 100, "verify", UnitTestConstants.SECRET);
         
         final LinkedBlockingQueue<HttpRequest> issuedRequests = new LinkedBlockingQueue<HttpRequest>();
         final LinkedBlockingQueue<byte[]> issuedRequestBodies = new LinkedBlockingQueue<byte[]>();
@@ -96,7 +96,12 @@ public class DefaultPushSubscriberPublishTest {
 
         HttpRequest request = issuedRequests.poll(10000, TimeUnit.MILLISECONDS);
         Assert.assertNotNull(request);
-        Assert.assertEquals(ContentType.ATOM.toString(), request.getHeaders("Content-Type")[0].getValue());
+        Assert.assertEquals(ContentType.ATOM.toString(), request.getFirstHeader("Content-Type").getValue());
+
+        // verify HMAC header
+        Assert.assertEquals("sha1=1356b52665408a17af46803a7988e48d40d1fb75", request.getFirstHeader("X-Hub-Signature").getValue());
+        
+        // verify content
         Assert.assertTrue(request instanceof HttpEntityEnclosingRequest);
         
         HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();
