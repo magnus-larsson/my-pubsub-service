@@ -19,7 +19,6 @@
 
 package se.vgregion.pubsub.push.impl;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
@@ -29,10 +28,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import nu.xom.ParsingException;
-
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
@@ -44,7 +40,6 @@ import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
 import se.vgregion.pubsub.content.AbstractParser;
-import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 import se.vgregion.pubsub.push.PolledPublisher;
 import se.vgregion.pubsub.push.PushSubscriber;
 

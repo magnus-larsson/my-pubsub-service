@@ -49,8 +49,8 @@ public class JpaPushSubscriberRepositoryTest extends AbstractTransactionalJUnit4
     @Rollback(false)
     public void setup() {
         subscriberRepository = applicationContext.getBean(PushSubscriberRepository.class);
-        expected = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 100, "verify");
-        expected2 = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK2, 100, "verify");
+        expected = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 100, "verify", UnitTestConstants.SECRET);
+        expected2 = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK2, 100, "verify", UnitTestConstants.SECRET);
         subscriberRepository.persist(expected);
         subscriberRepository.persist(expected2);
     }

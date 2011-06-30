@@ -55,7 +55,7 @@ public class DefaultPushSubscriberVerifyTest {
         DateTimeUtils.setCurrentMillisFixed(new DateTime().getMillis());
         server.start();
         
-        subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, buildTestUrl("/"), UnitTestConstants.FUTURE, UnitTestConstants.UPDATED1, 123, "verify" );
+        subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, buildTestUrl("/"), UnitTestConstants.FUTURE, UnitTestConstants.UPDATED1, 123, "verify", UnitTestConstants.SECRET);
     }
     
     private URI buildTestUrl(String path) throws URISyntaxException {

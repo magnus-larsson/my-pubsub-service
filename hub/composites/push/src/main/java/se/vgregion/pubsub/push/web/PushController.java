@@ -97,7 +97,7 @@ public class PushController {
                 			String verifyToken = request.getParameter("hub.verify_token");
                 			
                 			try {
-                				pushSubscriberManager.subscribe(topicUrl, callback, leaseSeconds, verifyToken, true);
+                				pushSubscriberManager.subscribe(topicUrl, callback, leaseSeconds, verifyToken, secret, true);
                 			
                 				response.setStatus(204);
                 				LOG.info("Subscription request for topic {} with callback {} successful", topicUrl, callback);

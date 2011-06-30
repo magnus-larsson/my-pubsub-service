@@ -35,6 +35,7 @@ import static org.mockito.Mockito.verify;
 import org.mockito.MockitoAnnotations;
 
 import se.vgregion.pubsub.push.PushSubscriber;
+import se.vgregion.pubsub.push.UnitTestConstants;
 import se.vgregion.pubsub.push.impl.PushSubscriberManager;
 import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
@@ -42,6 +43,8 @@ public class PushControllerTest {
 
 	private static final URI CALLBACK = URI.create("http://example.com/callback");
 	private static final URI TOPIC = URI.create("http://example.com/topic");
+
+	private static final String SECRET = UnitTestConstants.SECRET;
 	
 	@Mock private PushSubscriberRepository pushSubscriberRepository;
 	@Mock private PushSubscriberManager pushSubscriberManager;
@@ -68,7 +71,7 @@ public class PushControllerTest {
     	controller.post(request, response);
     	
     	verify(response).setStatus(204);
-    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, PushSubscriber.DEFAULT_LEASE_SECONDS, null, true);
+    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, PushSubscriber.DEFAULT_LEASE_SECONDS, null, null, true);
     	Mockito.verifyNoMoreInteractions(response);
     }
 
@@ -83,7 +86,7 @@ public class PushControllerTest {
     	controller.post(request, response);
     	
     	verify(response).setStatus(204);
-    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, 123, null, true);
+    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, 123, null, null, true);
     	Mockito.verifyNoMoreInteractions(response);
     }
 
@@ -114,7 +117,23 @@ public class PushControllerTest {
     	controller.post(request, response);
     	
     	verify(response).setStatus(204);
-    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, 123, "vt", true);
+    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, 123, "vt", null, true);
+    	Mockito.verifyNoMoreInteractions(response);
+    }
+    
+    @Test
+    public void subscribeWithSecret() throws Exception {
+    	when(request.getParameter("hub.mode")).thenReturn("subscribe");
+    	when(request.getParameter("hub.callback")).thenReturn(CALLBACK.toString());
+    	when(request.getParameter("hub.topic")).thenReturn(TOPIC.toString());
+    	when(request.getParameter("hub.verify")).thenReturn("sync");
+    	when(request.getParameter("hub.lease_seconds")).thenReturn("123");
+    	when(request.getParameter("hub.secret")).thenReturn(SECRET);
+    	
+    	controller.post(request, response);
+    	
+    	verify(response).setStatus(204);
+    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, 123, null, SECRET, true);
     	Mockito.verifyNoMoreInteractions(response);
     }
     

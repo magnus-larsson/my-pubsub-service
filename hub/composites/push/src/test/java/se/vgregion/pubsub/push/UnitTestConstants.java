@@ -42,6 +42,10 @@ public class UnitTestConstants {
     
     public static DateTime FUTURE = new DateTime(2050, 1, 1, 0, 0, 0, 0);
 
+    public static String SECRET = "sekrit";
+
+    
+    
     public static Feed atom1() {
         return new FeedBuilder(ContentType.ATOM)
             .field(Namespaces.ATOM, "id", "f1")
