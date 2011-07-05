@@ -23,8 +23,9 @@
 			<p><label for="leaseSeconds">Lease seconds</label><input name="leaseSeconds" value="${subscriber.leaseSeconds}" /></p>
 			<p><label for="verifyToken">Verify token</label><input name="verifyToken" value="${subscriber.verifyToken}" /></p>
 			<p><label for="secret">Secret</label><input name="secret" value="${subscriber.secret}" /></p>
+			<p><label for="active">Aktiv</label><input name="active" type="checkbox" ${subscriber.active ? 'checked="yes"' : ''} /></p>
+
 			<input type="hidden" name="id" value="${subscriber.id}" /></p>
-			
 			
 			<p><input type='submit' value='Spara'> <c:if test="${not empty subscriber}"><input type='submit' name='delete' value='Ta bort prenumerant'></c:if></p>
 		</form>	

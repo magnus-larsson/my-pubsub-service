@@ -36,11 +36,11 @@ public interface AdminService {
 
     Collection<PushSubscriber> getAllPushSubscribers();
     
-    void createPushSubscriber(URI topic, URI callback, int leaseSeconds, String verifyToken, String secret) throws IOException, FailedSubscriberVerificationException;
+    void createPushSubscriber(URI topic, URI callback, int leaseSeconds, String verifyToken, String secret, boolean active) throws IOException, FailedSubscriberVerificationException;
 
     PushSubscriber getPushSubscriber(UUID id);
 
-    void updatePushSubscriber(UUID id, URI topic, URI callback, int leaseSeconds, String verifyToken, String secret) throws IOException, FailedSubscriberVerificationException;
+    void updatePushSubscriber(UUID id, URI topic, URI callback, int leaseSeconds, String verifyToken, String secret, boolean active) throws IOException, FailedSubscriberVerificationException;
 
     void removePushSubscriber(UUID id);
 

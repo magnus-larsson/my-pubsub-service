@@ -34,16 +34,16 @@ public class DefaultPushSubscriberTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void cstrNullTopic() {
-        new DefaultPushSubscriber(null, UnitTestConstants.CALLBACK, 123, "token", UnitTestConstants.SECRET);
+        new DefaultPushSubscriber(null, UnitTestConstants.CALLBACK, 123, "token", UnitTestConstants.SECRET, true);
     }    
     @Test(expected=IllegalArgumentException.class)
     public void cstrNullCallback() {
-        new DefaultPushSubscriber(UnitTestConstants.TOPIC, null, 123, "token", UnitTestConstants.SECRET);
+        new DefaultPushSubscriber(UnitTestConstants.TOPIC, null, 123, "token", UnitTestConstants.SECRET, true);
     }    
 
     @Test
     public void getTimeout() {
-        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 0, "token", UnitTestConstants.SECRET);
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 0, "token", UnitTestConstants.SECRET, true);
         
         Assert.assertNull(subscriber.getTimeout());
         
@@ -52,7 +52,7 @@ public class DefaultPushSubscriberTest {
     
     @Test
     public void verificationUrl() throws UnsupportedEncodingException {
-        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 123, "token", UnitTestConstants.SECRET);
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 123, "token", UnitTestConstants.SECRET, true);
         
         Assert.assertEquals(
                 URI.create(UnitTestConstants.CALLBACK + "?hub.mode=subscribe&hub.topic=" + URLEncoder.encode(UnitTestConstants.TOPIC.toString(), "UTF-8") + "&hub.challenge=ch&hub.lease_seconds=123&hub.verify_token=token"), 
@@ -61,7 +61,7 @@ public class DefaultPushSubscriberTest {
 
     @Test
     public void verificationUrlUnsubscribe() throws UnsupportedEncodingException {
-        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 123, "token", UnitTestConstants.SECRET);
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 123, "token", UnitTestConstants.SECRET, true);
         
         Assert.assertEquals(
                 URI.create(UnitTestConstants.CALLBACK + "?hub.mode=unsubscribe&hub.topic=" + URLEncoder.encode(UnitTestConstants.TOPIC.toString(), "UTF-8") + "&hub.challenge=ch&hub.lease_seconds=123&hub.verify_token=token"), 
@@ -71,7 +71,7 @@ public class DefaultPushSubscriberTest {
     
     @Test
     public void verificationUrlNoLeaseSecondsAndToken() throws UnsupportedEncodingException {
-        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 0, null, UnitTestConstants.SECRET);
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, UnitTestConstants.CALLBACK, 0, null, UnitTestConstants.SECRET, true);
         
         Assert.assertEquals(
                 URI.create(UnitTestConstants.CALLBACK + "?hub.mode=subscribe&hub.topic=" + URLEncoder.encode(UnitTestConstants.TOPIC.toString(), "UTF-8") + "&hub.challenge=ch"), 
@@ -80,7 +80,7 @@ public class DefaultPushSubscriberTest {
 
     @Test
     public void verificationUrlCallbackWithQuery() throws UnsupportedEncodingException {
-        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, URI.create(UnitTestConstants.CALLBACK.toString() + "?abc=def"), 0, null, UnitTestConstants.SECRET);
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, URI.create(UnitTestConstants.CALLBACK.toString() + "?abc=def"), 0, null, UnitTestConstants.SECRET, true);
         
         Assert.assertEquals(
                 URI.create(UnitTestConstants.CALLBACK + "?abc=def&hub.mode=subscribe&hub.topic=" + URLEncoder.encode(UnitTestConstants.TOPIC.toString(), "UTF-8") + "&hub.challenge=ch"), 
