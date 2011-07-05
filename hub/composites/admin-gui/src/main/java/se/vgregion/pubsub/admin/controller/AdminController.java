@@ -84,13 +84,15 @@ public class AdminController {
         @RequestParam("callback") URI callback,    
         @RequestParam(value="leaseSeconds", required=false) Integer leaseSeconds,    
         @RequestParam(value="verifyToken", required=false) String verifyToken,
-        @RequestParam(value="secret", required=false) String secret
+        @RequestParam(value="secret", required=false) String secret,
+        @RequestParam(value="active", defaultValue="false", required=false) Boolean active
         ) throws IOException, FailedSubscriberVerificationException {
 
         if(leaseSeconds == null) {
             leaseSeconds = 0;
         }
-        adminService.createPushSubscriber(topic, callback, leaseSeconds, verifyToken, secret);
+        
+        adminService.createPushSubscriber(topic, callback, leaseSeconds, verifyToken, secret, active);
         
         return new ModelAndView("redirect:..");
     }
@@ -103,6 +105,7 @@ public class AdminController {
         @RequestParam(value="leaseSeconds", required=false) Integer leaseSeconds,    
         @RequestParam(value="verifyToken", required=false) String verifyToken,
         @RequestParam(value="secret", required=false) String secret,
+        @RequestParam(value="active", defaultValue="false", required=false) Boolean active,
         @RequestParam(value="delete", required=false) String delete) throws IOException, FailedSubscriberVerificationException {
 
         if(leaseSeconds == null) {
@@ -114,7 +117,7 @@ public class AdminController {
             adminService.removePushSubscriber(id);
         } else {
             // update
-            adminService.updatePushSubscriber(id, topic, callback, leaseSeconds, verifyToken, secret);
+            adminService.updatePushSubscriber(id, topic, callback, leaseSeconds, verifyToken, secret, active);
         }
         
         return new ModelAndView("redirect:../..");

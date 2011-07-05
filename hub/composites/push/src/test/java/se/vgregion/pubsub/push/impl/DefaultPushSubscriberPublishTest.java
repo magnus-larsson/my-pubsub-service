@@ -70,7 +70,7 @@ public class DefaultPushSubscriberPublishTest {
     @Test
     public void publish() throws Exception {
         
-        subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, buildTestUrl("/"), UnitTestConstants.FUTURE, UnitTestConstants.UPDATED1, 100, "verify", UnitTestConstants.SECRET);
+        subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, buildTestUrl("/"), UnitTestConstants.FUTURE, UnitTestConstants.UPDATED1, 100, "verify", UnitTestConstants.SECRET, true);
         
         final LinkedBlockingQueue<HttpRequest> issuedRequests = new LinkedBlockingQueue<HttpRequest>();
         final LinkedBlockingQueue<byte[]> issuedRequestBodies = new LinkedBlockingQueue<byte[]>();

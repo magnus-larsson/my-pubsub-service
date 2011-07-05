@@ -101,6 +101,9 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     @Column
     private String secret;
     
+    @Column
+    private boolean active;
+    
     @Transient
     private int failedVerifications;
     
@@ -111,7 +114,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     
     public DefaultPushSubscriber(URI topic, URI callback, 
             DateTime timeout, DateTime lastUpdated,
-            int leaseSeconds, String verifyToken, String secret) {
+            int leaseSeconds, String verifyToken, String secret, boolean active) {
         id = UUID.randomUUID();
         
         Assert.notNull(topic);
@@ -124,13 +127,14 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         this.leaseSeconds = leaseSeconds;
         this.verifyToken = verifyToken;
         this.secret = secret;
+        this.active = active;
     }
 
     public DefaultPushSubscriber(URI topic, URI callback, 
-            int leaseSeconds, String verifyToken, String secret) {
+            int leaseSeconds, String verifyToken, String secret, boolean active) {
         this(topic, callback, 
                 (leaseSeconds > 0) ? new DateTime().plusSeconds(leaseSeconds) : null, null,
-                leaseSeconds, verifyToken, secret);
+                leaseSeconds, verifyToken, secret, active);
     }
 
     
@@ -159,62 +163,66 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
      */
     @Override
     public synchronized void publish(Feed feed) throws PublicationFailedException {
-        LOG.info("Getting subscribed feed for {}", callback);
-        
-        if(feed.hasUpdates(getLastUpdated())) {
-            LOG.info("Feed has updates, distributing to {}", callback);
-            HttpPost post = new HttpPost(callback);
-            
-            post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
-            
-            Document doc = AbstractSerializer.create(feed.getContentType()).print(feed, 
-                    new UpdatedSinceEntryFilter(getLastUpdated()));
-            
-            String xml = doc.toXML();
-            
-            LOG.debug("XML being pushed to subscriber:");
-            LOG.debug(xml);
-            
-            post.setEntity(HttpUtil.createEntity(xml));
-            
-            if(StringUtils.isNotBlank(secret)) {
-            	// calculate HMAC header
-            	post.addHeader(new BasicHeader("X-Hub-Signature", "sha1=" + CryptoUtil.calculateHmacSha1(secret, xml)));
-            }
-            
-            HttpResponse response = null;
-            try {
-                DefaultHttpClient httpClient = HttpUtil.getClient();
-                
-                // don't redirect publications
-                httpClient.setRedirectHandler(new DontRedirectHandler());
-                response = httpClient.execute(post);
-                if(HttpUtil.successStatus(response)) {
-                    LOG.info("Succeeded distributing to subscriber {}", callback);
-                    
-                    // update last update
-                    lastUpdated = new DateTime().getMillis();
-                } else {
-                    // TODO revisit
-                    // subscription.markForVerification();
-                    String msg = "Failed distributing to subscriber \"" + callback + "\" with error \"" + response.getStatusLine() + "\"";
-                    
-                    LOG.warn(msg);
-                    throw new PublicationFailedException(msg);
-                }
-            } catch(IOException e) {
-                // TODO revisit
-                //subscription.markForVerification();
-
-                String msg = "Failed distributing to subscriber \"" + callback + "\" with error \"" + response.getStatusLine() + "\"";
-                LOG.warn(msg);
-                throw new PublicationFailedException(msg);
-            } finally {
-                HttpUtil.closeQuitely(response);
-            }
-        } else {
-            LOG.info("No updates for subscriber {}", callback);
-        }
+    	if(active) {
+	        LOG.info("Getting subscribed feed for {}", callback);
+	        
+	        if(feed.hasUpdates(getLastUpdated())) {
+	            LOG.info("Feed has updates, distributing to {}", callback);
+	            HttpPost post = new HttpPost(callback);
+	            
+	            post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
+	            
+	            Document doc = AbstractSerializer.create(feed.getContentType()).print(feed, 
+	                    new UpdatedSinceEntryFilter(getLastUpdated()));
+	            
+	            String xml = doc.toXML();
+	            
+	            LOG.debug("XML being pushed to subscriber:");
+	            LOG.debug(xml);
+	            
+	            post.setEntity(HttpUtil.createEntity(xml));
+	            
+	            if(StringUtils.isNotBlank(secret)) {
+	            	// calculate HMAC header
+	            	post.addHeader(new BasicHeader("X-Hub-Signature", "sha1=" + CryptoUtil.calculateHmacSha1(secret, xml)));
+	            }
+	            
+	            HttpResponse response = null;
+	            try {
+	                DefaultHttpClient httpClient = HttpUtil.getClient();
+	                
+	                // don't redirect publications
+	                httpClient.setRedirectHandler(new DontRedirectHandler());
+	                response = httpClient.execute(post);
+	                if(HttpUtil.successStatus(response)) {
+	                    LOG.info("Succeeded distributing to subscriber {}", callback);
+	                    
+	                    // update last update
+	                    lastUpdated = new DateTime().getMillis();
+	                } else {
+	                    // TODO revisit
+	                    // subscription.markForVerification();
+	                    String msg = "Failed distributing to subscriber \"" + callback + "\" with error \"" + response.getStatusLine() + "\"";
+	                    
+	                    LOG.warn(msg);
+	                    throw new PublicationFailedException(msg);
+	                }
+	            } catch(IOException e) {
+	                // TODO revisit
+	                //subscription.markForVerification();
+	
+	                String msg = "Failed distributing to subscriber \"" + callback + "\" with error \"" + response.getStatusLine() + "\"";
+	                LOG.warn(msg);
+	                throw new PublicationFailedException(msg);
+	            } finally {
+	                HttpUtil.closeQuitely(response);
+	            }
+	        } else {
+	            LOG.info("No updates for subscriber {}", callback);
+	        }
+    	} else {
+    		LOG.debug("Subscriber for {} disabled", callback);
+    	}
     }
     
     /**
@@ -299,6 +307,10 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     
     public String getSecret() {
     	return secret;
+    }
+    
+    public boolean isActive() {
+    	return active;
     }
     
     /**
