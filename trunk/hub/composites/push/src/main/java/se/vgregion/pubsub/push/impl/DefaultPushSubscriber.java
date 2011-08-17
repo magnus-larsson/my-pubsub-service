@@ -23,12 +23,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -38,7 +34,6 @@ import javax.persistence.UniqueConstraint;
 
 import nu.xom.Document;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -57,10 +52,8 @@ import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PublicationFailedException;
 import se.vgregion.pubsub.content.AbstractSerializer;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
-import se.vgregion.pubsub.push.FeedRetriever;
 import se.vgregion.pubsub.push.PushSubscriber;
 import se.vgregion.pubsub.push.SubscriptionMode;
-import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
 
 /**
  * Implementation of {@link PushSubscriber} with support for JPA
@@ -68,60 +61,64 @@ import se.vgregion.pubsub.push.repository.PushSubscriberRepository;
  */
 @Entity
 @Table(name="PUSH_SUBSCRIBERS",
-    uniqueConstraints={
+uniqueConstraints={
         @UniqueConstraint(columnNames={"topic", "callback"})
-    }
-)
+}
+        )
 public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushSubscriber {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultPushSubscriber.class);
-    
+
     @Id
     private UUID id;
 
     @Column
     private Long timeout;
-    
+
     @Column
     private Long lastUpdated;
-    
+
     @Column(nullable=false)
     @Index(name="push_subscriber_topic")
     private String topic;
-    
+
     @Column(nullable=false)
     private String callback;
-    
+
     @Column(nullable=false)
     private int leaseSeconds;
-    
+
     @Column
     private String verifyToken;
-    
+
     @Column
     private String secret;
-    
-    @Column
+
+    @Column(nullable=false)
     private boolean active;
-    
+
     @Transient
     private int failedVerifications;
-    
+
     // For JPA
     protected DefaultPushSubscriber() {
-        
+
     }
-    
-    public DefaultPushSubscriber(URI topic, URI callback, 
+
+    public DefaultPushSubscriber(URI topic, URI callback,
             DateTime timeout, DateTime lastUpdated,
             int leaseSeconds, String verifyToken, String secret, boolean active) {
         id = UUID.randomUUID();
-        
+
         Assert.notNull(topic);
         Assert.notNull(callback);
-        
-        if(timeout != null) this.timeout = timeout.getMillis();
-        if(lastUpdated != null) this.lastUpdated = lastUpdated.getMillis();
+
+        if(timeout != null) {
+            this.timeout = timeout.getMillis();
+        }
+        if(lastUpdated != null) {
+            this.lastUpdated = lastUpdated.getMillis();
+        }
         this.topic = topic.toString();
         this.callback = callback.toString();
         this.leaseSeconds = leaseSeconds;
@@ -130,14 +127,14 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         this.active = active;
     }
 
-    public DefaultPushSubscriber(URI topic, URI callback, 
+    public DefaultPushSubscriber(URI topic, URI callback,
             int leaseSeconds, String verifyToken, String secret, boolean active) {
-        this(topic, callback, 
+        this(topic, callback,
                 (leaseSeconds > 0) ? new DateTime().plusSeconds(leaseSeconds) : null, null,
-                leaseSeconds, verifyToken, secret, active);
+                        leaseSeconds, verifyToken, secret, active);
     }
 
-    
+
     /**
      * {@inheritDoc}
      */
@@ -163,104 +160,104 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
      */
     @Override
     public synchronized void publish(Feed feed) throws PublicationFailedException {
-    	if(active) {
-	        LOG.info("Getting subscribed feed for {}", callback);
-	        
-	        if(feed.hasUpdates(getLastUpdated())) {
-	            LOG.info("Feed has updates, distributing to {}", callback);
-	            HttpPost post = new HttpPost(callback);
-	            
-	            post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
-	            
-	            Document doc = AbstractSerializer.create(feed.getContentType()).print(feed, 
-	                    new UpdatedSinceEntryFilter(getLastUpdated()));
-	            
-	            String xml = doc.toXML();
-	            
-	            LOG.debug("XML being pushed to subscriber:");
-	            LOG.debug(xml);
-	            
-	            post.setEntity(HttpUtil.createEntity(xml));
-	            
-	            if(StringUtils.isNotBlank(secret)) {
-	            	// calculate HMAC header
-	            	post.addHeader(new BasicHeader("X-Hub-Signature", "sha1=" + CryptoUtil.calculateHmacSha1(secret, xml)));
-	            }
-	            
-	            HttpResponse response = null;
-	            try {
-	                DefaultHttpClient httpClient = HttpUtil.getClient();
-	                
-	                // don't redirect publications
-	                httpClient.setRedirectHandler(new DontRedirectHandler());
-	                response = httpClient.execute(post);
-	                if(HttpUtil.successStatus(response)) {
-	                    LOG.info("Succeeded distributing to subscriber {}", callback);
-	                    
-	                    // update last update
-	                    lastUpdated = new DateTime().getMillis();
-	                } else {
-	                    // TODO revisit
-	                    // subscription.markForVerification();
-	                    String msg = "Failed distributing to subscriber \"" + callback + "\" with error \"" + response.getStatusLine() + "\"";
-	                    
-	                    LOG.warn(msg);
-	                    throw new PublicationFailedException(msg);
-	                }
-	            } catch(IOException e) {
-	                // TODO revisit
-	                //subscription.markForVerification();
-	
-	                String msg = "Failed distributing to subscriber \"" + callback + "\" with error \"" + response.getStatusLine() + "\"";
-	                LOG.warn(msg);
-	                throw new PublicationFailedException(msg);
-	            } finally {
-	                HttpUtil.closeQuitely(response);
-	            }
-	        } else {
-	            LOG.info("No updates for subscriber {}", callback);
-	        }
-    	} else {
-    		LOG.debug("Subscriber for {} disabled", callback);
-    	}
+        if(active) {
+            LOG.info("Getting subscribed feed for {}", callback);
+
+            if(feed.hasUpdates(getLastUpdated())) {
+                LOG.info("Feed has updates, distributing to {}", callback);
+                HttpPost post = new HttpPost(callback);
+
+                post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
+
+                Document doc = AbstractSerializer.create(feed.getContentType()).print(feed,
+                        new UpdatedSinceEntryFilter(getLastUpdated()));
+
+                String xml = doc.toXML();
+
+                LOG.debug("XML being pushed to subscriber:");
+                LOG.debug(xml);
+
+                post.setEntity(HttpUtil.createEntity(xml));
+
+                if(StringUtils.isNotBlank(secret)) {
+                    // calculate HMAC header
+                    post.addHeader(new BasicHeader("X-Hub-Signature", "sha1=" + CryptoUtil.calculateHmacSha1(secret, xml)));
+                }
+
+                HttpResponse response = null;
+                try {
+                    DefaultHttpClient httpClient = HttpUtil.getClient();
+
+                    // don't redirect publications
+                    httpClient.setRedirectHandler(new DontRedirectHandler());
+                    response = httpClient.execute(post);
+                    if(HttpUtil.successStatus(response)) {
+                        LOG.info("Succeeded distributing to subscriber {}", callback);
+
+                        // update last update
+                        lastUpdated = new DateTime().getMillis();
+                    } else {
+                        // TODO revisit
+                        // subscription.markForVerification();
+                        String msg = "Failed distributing to subscriber \"" + callback + "\" with error \"" + response.getStatusLine() + "\"";
+
+                        LOG.warn(msg);
+                        throw new PublicationFailedException(msg);
+                    }
+                } catch(IOException e) {
+                    // TODO revisit
+                    //subscription.markForVerification();
+
+                    String msg = "Failed distributing to subscriber \"" + callback + "\" with error \"" + response.getStatusLine() + "\"";
+                    LOG.warn(msg);
+                    throw new PublicationFailedException(msg);
+                } finally {
+                    HttpUtil.closeQuitely(response);
+                }
+            } else {
+                LOG.info("No updates for subscriber {}", callback);
+            }
+        } else {
+            LOG.debug("Subscriber for {} disabled", callback);
+        }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void timedOut() {
         // TODO verify
-        
+
         try {
             verify(SubscriptionMode.SUBSCRIBE);
         } catch (Exception e) {
             failedVerifications++;
-            
+
             // TODO up for removal?
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public void verify(SubscriptionMode mode) throws IOException, FailedSubscriberVerificationException {
         String challenge = UUID.randomUUID().toString();
-        
+
         HttpGet get = new HttpGet(getVerificationUrl(mode, challenge));
 
         HttpResponse response = HttpUtil.getClient().execute(get);
         try {
-            
+
             if(HttpUtil.successStatus(response)) {
                 String returnedChallenge = HttpUtil.readContent(response.getEntity());
-                
+
                 if(challenge.equals(returnedChallenge)) {
                     // all okay
                 } else {
                     throw new FailedSubscriberVerificationException("Challenge did not match");
                 }
-                
+
             } else {
                 throw new FailedSubscriberVerificationException("Failed to verify subscription, status: " + response.getStatusLine().getStatusCode() + " : " + response.getStatusLine().getReasonPhrase());
             }
@@ -281,7 +278,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
             return new DateTime(lastUpdated);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -304,15 +301,15 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     public String getVerifyToken() {
         return verifyToken;
     }
-    
+
     public String getSecret() {
-    	return secret;
+        return secret;
     }
-    
+
     public boolean isActive() {
-    	return active;
+        return active;
     }
-    
+
     /**
      * Builds the URL used for verifying a subscriber
      * @param mode
@@ -323,28 +320,28 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         try {
             StringBuffer url = new StringBuffer();
             url.append(callback);
-            
+
             if(getCallback().getQuery() != null) {
                 url.append("&");
             } else {
                 url.append("?");
             }
-            
+
             if(mode.equals(SubscriptionMode.SUBSCRIBE)) {
                 url.append("hub.mode=subscribe");
             } else {
                 url.append("hub.mode=unsubscribe");
             }
             url.append("&hub.topic=").append(URLEncoder.encode(topic.toString(), "UTF-8"))
-                .append("&hub.challenge=").append(URLEncoder.encode(challenge, "UTF-8"));
-                
+            .append("&hub.challenge=").append(URLEncoder.encode(challenge, "UTF-8"));
+
             if(leaseSeconds > 0) {
                 url.append("&hub.lease_seconds=").append(leaseSeconds);
             }
             if(verifyToken != null) {
                 url.append("&hub.verify_token=").append(URLEncoder.encode(verifyToken, "UTF-8"));
             }
-            
+
             return URI.create(url.toString());
         } catch (UnsupportedEncodingException e) {
             // should never happen
