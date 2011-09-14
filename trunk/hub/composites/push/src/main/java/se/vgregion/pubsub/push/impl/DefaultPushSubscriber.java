@@ -190,7 +190,10 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
 
                     // don't redirect publications
                     httpClient.setRedirectHandler(new DontRedirectHandler());
+
                     response = httpClient.execute(post);
+                    LOG.debug("XML has been pushed to subscriber");
+
                     if(HttpUtil.successStatus(response)) {
                         LOG.info("Succeeded distributing to subscriber {}", callback);
 
@@ -208,9 +211,9 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
                     // TODO revisit
                     //subscription.markForVerification();
 
-                    String msg = "Failed distributing to subscriber \"" + callback + "\" with error \"" + response.getStatusLine() + "\"";
+                    String msg = "Failed distributing to subscriber \"" + callback + "\" with error: ";
                     LOG.warn(msg);
-                    throw new PublicationFailedException(msg);
+                    throw new PublicationFailedException(msg, e);
                 } finally {
                     HttpUtil.closeQuitely(response);
                 }
