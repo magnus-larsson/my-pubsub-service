@@ -56,41 +56,44 @@ public class DefaultPushSubscriberPublishTest {
 
     private DefaultPushSubscriber subscriber;
     private LocalTestServer server = new LocalTestServer(null, null);
-    
+
     @Before
     public void before() throws Exception {
         DateTimeUtils.setCurrentMillisFixed(new DateTime().getMillis());
         server.start();
     }
-    
+
     private URI buildTestUrl(String path) throws URISyntaxException {
         return new URI("http://" + server.getServiceHostName() + ":" + server.getServicePort() + path);
     }
-    
+
     @Test
     public void publish() throws Exception {
-        
+
         subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, buildTestUrl("/"), UnitTestConstants.FUTURE, UnitTestConstants.UPDATED1, 100, "verify", UnitTestConstants.SECRET, true);
-        
+
         final LinkedBlockingQueue<HttpRequest> issuedRequests = new LinkedBlockingQueue<HttpRequest>();
         final LinkedBlockingQueue<byte[]> issuedRequestBodies = new LinkedBlockingQueue<byte[]>();
         server.register("/*", new HttpRequestHandler() {
             @Override
             public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException,
-                    IOException {
+            IOException {
                 issuedRequests.add(request);
-                
+
                 HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 entity.writeTo(buffer);
                 issuedRequestBodies.add(buffer.toByteArray());
             }
         });
-        
-        Feed feed = new FeedBuilder(ContentType.ATOM).id("e1").entry(new EntryBuilder().id("f1").updated(new DateTime()).build()).build();
-        
+
+        Feed feed = new FeedBuilder(ContentType.ATOM).id("e1")
+                .entry(new EntryBuilder().id("f1").updated(new DateTime()).build())
+                .entry(new EntryBuilder().id("f2").updated(UnitTestConstants.UPDATED1.minusHours(1)).build())
+                .build();
+
         subscriber.publish(feed);
-        
+
         // subscriber should be updated
         Assert.assertEquals(new DateTime(), subscriber.getLastUpdated());
 
@@ -100,20 +103,20 @@ public class DefaultPushSubscriberPublishTest {
 
         // verify HMAC header
         Assert.assertEquals("sha1=1356b52665408a17af46803a7988e48d40d1fb75", request.getFirstHeader("X-Hub-Signature").getValue());
-        
+
         // verify content
         Assert.assertTrue(request instanceof HttpEntityEnclosingRequest);
-        
+
         HttpEntity entity = ((HttpEntityEnclosingRequest)request).getEntity();
-        
+
         Assert.assertNotNull(entity);
-        
+
         Document actualAtom = new Builder().build(new ByteArrayInputStream(issuedRequestBodies.poll()));
 
         Assert.assertEquals(1, actualAtom.getRootElement().getChildElements("entry", Namespaces.ATOM).size());
-        
+
     }
-    
+
     @After
     public void after() {
         DateTimeUtils.setCurrentMillisSystem();

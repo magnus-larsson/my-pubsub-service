@@ -162,6 +162,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     public synchronized void publish(Feed feed) throws PublicationFailedException {
         if(active) {
             LOG.info("Getting subscribed feed for {}", callback);
+            LOG.debug("Using PushSubcriber {}", this);
 
             if(feed.hasUpdates(getLastUpdated())) {
                 LOG.info("Feed has updates, distributing to {}", callback);

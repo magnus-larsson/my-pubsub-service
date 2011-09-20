@@ -25,6 +25,7 @@ import nu.xom.Element;
 import org.joda.time.DateTime;
 
 import se.vgregion.pubsub.ContentType;
+import se.vgregion.pubsub.Entry;
 import se.vgregion.pubsub.Feed;
 
 public abstract class AbstractSerializer {
@@ -36,7 +37,7 @@ public abstract class AbstractSerializer {
             return new Rss2Serializer();
         }
     }
-    
+
     public static Document printFeed(ContentType type, Feed feed) {
         return create(type).print(feed);
     }
@@ -45,13 +46,13 @@ public abstract class AbstractSerializer {
         return create(type).print(feed, entryFilter);
     }
 
-    
+
     public Document print(Feed feed) {
         return print(feed, null);
     }
-    
+
     public abstract Document print(Feed feed, EntryFilter entryFilter);
-    
+
     protected Element print(String name, String ns, String value) {
         Element elm = new Element(name, ns);
         elm.appendChild(value);
@@ -66,5 +67,9 @@ public abstract class AbstractSerializer {
         } else {
             return null;
         }
+    }
+
+    protected static boolean include(Entry entry, EntryFilter entryFilter) {
+        return entryFilter == null || entryFilter.include(entry);
     }
 }
