@@ -76,5 +76,8 @@
         <property name="idleConnectionTestPeriod" value="60" />
         <property name="maxPoolSize" value="20" />
         <property name="minPoolSize" value="5" />
+        <property name="acquireRetryAttempts" value="-1" />
+        <property name="acquireRetryDelay" value="20000" />
+        <property name="breakAfterAcquireFailure" value="false" />
 	</bean>
 </beans>
