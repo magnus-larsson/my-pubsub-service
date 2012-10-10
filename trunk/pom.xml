@@ -10,7 +10,7 @@
   <groupId>se.vgregion.pubsubhubbub</groupId>
   <artifactId>pubsubhubbub-system</artifactId>
   <packaging>pom</packaging>
-  <version>0.5.5-SNAPSHOT</version>
+  <version>0.5.5</version>
   <name>${project.artifactId}</name>
 
   <modules>
@@ -18,8 +18,8 @@
   </modules>
 
   <scm>
-    <developerConnection>scm:svn:https://oppna-program-pubsub-service.googlecode.com/svn/trunk</developerConnection>
-    <url>http://oppna-program-pubsub-service.googlecode.com/svn/trunk</url>
+    <developerConnection>scm:svn:https://oppna-program-pubsub-service.googlecode.com/svn/tags/pubsubhubbub-system-0.5.5</developerConnection>
+    <url>http://oppna-program-pubsub-service.googlecode.com/svn/tags/pubsubhubbub-system-0.5.5</url>
   </scm>
 
 <build>
