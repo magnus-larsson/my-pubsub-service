@@ -72,12 +72,7 @@
 		<property name="jdbcUrl" value="${database.url}" />
 		<property name="user" value="${database.user}" />
 		<property name="password" value="${database.password}" />
-        <property name="testConnectionOnCheckin" value="true" />
-        <property name="idleConnectionTestPeriod" value="60" />
-        <property name="maxPoolSize" value="20" />
-        <property name="minPoolSize" value="5" />
-        <property name="acquireRetryAttempts" value="-1" />
-        <property name="acquireRetryDelay" value="20000" />
-        <property name="breakAfterAcquireFailure" value="false" />
+		<property name="testConnectionOnCheckin" value="true" />
+		<property name="idleConnectionTestPeriod" value="60" />
 	</bean>
 </beans>
