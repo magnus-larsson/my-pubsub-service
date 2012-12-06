@@ -42,29 +42,30 @@ import se.vgregion.pubsub.repository.TopicRepository;
 public class DefaultPubSubEngine implements PubSubEngine {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultPubSubEngine.class);
-	
+
     private TopicRepository topicRepository;
     private SubscriberTimeoutNotifier subscriberTimeoutNotifier = new DefaultSubscriberTimeoutNotifier();
     private PublicationRetryer publicationRetryer;
 
     private Map<URI, DefaultTopic> topics = new ConcurrentHashMap<URI, DefaultTopic>();
-    
+
     private List<PubSubEventListener> eventListeners = new ArrayList<PubSubEventListener>();
     private List<SubscriberManager> subscriberManagers = new ArrayList<SubscriberManager>();
-    
+
     public DefaultPubSubEngine(TopicRepository topicRepository, PublicationRetryer publicationRetryer) {
         this.topicRepository = topicRepository;
         this.publicationRetryer = publicationRetryer;
-        
+
         Collection<Topic> storedTopics = topicRepository.findAll();
-        
-        for(Topic storedTopic : storedTopics) {
+
+        for (Topic storedTopic : storedTopics) {
             DefaultTopic defaultTopic = (DefaultTopic) storedTopic;
-            
+
             topics.put(defaultTopic.getUrl(), defaultTopic);
         }
     }
 
+    @Override
     @Transactional
     public DefaultTopic getTopic(URI url) {
         return topics.get(url);
@@ -73,19 +74,22 @@ public class DefaultPubSubEngine implements PubSubEngine {
     @Override
     @Transactional
     public synchronized DefaultTopic createTopic(URI url) {
-    	DefaultTopic topic = new DefaultTopic(url, publicationRetryer);
+        DefaultTopic topic = new DefaultTopic(url, publicationRetryer);
         topics.put(url, topic);
-        
         topicRepository.persist(topic);
+        topicRepository.flush();
         return topic;
     }
 
     @Override
     @Transactional
     public DefaultTopic getOrCreateTopic(URI url) {
-    	DefaultTopic topic = getTopic(url);
-        if(topic == null) {
-            topic = createTopic(url);
+        DefaultTopic topic = getTopic(url);
+        if (topic == null) {
+            topic = (DefaultTopic) topicRepository.find(url);
+            if (topic == null) {
+                topic = createTopic(url);
+            }
         }
         return topic;
     }
@@ -94,32 +98,32 @@ public class DefaultPubSubEngine implements PubSubEngine {
     @Transactional
     public void publish(URI url, Feed feed) {
         Topic topic = getOrCreateTopic(url);
-        
+
         LOG.debug("Publishing directly on topic");
         topic.publish(feed);
         LOG.debug("Done publishing directly on topic");
-        
+
         // now, also notify all SubscriberManagers
-        if(!subscriberManagers.isEmpty()) {
-        	LOG.debug("Publishing to subscriber managers");
-	        for(SubscriberManager subscriberManager : subscriberManagers) {
-	        	subscriberManager.publishToSubscribers(topic, feed);
-	        }
-	        LOG.debug("Done publishing to subscriber managers");
+        if (!subscriberManagers.isEmpty()) {
+            LOG.debug("Publishing to subscriber managers");
+            for (SubscriberManager subscriberManager : subscriberManagers) {
+                subscriberManager.publishToSubscribers(topic, feed);
+            }
+            LOG.debug("Done publishing to subscriber managers");
         } else {
-        	LOG.debug("No subscriber managers registered for publication");
+            LOG.debug("No subscriber managers registered for publication");
         }
     }
 
     @Override
     @Transactional
     public void subscribe(Subscriber subscriber) {
-    	DefaultTopic topic = getOrCreateTopic(subscriber.getTopic());
+        DefaultTopic topic = getOrCreateTopic(subscriber.getTopic());
         topic.addSubscriber(subscriber);
-        
+
         subscriberTimeoutNotifier.addSubscriber(subscriber);
-        
-        for(PubSubEventListener listener : eventListeners) {
+
+        for (PubSubEventListener listener : eventListeners) {
             listener.onSubscribe(subscriber);
         }
     }
@@ -127,30 +131,28 @@ public class DefaultPubSubEngine implements PubSubEngine {
     @Override
     @Transactional
     public void subscribe(SubscriberManager subscriberManager) {
-    	subscriberManagers.add(subscriberManager);
+        subscriberManagers.add(subscriberManager);
     }
 
-
-    
     @Override
     @Transactional
     public void unsubscribe(Subscriber subscriber) {
-    	DefaultTopic topic = getTopic(subscriber.getTopic());
-        
-        if(topic != null) {
+        DefaultTopic topic = getTopic(subscriber.getTopic());
+
+        if (topic != null) {
             topic.removeSubscriber(subscriber);
         }
-        
+
         subscriberTimeoutNotifier.removeSubscriber(subscriber);
 
-        for(PubSubEventListener listener : eventListeners) {
+        for (PubSubEventListener listener : eventListeners) {
             listener.onUnsubscribe(subscriber);
         }
     }
 
     @Override
     public void addPubSubEventListener(PubSubEventListener eventListener) {
-        eventListeners.add(eventListener);        
+        eventListeners.add(eventListener);
     }
 
     @Override
