@@ -30,13 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import se.vgregion.pubsub.Feed;
-import se.vgregion.pubsub.PubSubEngine;
-import se.vgregion.pubsub.PubSubEventListener;
-import se.vgregion.pubsub.Subscriber;
-import se.vgregion.pubsub.SubscriberManager;
-import se.vgregion.pubsub.SubscriberTimeoutNotifier;
-import se.vgregion.pubsub.Topic;
+import se.vgregion.pubsub.*;
 import se.vgregion.pubsub.repository.TopicRepository;
 
 public class DefaultPubSubEngine implements PubSubEngine {
@@ -46,6 +40,8 @@ public class DefaultPubSubEngine implements PubSubEngine {
     private TopicRepository topicRepository;
     private SubscriberTimeoutNotifier subscriberTimeoutNotifier = new DefaultSubscriberTimeoutNotifier();
     private PublicationRetryer publicationRetryer;
+
+    private PushJms pushJms;
 
     private Map<URI, DefaultTopic> topics = new ConcurrentHashMap<URI, DefaultTopic>();
 
@@ -100,9 +96,8 @@ public class DefaultPubSubEngine implements PubSubEngine {
         Topic topic = getOrCreateTopic(url);
 
         LOG.debug("Publishing directly on topic");
-        topic.publish(feed);
+        topic.publish(feed, pushJms);
         LOG.debug("Done publishing directly on topic");
-
         // now, also notify all SubscriberManagers
         if (!subscriberManagers.isEmpty()) {
             LOG.debug("Publishing to subscriber managers");
@@ -158,5 +153,13 @@ public class DefaultPubSubEngine implements PubSubEngine {
     @Override
     public void removePubSubEventListener(PubSubEventListener eventListener) {
         eventListeners.remove(eventListener);
+    }
+
+    public PushJms getPushJms() {
+        return pushJms;
+    }
+
+    public void setPushJms(PushJms pushJms) {
+        this.pushJms = pushJms;
     }
 }

@@ -13,7 +13,14 @@
 	<name>${project.artifactId}</name>
 
 	<dependencies>
-		<dependency>
+
+        <dependency>
+            <groupId>se.vgregion.icc.sd.docpublishing</groupId>
+            <artifactId>docpublishing-schemas</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+
+        <dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>pubsubhubbub-hub-composite-pubsub</artifactId>
 		</dependency>

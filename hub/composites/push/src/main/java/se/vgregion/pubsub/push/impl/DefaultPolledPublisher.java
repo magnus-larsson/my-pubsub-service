@@ -113,11 +113,12 @@ public class DefaultPolledPublisher extends AbstractEntity<UUID> implements Poll
 				Feed feed = AbstractParser.create(contentType).parse(feedXml, contentType);
 				
 				LOG.debug("Publishing feed polled from {}", url);
+
 				pubSubEngine.publish(getUrl(), feed);
 			}
 			
 		} catch (Exception e) {
-			LOG.warn("Error polling \"" + url + "\"", e);
+			LOG.error("Error polling \"" + url + "\"", e);
 		} finally {
 			HttpUtil.closeQuitely(response);
 		}

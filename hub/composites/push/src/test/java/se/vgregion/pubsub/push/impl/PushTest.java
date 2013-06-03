@@ -32,10 +32,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
 
-import se.vgregion.pubsub.Feed;
-import se.vgregion.pubsub.PubSubEngine;
-import se.vgregion.pubsub.PublicationFailedException;
-import se.vgregion.pubsub.Subscriber;
+import se.vgregion.pubsub.*;
 
 @ContextConfiguration({"classpath:spring/pubsub-common.xml", "classpath:spring/pubsub-jpa.xml", "classpath:spring/pubsub-push.xml", "classpath:spring/pubsub-push-jpa.xml", "classpath:spring/test-jpa.xml"})
 public class PushTest extends AbstractTransactionalJUnit4SpringContextTests {
@@ -63,7 +60,7 @@ public class PushTest extends AbstractTransactionalJUnit4SpringContextTests {
             }
             
             @Override
-            public void publish(Feed feed) throws PublicationFailedException {
+            public void publish(Feed feed, PushJms pushJms) throws PublicationFailedException {
                 publishedFeeds.add(feed);
             }
             

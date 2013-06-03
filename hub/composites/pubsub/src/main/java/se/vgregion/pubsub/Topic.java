@@ -39,6 +39,6 @@ public interface Topic extends Entity<URI> {
      * Publish a {@link Feed} to all subscribed subscribers
      * @param feed
      */
-    void publish(Feed feed);
+    void publish(Feed feed, PushJms pushJms);
     
 }
