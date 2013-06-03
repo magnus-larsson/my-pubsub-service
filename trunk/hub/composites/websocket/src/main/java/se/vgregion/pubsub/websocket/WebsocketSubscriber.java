@@ -31,12 +31,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.eclipse.jetty.websocket.WebSocket;
 import org.joda.time.DateTime;
 
-import se.vgregion.pubsub.Entry;
-import se.vgregion.pubsub.Feed;
-import se.vgregion.pubsub.Field;
-import se.vgregion.pubsub.PubSubEngine;
-import se.vgregion.pubsub.PublicationFailedException;
-import se.vgregion.pubsub.Subscriber;
+import se.vgregion.docpublishing.v1.DocumentStatusType;
+import se.vgregion.pubsub.*;
 
 public class WebsocketSubscriber implements Subscriber, WebSocket  {
 
@@ -69,7 +65,7 @@ public class WebsocketSubscriber implements Subscriber, WebSocket  {
     private ObjectMapper mapper = new ObjectMapper();
     
     @Override
-    public void publish(Feed feed) throws PublicationFailedException {
+    public void publish(Feed feed, PushJms pushJms) throws PublicationFailedException {
         if(outbound != null) {
             try {
                 StringWriter writer = new StringWriter();
@@ -92,6 +88,9 @@ public class WebsocketSubscriber implements Subscriber, WebSocket  {
                 mapper.writeValue(writer, map);
 
                 outbound.sendMessage(writer.toString());
+                if (pushJms != null) {
+                    pushJms.send(feed, WebsocketSubscriber.class.getName(), DocumentStatusType.OK);
+                }
                 lastUpdate = new DateTime();
             } catch (IOException e) {
                 // ignore

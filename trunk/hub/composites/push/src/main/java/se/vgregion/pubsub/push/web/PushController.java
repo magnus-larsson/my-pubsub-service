@@ -65,7 +65,6 @@ public class PushController {
     @RequestMapping(value="/", method=RequestMethod.POST)
     public void post(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String mode = request.getParameter("hub.mode");
-        
         if("publish".equals(mode)) {
             publish(request, response);
         } else if("subscribe".equals(mode)) {

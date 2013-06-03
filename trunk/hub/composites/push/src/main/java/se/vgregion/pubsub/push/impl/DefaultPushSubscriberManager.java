@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PubSubEngine;
+import se.vgregion.pubsub.PushJms;
 import se.vgregion.pubsub.Topic;
 import se.vgregion.pubsub.impl.PublicationRetryer;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
@@ -49,6 +50,8 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
     private PushSubscriberRepository subscriptionRepository;
     private BlockingQueue<URI> retrieverQueue = new LinkedBlockingQueue<URI>();
     private PublicationRetryer publicationRetryer;
+
+    private PushJms pushJms;
     
     public DefaultPushSubscriberManager(PubSubEngine pubSubEngine, PushSubscriberRepository subscriptionRepository, PublicationRetryer publicationRetryer) {
         this.pubSubEngine = pubSubEngine;
@@ -133,7 +136,7 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
             for(PushSubscriber subscriber : subscribers) {
                 try {
                 	
-                    subscriber.publish(feed);
+                    subscriber.publish(feed, pushJms);
                 } catch (Exception e) {
                     LOG.warn("Subscriber failed: {}", e.getMessage());
                     
@@ -150,4 +153,12 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
             LOG.info("No PuSH subscribers for topic {}, publication dropped", topic);
         }
 	}
+
+    public PushJms getPushJms() {
+        return pushJms;
+    }
+
+    public void setPushJms(PushJms pushJms) {
+        this.pushJms = pushJms;
+    }
 }

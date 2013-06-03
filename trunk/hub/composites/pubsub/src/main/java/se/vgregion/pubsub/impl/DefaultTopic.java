@@ -37,10 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
-import se.vgregion.pubsub.Feed;
-import se.vgregion.pubsub.PublicationFailedException;
-import se.vgregion.pubsub.Subscriber;
-import se.vgregion.pubsub.Topic;
+import se.vgregion.pubsub.*;
 
 @Entity
 @Table(name="TOPICS")
@@ -88,7 +85,7 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
     }
 
     @Override
-    public synchronized void publish(Feed feed) {
+    public synchronized void publish(Feed feed, PushJms pushJms) {
         LOG.info("Publishing on topic {}", url);
 
         if(!subscribers.isEmpty()) {
@@ -97,7 +94,7 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
             for(Subscriber subscriber : subscribers) {
                 try {
                 	
-                    publish(subscriber, feed);
+                    publish(subscriber, feed, pushJms);
                 } catch (Exception e) {
                     LOG.warn("Subscriber failed: {}", e.getMessage());
                     
@@ -113,9 +110,9 @@ public class DefaultTopic extends AbstractEntity<URI> implements Topic {
         // TODO purge old entries based on lastUpdatedSubscriber
     }
     
-    protected synchronized void publish(Subscriber subscriber, Feed feed) throws PublicationFailedException {
+    protected synchronized void publish(Subscriber subscriber, Feed feed, PushJms pushJms) throws PublicationFailedException {
         LOG.info("Publishing to {}", subscriber);
-        subscriber.publish(feed);
+        subscriber.publish(feed, pushJms);
     }
 
     /**

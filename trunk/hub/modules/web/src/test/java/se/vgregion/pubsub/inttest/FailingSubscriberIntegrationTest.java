@@ -30,10 +30,10 @@ import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.impl.DefaultEntry.EntryBuilder;
 import se.vgregion.pubsub.impl.DefaultFeed.FeedBuilder;
 
+@Ignore
 public class FailingSubscriberIntegrationTest extends IntegrationTestTemplate {
 
     @Test
-    @Ignore
     public void failedFirstPublication() throws Exception {
         Feed feed = new FeedBuilder(ContentType.ATOM).id("f1").updated(
                 UnitTestConstants.UPDATED1).entry(

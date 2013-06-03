@@ -92,7 +92,7 @@ public class DefaultPushSubscriberPublishTest {
                 .entry(new EntryBuilder().id("f2").updated(UnitTestConstants.UPDATED1.minusHours(1)).build())
                 .build();
 
-        subscriber.publish(feed);
+        subscriber.publish(feed, null);
 
         // subscriber should be updated
         Assert.assertEquals(new DateTime(), subscriber.getLastUpdated());

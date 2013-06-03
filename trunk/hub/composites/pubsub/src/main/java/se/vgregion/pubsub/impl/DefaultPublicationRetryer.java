@@ -28,16 +28,14 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import se.vgregion.pubsub.Feed;
-import se.vgregion.pubsub.PublicationFailedException;
-import se.vgregion.pubsub.Subscriber;
-import se.vgregion.pubsub.Topic;
+import se.vgregion.pubsub.*;
 
 public class DefaultPublicationRetryer implements PublicationRetryer {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultPublicationRetryer.class);
     private final static int DELAY = 60 * 1000;
 
+    private static PushJms pushJms;
     
     private Timer timer = new Timer("publication-retries");
     private TransactionTemplate transactionTemplate;
@@ -50,7 +48,15 @@ public class DefaultPublicationRetryer implements PublicationRetryer {
         LOG.info("Registring publication retry on {} to {}", topic.getUrl(), subscriber);
         timer.schedule(new PublicationRetryTask(transactionTemplate, (DefaultTopic) topic, subscriber, feed), DELAY, DELAY);
     }
-    
+
+    public PushJms getPushJms() {
+        return pushJms;
+    }
+
+    public void setPushJms(PushJms pushJms) {
+        this.pushJms = pushJms;
+    }
+
     public static class PublicationRetryTask extends TimerTask {
         private TransactionTemplate transactionTemplate;
         private DefaultTopic topic;
@@ -73,7 +79,7 @@ public class DefaultPublicationRetryer implements PublicationRetryer {
                 protected void doInTransactionWithoutResult(TransactionStatus status) {
                     try {
                         LOG.info("Attempt " + attempts + " at retrying publication on {} to {}", topic.getUrl(), subscriber);
-                        subscriber.publish(feed);
+                        subscriber.publish(feed, pushJms);
                         
                         // success! don't attempt retrying again
                         cancel();

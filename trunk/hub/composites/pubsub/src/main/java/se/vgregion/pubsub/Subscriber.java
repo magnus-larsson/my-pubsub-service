@@ -53,7 +53,7 @@ public interface Subscriber {
      * @param feed
      * @throws PublicationFailedException
      */
-    void publish(Feed feed) throws PublicationFailedException;
+    void publish(Feed feed, PushJms pushJms) throws PublicationFailedException;
 
     /**
      * Called when a subcriber gets timed out

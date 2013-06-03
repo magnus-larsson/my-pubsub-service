@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PublicationFailedException;
+import se.vgregion.pubsub.PushJms;
 import se.vgregion.pubsub.Subscriber;
 
 public class DefaultSubscriberTimeoutNotifierTest {
@@ -47,7 +48,7 @@ public class DefaultSubscriberTimeoutNotifierTest {
             }
             
             @Override
-            public void publish(Feed feed) throws PublicationFailedException {}
+            public void publish(Feed feed, PushJms pushJms) throws PublicationFailedException {}
             
             @Override
             public URI getTopic() {

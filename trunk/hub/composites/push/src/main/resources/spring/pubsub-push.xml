@@ -31,6 +31,7 @@
 		<constructor-arg ref="pubSubEngine" />
 		<constructor-arg ref="pushSubscriberRepository" />
 		<constructor-arg ref="publicationRetryer" />
+        <property name="pushJms" ref="pushJms" />
 	</bean>
 
 	<bean id="feedRetriver" class="se.vgregion.pubsub.push.impl.DefaultFeedRetriever"

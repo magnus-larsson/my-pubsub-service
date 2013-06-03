@@ -42,13 +42,24 @@
 				<property name="transactionManager" ref="transactionManager" />
 			</bean>
 		</constructor-arg>
+        <property name="pushJms" ref="pushJms" />
 	</bean>
 
 
  	<bean id="pubSubEngine" class="se.vgregion.pubsub.impl.DefaultPubSubEngine" >
 		<constructor-arg ref="topicRepository"></constructor-arg>
 		<constructor-arg ref="publicationRetryer"></constructor-arg>
+        <property name="pushJms" ref="pushJms" />
 	</bean>
+
+    <bean id="pushJms" class="se.vgregion.pubsub.impl.PushJmsImpl">
+        <property name="vgrHdrMessageTypeVersion" value="${vgrHdrMessageTypeVersion}"/>
+        <property name="vgrHdrReceiverId" value="${vgrHdrReceiverId}"/>
+        <property name="queueName" value="${queueName}"/>
+        <property name="producerLocalUrl" value="${producerLocalUrl}"/>
+        <property name="consumerRemoteUrl" value="${consumerRemoteUrl}"/>
+        <property name="vgrHdrSenderId" value="${vgrHdrSenderId}"/>
+    </bean>
 
 
 </beans>

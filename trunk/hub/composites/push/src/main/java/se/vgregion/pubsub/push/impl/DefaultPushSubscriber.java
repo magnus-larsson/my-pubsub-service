@@ -48,8 +48,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import se.vgregion.dao.domain.patterns.entity.AbstractEntity;
+import se.vgregion.docpublishing.v1.DocumentStatusType;
+import se.vgregion.pubsub.ContentType;
 import se.vgregion.pubsub.Feed;
 import se.vgregion.pubsub.PublicationFailedException;
+import se.vgregion.pubsub.PushJms;
+import se.vgregion.pubsub.content.AbstractParser;
 import se.vgregion.pubsub.content.AbstractSerializer;
 import se.vgregion.pubsub.push.FailedSubscriberVerificationException;
 import se.vgregion.pubsub.push.PushSubscriber;
@@ -159,12 +163,13 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
      * {@inheritDoc}
      */
     @Override
-    public synchronized void publish(Feed feed) throws PublicationFailedException {
+    public synchronized void publish(Feed feed, PushJms pushJms) throws PublicationFailedException {
         if(active) {
             LOG.info("Getting subscribed feed for {}", callback);
             LOG.debug("Using PushSubcriber {}", this);
 
             if(feed.hasUpdates(getLastUpdated())) {
+
                 LOG.info("Feed has updates, distributing to {}", callback);
                 HttpPost post = new HttpPost(callback);
 
@@ -195,6 +200,12 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
                     response = httpClient.execute(post);
                     LOG.debug("XML has been pushed to subscriber");
 
+                    Feed newFeed = AbstractParser.create(ContentType.ATOM).parse(xml, ContentType.ATOM);
+
+                    if (pushJms != null) {
+                        pushJms.send(newFeed, "event-text", DocumentStatusType.OK);
+                    }
+
                     if(HttpUtil.successStatus(response)) {
                         LOG.info("Succeeded distributing to subscriber {}", callback);
 
@@ -208,12 +219,16 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
                         LOG.warn(msg);
                         throw new PublicationFailedException(msg);
                     }
-                } catch(IOException e) {
+                } catch(Exception e) {
                     // TODO revisit
                     //subscription.markForVerification();
 
                     String msg = "Failed distributing to subscriber \"" + callback + "\" with error: ";
                     LOG.warn(msg);
+                    if (pushJms != null) {
+                        pushJms.send(feed, e.getMessage(), DocumentStatusType.ERROR);
+                    }
+
                     throw new PublicationFailedException(msg, e);
                 } finally {
                     HttpUtil.closeQuitely(response);
