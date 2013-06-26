@@ -91,25 +91,25 @@ public class AdminControllerTest {
     @Test
     public void createPushSubscriber() throws Exception {
         
-        ModelAndView mav = controller.createPushSubscriber(TOPIC, CALLBACK, LEASE, TOKEN, SECRET, true);
+        ModelAndView mav = controller.createPushSubscriber(TOPIC, CALLBACK, null, LEASE, TOKEN, SECRET, true);
 
         Assert.assertEquals("redirect:..", mav.getViewName());
-        Mockito.verify(adminService).createPushSubscriber(TOPIC, CALLBACK, LEASE, TOKEN, SECRET, true);
+        Mockito.verify(adminService).createPushSubscriber(TOPIC, CALLBACK, null, LEASE, TOKEN, SECRET, true);
     }
 
     @Test
     public void updatePushSubscriber() throws Exception {
         
-        ModelAndView mav = controller.updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN, SECRET, true, null);
+        ModelAndView mav = controller.updatePushSubscriber(ID, TOPIC, CALLBACK, null, LEASE, TOKEN, SECRET, true, null);
         
         Assert.assertEquals("redirect:../..", mav.getViewName());
-        Mockito.verify(adminService).updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN, SECRET, true);
+        Mockito.verify(adminService).updatePushSubscriber(ID, TOPIC, CALLBACK, null, LEASE, TOKEN, SECRET, true);
     }
 
     @Test
     public void deletePushSubscriber() throws Exception {
         
-        ModelAndView mav = controller.updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN, SECRET, true, "some value");
+        ModelAndView mav = controller.updatePushSubscriber(ID, TOPIC, CALLBACK, null, LEASE, TOKEN, SECRET, true, "some value");
         
         Assert.assertEquals("redirect:../..", mav.getViewName());
         Mockito.verify(adminService).removePushSubscriber(ID);

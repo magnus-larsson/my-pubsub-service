@@ -71,7 +71,7 @@ public class PushControllerTest {
     	controller.post(request, response);
     	
     	verify(response).setStatus(204);
-    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, PushSubscriber.DEFAULT_LEASE_SECONDS, null, null, true, true);
+    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, null, PushSubscriber.DEFAULT_LEASE_SECONDS, null, null, true, true);
     	Mockito.verifyNoMoreInteractions(response);
     }
 
@@ -86,7 +86,7 @@ public class PushControllerTest {
     	controller.post(request, response);
     	
     	verify(response).setStatus(204);
-    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, 123, null, null, true, true);
+    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, null, 123, null, null, true, true);
     	Mockito.verifyNoMoreInteractions(response);
     }
 
@@ -117,7 +117,7 @@ public class PushControllerTest {
     	controller.post(request, response);
     	
     	verify(response).setStatus(204);
-    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, 123, "vt", null, true, true);
+    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, null, 123, "vt", null, true, true);
     	Mockito.verifyNoMoreInteractions(response);
     }
     
@@ -133,7 +133,7 @@ public class PushControllerTest {
     	controller.post(request, response);
     	
     	verify(response).setStatus(204);
-    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, 123, null, SECRET, true, true);
+    	verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, null, 123, null, SECRET, true, true);
     	Mockito.verifyNoMoreInteractions(response);
     }
     

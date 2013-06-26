@@ -20,6 +20,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.TreeMap;
 
+import static se.vgregion.pubsub.impl.DefaultEntry.getValueFromEntry;
+
 /**
  * Created with IntelliJ IDEA.
  * User: portaldev
@@ -98,20 +100,7 @@ public class PushJmsImpl implements PushJms {
         return os.toString();
     }
 
-    private Field getFieldFromEntry(Entry entries, String key) {
-        for (Field field : entries.getFields()) {
-            if (key.equals(field.getName())) {
-                return field;
-            }
-        }
-        return null;
-    }
 
-    private String getValueFromEntry(Entry entry, String key) {
-        Field field = getFieldFromEntry(entry, key);
-        if (field != null) return field.getContent();
-        return null;
-    }
 
 
     ConnectionFactory connectionFactory;
@@ -191,6 +180,15 @@ public class PushJmsImpl implements PushJms {
         }
     }
 
+    @Override
+    public PushJms copy(String newConsumerLocation) {
+        BeanMap bm = new BeanMap(this);
+        PushJmsImpl newInstance = new PushJmsImpl();
+        BeanMap newInstanceMap = new BeanMap(newInstance);
+        newInstanceMap.putAllWriteable(bm);
+        newInstance.setConsumerRemoteUrl(newConsumerLocation);
+        return newInstance;
+    }
 
 
     public String getQueueName() {

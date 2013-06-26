@@ -19,13 +19,22 @@
 
 package se.vgregion.pubsub.push.impl;
 
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URI;
+import java.net.URL;
 import java.net.URLEncoder;
 
+import nu.xom.ParsingException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import se.vgregion.docpublishing.v1.DocumentStatusType;
+import se.vgregion.pubsub.ContentType;
+import se.vgregion.pubsub.Feed;
+import se.vgregion.pubsub.PublicationFailedException;
+import se.vgregion.pubsub.PushJms;
+import se.vgregion.pubsub.content.AbstractParser;
+import se.vgregion.pubsub.impl.DefaultFeed;
 import se.vgregion.pubsub.push.SubscriptionMode;
 import se.vgregion.pubsub.push.UnitTestConstants;
 
@@ -86,4 +95,35 @@ public class DefaultPushSubscriberTest {
                 URI.create(UnitTestConstants.CALLBACK + "?abc=def&hub.mode=subscribe&hub.topic=" + URLEncoder.encode(UnitTestConstants.TOPIC.toString(), "UTF-8") + "&hub.challenge=ch"), 
                 subscriber.getVerificationUrl(SubscriptionMode.SUBSCRIBE, "ch"));
     }
+
+    @Test
+    public void publish() throws PublicationFailedException, IOException, ParsingException {
+        DefaultPushSubscriber subscriber = new DefaultPushSubscriber(UnitTestConstants.TOPIC, URI.create(UnitTestConstants.CALLBACK.toString() + "?abc=def"), 0, null, UnitTestConstants.SECRET, true);
+
+        PushJms pushJms = new PushJms() {
+            @Override
+            public boolean send(Feed feed, String systemMessage, DocumentStatusType type) {
+                return true;  //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public PushJms copy(String newConsumerLocation) {
+                return this;
+            }
+        };
+
+
+
+        //File file =  new File("../../../../../src/test/resources/atom3.xml");
+        URL url = getClass().getResource("../../../../../");
+        String path = url.getFile();
+        File file =  new File(path + File.separator + "atom3.xml");
+
+        FileInputStream xml = new FileInputStream(file);
+
+        Feed feed = AbstractParser.create(ContentType.ATOM).parse(xml, ContentType.ATOM);
+
+        subscriber.publish(feed, pushJms);
+    }
+
 }

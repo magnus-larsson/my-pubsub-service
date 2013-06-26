@@ -80,8 +80,9 @@ public class AdminController {
     
     @RequestMapping(value="/admin/push/new", method=RequestMethod.POST)
     public ModelAndView createPushSubscriber(
-        @RequestParam("topic") URI topic,    
-        @RequestParam("callback") URI callback,    
+        @RequestParam("topic") URI topic,
+        @RequestParam("callback") URI callback,
+        @RequestParam("jmsLoggAddress") String jmsLoggAddress,
         @RequestParam(value="leaseSeconds", required=false) Integer leaseSeconds,    
         @RequestParam(value="verifyToken", required=false) String verifyToken,
         @RequestParam(value="secret", required=false) String secret,
@@ -92,7 +93,7 @@ public class AdminController {
             leaseSeconds = 0;
         }
         
-        adminService.createPushSubscriber(topic, callback, leaseSeconds, verifyToken, secret, active);
+        adminService.createPushSubscriber(topic, callback, jmsLoggAddress, leaseSeconds, verifyToken, secret, active);
         
         return new ModelAndView("redirect:..");
     }
@@ -101,7 +102,8 @@ public class AdminController {
     public ModelAndView updatePushSubscriber(
         @RequestParam("id") UUID id,    
         @RequestParam("topic") URI topic,    
-        @RequestParam("callback") URI callback,    
+        @RequestParam("callback") URI callback,
+        @RequestParam("jmsLoggAddress") String jmsLoggAddress,
         @RequestParam(value="leaseSeconds", required=false) Integer leaseSeconds,    
         @RequestParam(value="verifyToken", required=false) String verifyToken,
         @RequestParam(value="secret", required=false) String secret,
@@ -117,7 +119,7 @@ public class AdminController {
             adminService.removePushSubscriber(id);
         } else {
             // update
-            adminService.updatePushSubscriber(id, topic, callback, leaseSeconds, verifyToken, secret, active);
+            adminService.updatePushSubscriber(id, topic, callback, jmsLoggAddress, leaseSeconds, verifyToken, secret, active);
         }
         
         return new ModelAndView("redirect:../..");

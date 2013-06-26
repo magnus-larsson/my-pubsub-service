@@ -54,4 +54,18 @@ public class DateTimeUtilsTest {
         Assert.assertEquals(14, time.getSecondOfMinute());
     }
 
+
+    @Test
+    public void parseUtcDate() {
+        String value = "2013-06-26T09:13:00Z";
+
+        DateTime time = DateTimeUtils.parseDateTime(value);
+        Assert.assertEquals(2013, time.getYear());
+        Assert.assertEquals(6, time.getMonthOfYear());
+        Assert.assertEquals(26, time.getDayOfMonth());
+        Assert.assertEquals(9, time.getHourOfDay());
+        Assert.assertEquals(13, time.getMinuteOfHour());
+        Assert.assertEquals(0, time.getSecondOfMinute());
+    }
+
 }

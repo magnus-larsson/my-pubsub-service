@@ -57,15 +57,15 @@ public class DefaultAdminService implements AdminService {
     
     @Override
     @Transactional
-    public void createPushSubscriber(URI topic, URI callback, int leaseSeconds, String verifyToken, String secret, boolean active) throws IOException, FailedSubscriberVerificationException {
-        pushSubscriberManager.subscribe(topic, callback, leaseSeconds, verifyToken, secret, active, false);
+    public void createPushSubscriber(URI topic, URI callback, String jmsLoggAddress, int leaseSeconds, String verifyToken, String secret, boolean active) throws IOException, FailedSubscriberVerificationException {
+        pushSubscriberManager.subscribe(topic, callback, jmsLoggAddress, leaseSeconds, verifyToken, secret, active, false);
     }
 
     @Override
     @Transactional
-    public void updatePushSubscriber(UUID id, URI topic, URI callback, int leaseSeconds, String verifyToken, String secret, boolean active) throws IOException, FailedSubscriberVerificationException {
+    public void updatePushSubscriber(UUID id, URI topic, URI callback, String jmsLoggAddress, int leaseSeconds, String verifyToken, String secret, boolean active) throws IOException, FailedSubscriberVerificationException {
         removePushSubscriber(id);
-        createPushSubscriber(topic, callback, leaseSeconds, verifyToken, secret, active);
+        createPushSubscriber(topic, callback, jmsLoggAddress, leaseSeconds, verifyToken, secret, active);
     }
     
     @Override
