@@ -84,16 +84,17 @@ public class DefaultPublicationRetryer implements PublicationRetryer {
                         // success! don't attempt retrying again
                         cancel();
                     } catch (PublicationFailedException e) {
-                        attempts++;
-                        
-                        if(attempts > 10) {
+                         attempts++;
+                        cancel();
+                        LOG.warn("Giving up on retrying publishing to {}", subscriber);
+                        /*if(attempts > 3) {
                             // give up
                             LOG.warn("Giving up on retrying publishing to {}", subscriber);
                             cancel();
                         } else {
                             // ignore, this task will run again later
                             LOG.info("Failed publishing to {}, will retry later", subscriber);
-                        }
+                        } */
                     }
                 }
             });

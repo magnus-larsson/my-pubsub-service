@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -61,17 +63,27 @@ import se.vgregion.pubsub.push.SubscriptionMode;
 
 /**
  * Implementation of {@link PushSubscriber} with support for JPA
- *
  */
 @Entity
-@Table(name="PUSH_SUBSCRIBERS",
-uniqueConstraints={
-        @UniqueConstraint(columnNames={"topic", "callback"})
-}
-        )
+@Table(name = "PUSH_SUBSCRIBERS",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"topic", "callback"})
+        }
+)
 public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushSubscriber {
 
     private final static Logger LOG = LoggerFactory.getLogger(DefaultPushSubscriber.class);
+
+    private final static Map<UUID, Boolean> loggedErrorOnLastPush = new HashMap<UUID, Boolean>() {
+        @Override
+        public Boolean get(Object key) {
+            Boolean result = super.get(key);
+            if (result == null) {
+                put((UUID) key, result = false);
+            }
+            return result;
+        }
+    };
 
     @Id
     private UUID id;
@@ -82,14 +94,17 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     @Column
     private Long lastUpdated;
 
-    @Column(nullable=false)
-    @Index(name="push_subscriber_topic")
+    @Column(nullable = false)
+    @Index(name = "push_subscriber_topic")
     private String topic;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String callback;
 
-    @Column(nullable=false)
+    @Column(name = "jms_logg_address")
+    private String jmsLoggAddress;
+
+    @Column(nullable = false)
     private int leaseSeconds;
 
     @Column
@@ -98,7 +113,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     @Column
     private String secret;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private boolean active;
 
     @Transient
@@ -110,17 +125,17 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     }
 
     public DefaultPushSubscriber(URI topic, URI callback,
-            DateTime timeout, DateTime lastUpdated,
-            int leaseSeconds, String verifyToken, String secret, boolean active) {
+                                 DateTime timeout, DateTime lastUpdated,
+                                 int leaseSeconds, String verifyToken, String secret, boolean active) {
         id = UUID.randomUUID();
 
         Assert.notNull(topic);
         Assert.notNull(callback);
 
-        if(timeout != null) {
+        if (timeout != null) {
             this.timeout = timeout.getMillis();
         }
-        if(lastUpdated != null) {
+        if (lastUpdated != null) {
             this.lastUpdated = lastUpdated.getMillis();
         }
         this.topic = topic.toString();
@@ -132,10 +147,10 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
     }
 
     public DefaultPushSubscriber(URI topic, URI callback,
-            int leaseSeconds, String verifyToken, String secret, boolean active) {
+                                 int leaseSeconds, String verifyToken, String secret, boolean active) {
         this(topic, callback,
                 (leaseSeconds > 0) ? new DateTime().plusSeconds(leaseSeconds) : null, null,
-                        leaseSeconds, verifyToken, secret, active);
+                leaseSeconds, verifyToken, secret, active);
     }
 
 
@@ -152,7 +167,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
      */
     @Override
     public DateTime getTimeout() {
-        if(timeout != null && timeout > 0) {
+        if (timeout != null && timeout > 0) {
             return new DateTime(timeout, DateTimeZone.UTC);
         } else {
             return null;
@@ -164,11 +179,11 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
      */
     @Override
     public synchronized void publish(Feed feed, PushJms pushJms) throws PublicationFailedException {
-        if(active) {
+        if (active) {
             LOG.info("Getting subscribed feed for {}", callback);
             LOG.debug("Using PushSubcriber {}", this);
 
-            if(feed.hasUpdates(getLastUpdated())) {
+            if (feed.hasUpdates(getLastUpdated())) {
 
                 LOG.info("Feed has updates, distributing to {}", callback);
                 HttpPost post = new HttpPost(callback);
@@ -176,7 +191,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
                 post.addHeader(new BasicHeader("Content-Type", feed.getContentType().toString()));
 
                 Document doc = AbstractSerializer.create(feed.getContentType()).print(feed,
-                        new UpdatedSinceEntryFilter(getLastUpdated()));
+                        new MustHaveRequestIdFilter(getLastUpdated()));
 
                 String xml = doc.toXML();
 
@@ -185,11 +200,11 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
 
                 post.setEntity(HttpUtil.createEntity(xml));
 
-                if(StringUtils.isNotBlank(secret)) {
+                if (StringUtils.isNotBlank(secret)) {
                     // calculate HMAC header
                     post.addHeader(new BasicHeader("X-Hub-Signature", "sha1=" + CryptoUtil.calculateHmacSha1(secret, xml)));
                 }
-
+                PushJms localJms = pushJms;
                 HttpResponse response = null;
                 try {
                     DefaultHttpClient httpClient = HttpUtil.getClient();
@@ -202,11 +217,14 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
 
                     Feed newFeed = AbstractParser.create(ContentType.ATOM).parse(xml, ContentType.ATOM);
 
-                    if (pushJms != null) {
-                        pushJms.send(newFeed, "event-text", DocumentStatusType.OK);
+                    if (localJms != null) {
+                        if (getJmsLoggAddress() != null && !"".equals(getJmsLoggAddress())) {
+                            localJms = pushJms.copy(getJmsLoggAddress());
+                        }
+                        localJms.send(newFeed, "event-text", DocumentStatusType.OK);
                     }
 
-                    if(HttpUtil.successStatus(response)) {
+                    if (HttpUtil.successStatus(response)) {
                         LOG.info("Succeeded distributing to subscriber {}", callback);
 
                         // update last update
@@ -219,15 +237,22 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
                         LOG.warn(msg);
                         throw new PublicationFailedException(msg);
                     }
-                } catch(Exception e) {
+                    loggedErrorOnLastPush.put(getId(), false);
+                } catch (Exception e) {
                     // TODO revisit
                     //subscription.markForVerification();
 
                     String msg = "Failed distributing to subscriber \"" + callback + "\" with error: ";
-                    LOG.warn(msg);
-                    if (pushJms != null) {
-                        pushJms.send(feed, e.getMessage(), DocumentStatusType.ERROR);
+                    LOG.error(msg);
+                    if (localJms != null && !loggedErrorOnLastPush.get(getId())) {
+                        try {
+                            Feed newFeed = AbstractParser.create(ContentType.ATOM).parse(xml, ContentType.ATOM);
+                            localJms.send(newFeed, e.getMessage(), DocumentStatusType.ERROR);
+                        } catch (Exception e1) {
+                            LOG.error("Failed to log errors to jms", e1);
+                        }
                     }
+                    loggedErrorOnLastPush.put(getId(), true);
 
                     throw new PublicationFailedException(msg, e);
                 } finally {
@@ -268,10 +293,10 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
         HttpResponse response = HttpUtil.getClient().execute(get);
         try {
 
-            if(HttpUtil.successStatus(response)) {
+            if (HttpUtil.successStatus(response)) {
                 String returnedChallenge = HttpUtil.readContent(response.getEntity());
 
-                if(challenge.equals(returnedChallenge)) {
+                if (challenge.equals(returnedChallenge)) {
                     // all okay
                 } else {
                     throw new FailedSubscriberVerificationException("Challenge did not match");
@@ -291,7 +316,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
      */
     @Override
     public DateTime getLastUpdated() {
-        if(lastUpdated == null) {
+        if (lastUpdated == null) {
             return null;
         } else {
             return new DateTime(lastUpdated);
@@ -331,6 +356,7 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
 
     /**
      * Builds the URL used for verifying a subscriber
+     *
      * @param mode
      * @param challenge
      * @return
@@ -340,24 +366,24 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
             StringBuffer url = new StringBuffer();
             url.append(callback);
 
-            if(getCallback().getQuery() != null) {
+            if (getCallback().getQuery() != null) {
                 url.append("&");
             } else {
                 url.append("?");
             }
 
-            if(mode.equals(SubscriptionMode.SUBSCRIBE)) {
+            if (mode.equals(SubscriptionMode.SUBSCRIBE)) {
                 url.append("hub.mode=subscribe");
             } else {
                 url.append("hub.mode=unsubscribe");
             }
             url.append("&hub.topic=").append(URLEncoder.encode(topic.toString(), "UTF-8"))
-            .append("&hub.challenge=").append(URLEncoder.encode(challenge, "UTF-8"));
+                    .append("&hub.challenge=").append(URLEncoder.encode(challenge, "UTF-8"));
 
-            if(leaseSeconds > 0) {
+            if (leaseSeconds > 0) {
                 url.append("&hub.lease_seconds=").append(leaseSeconds);
             }
-            if(verifyToken != null) {
+            if (verifyToken != null) {
                 url.append("&hub.verify_token=").append(URLEncoder.encode(verifyToken, "UTF-8"));
             }
 
@@ -366,5 +392,13 @@ public class DefaultPushSubscriber extends AbstractEntity<UUID> implements PushS
             // should never happen
             throw new RuntimeException(e);
         }
+    }
+
+    public String getJmsLoggAddress() {
+        return jmsLoggAddress;
+    }
+
+    public void setJmsLoggAddress(String jmsLoggAddress) {
+        this.jmsLoggAddress = jmsLoggAddress;
     }
 }

@@ -119,4 +119,21 @@ public class DefaultEntry extends AbstractEntity<String> implements Entry {
             return thisUpdated.isAfter(since);
         }
     }
+
+    public static Field getFieldFromEntry(Entry entries, String key) {
+        for (Field field : entries.getFields()) {
+            if (key.equals(field.getName())) {
+                return field;
+            }
+        }
+        return null;
+    }
+
+    public static String getValueFromEntry(Entry entry, String key) {
+        Field field = getFieldFromEntry(entry, key);
+        if (field != null) return field.getContent();
+        return null;
+    }
+
+
 }

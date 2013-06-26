@@ -93,9 +93,10 @@ public class PushController {
                 			
                 			String secret = request.getParameter("hub.secret");
                 			String verifyToken = request.getParameter("hub.verify_token");
+                            String jmsLoggAddress = request.getParameter("hub.jmsLoggAddress");
                 			
                 			try {
-                				pushSubscriberManager.subscribe(topicUrl, callback, leaseSeconds, verifyToken, secret, true, true);
+                				pushSubscriberManager.subscribe(topicUrl, callback, jmsLoggAddress, leaseSeconds, verifyToken, secret, true, true);
                 			
                 				response.setStatus(204);
                 				LOG.info("Subscription request for topic {} with callback {} successful", topicUrl, callback);

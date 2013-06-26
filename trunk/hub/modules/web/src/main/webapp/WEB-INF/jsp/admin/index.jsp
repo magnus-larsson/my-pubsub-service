@@ -43,12 +43,14 @@
 				<tr>
 					<th>Topic</th>
 					<th>Callback</th>
+					<th>Jms Logg Address</th>
 					<th></th>
 				</tr>
 				<c:forEach var="pushSubscriber" items="${pushSubscribers}">
 					<tr>
 						<td>${pushSubscriber.topic}</td>
 						<td>${pushSubscriber.callback}</td>
+						<td>${pushSubscriber.jmsLoggAddress}</td>
 						<td><a href="${pageContext.request.contextPath}/push/admin/push/${pushSubscriber.id}/edit">Ändra</a></td>
 					</tr>
 				</c:forEach>

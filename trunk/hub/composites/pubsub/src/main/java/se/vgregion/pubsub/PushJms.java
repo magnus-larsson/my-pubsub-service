@@ -23,4 +23,11 @@ public interface PushJms {
      */
     public boolean send(Feed feed, String systemMessage, DocumentStatusType type);
 
+    /**
+     * Create a
+     * @param newConsumerLocation
+     * @return
+     */
+    public PushJms copy(String newConsumerLocation);
+
 }

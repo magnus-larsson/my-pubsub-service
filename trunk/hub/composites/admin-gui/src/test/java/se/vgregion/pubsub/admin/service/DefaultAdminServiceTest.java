@@ -63,16 +63,16 @@ public class DefaultAdminServiceTest {
     
     @Test
     public void createPushSubscriber() throws Exception {
-        adminService.createPushSubscriber(TOPIC, CALLBACK, LEASE, TOKEN, SECRET, true);
+        adminService.createPushSubscriber(TOPIC, CALLBACK, null, LEASE, TOKEN, SECRET, true);
 
-        Mockito.verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, LEASE, TOKEN, SECRET, true, false);
+        Mockito.verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, null, LEASE, TOKEN, SECRET, true, false);
     }
 
     @Test
     public void updatePushSubscriber() throws Exception {
-        adminService.updatePushSubscriber(ID, TOPIC, CALLBACK, LEASE, TOKEN, SECRET, true);
+        adminService.updatePushSubscriber(ID, TOPIC, CALLBACK, null, LEASE, TOKEN, SECRET, true);
         
-        Mockito.verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, LEASE, TOKEN, SECRET, true, false);
+        Mockito.verify(pushSubscriberManager).subscribe(TOPIC, CALLBACK, null, LEASE, TOKEN, SECRET, true, false);
     }
     
     @Test

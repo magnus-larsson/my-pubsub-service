@@ -40,6 +40,7 @@
 		<form action='' method="post">
 			<p><label for="topic">Topic URL</label><input name="topic" value="${subscriber.topic}" /></p>
 			<p><label for="callback">Callback URL</label><input name="callback" value="${subscriber.callback}" /></p>
+			<p><label for="jmsLoggAddress">Jms Logg Address</label><input name="jmsLoggAddress" value="${subscriber.jmsLoggAddress}" /></p>
 			<p><label for="leaseSeconds">Lease seconds</label><input name="leaseSeconds" value="${subscriber.leaseSeconds}" /></p>
 			<p><label for="verifyToken">Verify token</label><input name="verifyToken" value="${subscriber.verifyToken}" /></p>
 			<p><label for="secret">Secret</label><input name="secret" value="${subscriber.secret}" /></p>

@@ -68,10 +68,11 @@ public class DefaultPushSubscriberManager implements PushSubscriberManager {
     
     @Override
     @Transactional
-    public void subscribe(URI topicUrl, URI callback, int leaseSeconds, String verifyToken, String secret, boolean active, boolean verify) throws IOException, FailedSubscriberVerificationException {
+    public void subscribe(URI topicUrl, URI callback, String jmsLoggAddress, int leaseSeconds, String verifyToken, String secret, boolean active, boolean verify) throws IOException, FailedSubscriberVerificationException {
         unsubscribe(topicUrl, callback, verify);
         
         DefaultPushSubscriber subscriber = new DefaultPushSubscriber(topicUrl, callback, leaseSeconds, verifyToken, secret, active);
+        subscriber.setJmsLoggAddress(jmsLoggAddress);
         
         if(verify) {
         	subscriber.verify(SubscriptionMode.SUBSCRIBE);
